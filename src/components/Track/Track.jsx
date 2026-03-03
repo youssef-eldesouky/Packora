@@ -113,7 +113,7 @@ export default function Track() {
             <ShoppingCart size={18} />
             Cart
           </Link>
-          <Link to="#" className="track-nav-item">
+          <Link to="/Support" className="track-nav-item">
             <HelpCircle size={18} />
             Support
           </Link>

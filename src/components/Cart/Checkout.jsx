@@ -52,7 +52,7 @@ export default function Checkout() {
             <Link to="/Cart" className="checkout-nav-item active">
               <ShoppingCart size={18} /> Cart
             </Link>
-            <Link to="#" className="checkout-nav-item">
+            <Link to="/Support" className="checkout-nav-item">
               <HelpCircle size={18} /> Support
             </Link>
             <Link to="#" className="checkout-nav-item">

@@ -55,7 +55,7 @@ export default function Cart() {
               <ShoppingCart size={18} />
               Cart
             </Link>
-            <Link to="#" className="cart-nav-item">
+            <Link to="/Support" className="cart-nav-item">
               <HelpCircle size={18} />
               Support
             </Link>

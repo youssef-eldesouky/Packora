@@ -68,8 +68,8 @@
 
 .cart-badge {
   position: absolute;
-  top: 4px;
-  right: 4px;
+  left: 57px;
+  top: -5px;
   min-width: 18px;
   height: 18px;
   padding: 0 6px;

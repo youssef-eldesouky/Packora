@@ -14,6 +14,7 @@ import Singlecard from './components/Singlecard/Singlecard';
 import Track from './components/Track/Track';
 import Cart from './components/Cart/Cart';
 import Checkout from './components/Cart/Checkout';
+import Support from './components/Support/Support';
 
 let router = createBrowserRouter([
   {
@@ -55,6 +56,10 @@ let router = createBrowserRouter([
   {
     path: "Cart/checkout",
     element: <Checkout />,
+  },
+  {
+    path: "Support",
+    element: <Support />,
   },
 ]);
 

@@ -62,7 +62,7 @@ export default function Catalog() {
             <ShoppingCart size={18} />
             Cart
           </Link>
-          <Link to="#" className="catalog-nav-item">
+          <Link to="/Support" className="catalog-nav-item">
             <HelpCircle size={18} />
             Support
           </Link>

@@ -89,7 +89,7 @@ export default function HomePage() {
               <span className="nav-cart-badge">{cartItems.length}</span>
             )}
           </Link>
-          <Link to="#" className="nav-item">
+          <Link to="/Support" className="nav-item">
             <HelpCircle size={18} />
             Support
           </Link>

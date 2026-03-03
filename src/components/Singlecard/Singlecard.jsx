@@ -82,7 +82,7 @@ export default function Singlecard() {
             <ShoppingCart size={18} />
             Cart
           </Link>
-          <Link to="#" className="singlecard-nav-item">
+          <Link to="/Support" className="singlecard-nav-item">
             <HelpCircle size={18} />
             Support
           </Link>
