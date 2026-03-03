@@ -1,0 +1,98 @@
+[
+    {
+      "id": "1",
+      "name": "John Smith",
+      "businessName": "Acme Corporation",
+      "email": "john@acme.com",
+      "phone": "+1 (555) 123-4567",
+      "address": "123 Business St, New York, NY 10001",
+      "totalOrders": 45,
+      "totalSpent": "$12,450",
+      "memberSince": "Jan 2024",
+      "tier": "Gold"
+    },
+    {
+      "id": "2",
+      "name": "Sarah Johnson",
+      "businessName": "Tech Startup Inc",
+      "email": "sarah@techstartup.com",
+      "phone": "+1 (555) 234-5678",
+      "address": "456 Innovation Ave, San Francisco, CA 94102",
+      "totalOrders": 32,
+      "totalSpent": "$8,920",
+      "memberSince": "Mar 2024",
+      "tier": "Silver"
+    },
+    {
+      "id": "3",
+      "name": "Mike Chen",
+      "businessName": "Retail Solutions LLC",
+      "email": "mike@retailsolutions.com",
+      "phone": "+1 (555) 345-6789",
+      "address": "789 Commerce Blvd, Chicago, IL 60601",
+      "totalOrders": 68,
+      "totalSpent": "$18,750",
+      "memberSince": "Nov 2023",
+      "tier": "Platinum"
+    },
+    {
+      "id": "4",
+      "name": "Emily Davis",
+      "businessName": "Global Shipping Co",
+      "email": "contact@globalshipping.com",
+      "phone": "+1 (555) 456-7890",
+      "address": "321 Logistics Rd, Houston, TX 77001",
+      "totalOrders": 89,
+      "totalSpent": "$25,340",
+      "memberSince": "Aug 2023",
+      "tier": "Platinum"
+    },
+    {
+      "id": "5",
+      "name": "David Wilson",
+      "businessName": "E-commerce Solutions",
+      "email": "orders@ecomsolutions.com",
+      "phone": "+1 (555) 567-8901",
+      "address": "654 Digital Way, Seattle, WA 98101",
+      "totalOrders": 23,
+      "totalSpent": "$6,780",
+      "memberSince": "Jun 2024",
+      "tier": "Silver"
+    },
+    {
+      "id": "6",
+      "name": "Lisa Anderson",
+      "businessName": "Premium Goods Inc",
+      "email": "info@premiumgoods.com",
+      "phone": "+1 (555) 678-9012",
+      "address": "987 Luxury Ave, Los Angeles, CA 90001",
+      "totalOrders": 15,
+      "totalSpent": "$4,200",
+      "memberSince": "Sep 2024",
+      "tier": "Bronze"
+    },
+    {
+      "id": "7",
+      "name": "Robert Taylor",
+      "businessName": "Fast Delivery Co",
+      "email": "admin@fastdelivery.com",
+      "phone": "+1 (555) 789-0123",
+      "address": "147 Speed Ln, Miami, FL 33101",
+      "totalOrders": 56,
+      "totalSpent": "$14,920",
+      "memberSince": "Feb 2024",
+      "tier": "Gold"
+    },
+    {
+      "id": "8",
+      "name": "Maria Garcia",
+      "businessName": "Organic Products Ltd",
+      "email": "contact@organicproducts.com",
+      "phone": "+1 (555) 890-1234",
+      "address": "258 Green St, Portland, OR 97201",
+      "totalOrders": 41,
+      "totalSpent": "$11,650",
+      "memberSince": "Dec 2023",
+      "tier": "Gold"
+    }
+  ]

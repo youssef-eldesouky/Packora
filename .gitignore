@@ -1,0 +1,10 @@
+node_modules
+# Ignore build output
+/build
+
+# Ignore DS_Store (for macOS)
+.DS_Store
+
+# Optional: Ignore environment files
+.env
+.env.local

@@ -1,0 +1,45 @@
+.emailcheck-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--sidebar);
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+.emailcheck-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 400px;
+}
+
+.emailcheck-title {
+  font-size: 24px;
+  font-weight: 600;
+  margin: 0;
+  font-family: inherit;
+}
+
+.emailcheck-subtitle {
+  font-size: 14px;
+  margin: 0;
+  font-family: inherit;
+}
+
+.emailcheck-card-title {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0;
+  font-family: inherit;
+}
+
+.emailcheck-button:hover {
+  filter: brightness(0.92);
+}
+
+.emailcheck-back-link:hover {
+  text-decoration: underline !important;
+}
