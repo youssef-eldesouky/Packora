@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import products from '../../mockdata/product.json';
 import orders from '../../mockdata/Orders.json';
+import { useCart } from '../../context/CartContext';
 import './Homepage.css';
 
 // Group products by category for Browse by Category (use first product per category)
@@ -56,6 +57,7 @@ const metricIcons = [
 ];
 
 export default function HomePage() {
+  const { cartItems } = useCart();
   return (
     <div className="homepage">
       {/* Header */}
@@ -76,13 +78,16 @@ export default function HomePage() {
             <Box size={18} />
             Catalog
           </Link>
-          <Link to="#" className="nav-item">
+          <Link to="/Track" className="nav-item">
             <Truck size={18} />
             Track
           </Link>
-          <Link to="#" className="nav-item">
+          <Link to="/Cart" className={`nav-item ${cartItems.length > 0 ? 'cart-with-badge' : ''}`}>
             <ShoppingCart size={18} />
             Cart
+            {cartItems.length > 0 && (
+              <span className="nav-cart-badge">{cartItems.length}</span>
+            )}
           </Link>
           <Link to="#" className="nav-item">
             <HelpCircle size={18} />
@@ -186,15 +191,15 @@ export default function HomePage() {
           {/* Quick Actions */}
           <section className="quick-actions">
             <h2>Quick Actions</h2>
-            <Link to="#" className="action-btn primary">
+            <Link to="/Catalog" className="action-btn primary">
               <Box size={18} />
               Browse Catalog
             </Link>
-            <Link to="#" className="action-btn">
+            <Link to="/Cart" className="action-btn">
               <ShoppingCart size={18} />
               View Cart
             </Link>
-            <Link to="#" className="action-btn">
+            <Link to="/Track" className="action-btn">
               <Truck size={18} />
               Track Orders
             </Link>
@@ -209,11 +214,11 @@ export default function HomePage() {
         <section className="browse-section">
           <div className="section-header">
             <h2>Browse by Category</h2>
-            <Link to="#" className="view-all">See All →</Link>
+            <Link to="/Catalog" className="view-all">See All →</Link>
           </div>
           <div className="category-grid">
             {categories.map((item) => (
-              <Link key={item.id} to="#" className="category-card">
+              <Link key={item.id} to={`/Catalog/${item.id}`} className="category-card">
                 <div className="category-image-wrap">
                   <img src={item.image} alt={item.category} />
                   <div className="category-icon-overlay">

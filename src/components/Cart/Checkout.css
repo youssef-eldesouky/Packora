@@ -1,0 +1,249 @@
+.checkout-page {
+  min-height: 100vh;
+  background-color: var(--background);
+  color: var(--foreground);
+}
+
+.checkout-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 32px;
+  background-color: var(--card);
+  border-bottom: 1px solid var(--border);
+}
+
+.checkout-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: var(--foreground);
+  font-weight: 600;
+  font-size: 18px;
+}
+
+.checkout-logo-icon {
+  width: 40px;
+  height: 40px;
+  background-color: var(--primary);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.checkout-nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.checkout-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  text-decoration: none;
+  color: var(--muted-foreground);
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.checkout-nav-item:hover {
+  color: var(--foreground);
+  background-color: var(--sidebar);
+}
+
+.checkout-nav-item.active {
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+}
+
+.checkout-nav-badge {
+  position: relative;
+}
+
+.checkout-badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 6px;
+  font-size: 11px;
+  font-weight: 600;
+  background: var(--primary-foreground);
+  color: var(--primary);
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.checkout-share-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--card);
+  color: var(--foreground);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.checkout-share-btn:hover {
+  background: var(--sidebar);
+}
+
+.checkout-main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px;
+}
+
+.checkout-back {
+  display: inline-block;
+  margin-bottom: 16px;
+  font-size: 14px;
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.checkout-back:hover {
+  text-decoration: underline;
+}
+
+.checkout-title {
+  font-size: 28px;
+  font-weight: 600;
+  margin: 0 0 8px;
+}
+
+.checkout-subtitle {
+  font-size: 14px;
+  color: var(--muted-foreground);
+  margin: 0 0 28px;
+}
+
+.checkout-steps {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  margin-bottom: 40px;
+}
+
+.checkout-step-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border: none;
+  background: transparent;
+  color: var(--muted-foreground);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.checkout-step-btn.active {
+  color: var(--primary);
+}
+
+.checkout-step-btn.complete {
+  color: var(--primary);
+}
+
+.checkout-step-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--input-background);
+  border: 2px solid var(--border);
+}
+
+.checkout-step-btn.active .checkout-step-icon {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--primary-foreground);
+}
+
+.checkout-step-btn.complete .checkout-step-icon {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--primary-foreground);
+}
+
+.checkout-step-line {
+  width: 60px;
+  height: 2px;
+  background: var(--border);
+}
+
+.checkout-step-line.complete {
+  background: var(--primary);
+}
+
+.checkout-content {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 32px;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .checkout-content {
+    grid-template-columns: 1fr;
+  }
+}
+
+.checkout-empty {
+  text-align: center;
+  padding: 80px 24px;
+}
+
+.checkout-empty-icon {
+  color: var(--muted-foreground);
+  opacity: 0.4;
+  margin-bottom: 24px;
+}
+
+.checkout-empty h2 {
+  font-size: 24px;
+  font-weight: 600;
+  margin: 0 0 12px;
+}
+
+.checkout-empty p {
+  font-size: 16px;
+  color: var(--muted-foreground);
+  margin: 0 0 24px;
+}
+
+.checkout-browse-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 24px;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  font-size: 16px;
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: 8px;
+}
+
+.checkout-browse-btn:hover {
+  filter: brightness(0.92);
+}
