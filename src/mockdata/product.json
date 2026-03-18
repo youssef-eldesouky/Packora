@@ -1,0 +1,74 @@
+[
+  {
+    "id": "1",
+    "name": "Standard Cardboard Box",
+    "description": "Heavy-duty corrugated cardboard boxes perfect for shipping",
+    "price": 1.25,
+    "image": "https://images.unsplash.com/photo-1762902070741-c837a832ee7b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjYXJkYm9hcmQlMjBib3hlcyUyMHBhY2thZ2luZ3xlbnwxfHx8fDE3NjU2MzI0MTB8MA&ixlib=rb-4.1.0&q=80&w=1080",
+    "category": "Boxes",
+    "sizes": ["Small", "Medium", "Large", "X-Large"],
+    "materials": ["Single Wall", "Double Wall"],
+    "minOrder": 100,
+    "inStock": true
+  },
+  {
+    "id": "2",
+    "name": "Eco-Friendly Mailer",
+    "description": "Sustainable kraft paper mailers with self-seal adhesive",
+    "price": 0.85,
+    "image": "https://images.unsplash.com/photo-1686632800715-b705ba1b0eb6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxlY28lMjBmcmllbmRseSUyMHBhY2thZ2luZ3xlbnwxfHx8fDE3NjU1NzA5MDl8MA&ixlib=rb-4.1.0&q=80&w=1080",
+    "category": "Eco-Friendly",
+    "sizes": ["6x9", "9x12", "12x15", "14x19"],
+    "materials": ["Kraft Paper", "Recycled Paper"],
+    "minOrder": 250,
+    "inStock": true
+  },
+  {
+    "id": "3",
+    "name": "Bubble Wrap Roll",
+    "description": "Premium quality bubble wrap for fragile item protection",
+    "price": 24.99,
+    "image": "https://images.unsplash.com/photo-1624607702617-a65d6c56dd8c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxidWJibGUlMjB3cmFwJTIwcGFja2FnaW5nJTIwbWF0ZXJpYWxzfGVufDF8fHx8MTc2NTYzMjQxMXww&ixlib=rb-4.1.0&q=80&w=1080",
+    "category": "Protective",
+    "sizes": ["12\" x 50ft", "12\" x 100ft", "24\" x 50ft", "24\" x 100ft"],
+    "materials": ["Standard", "Anti-Static"],
+    "minOrder": 10,
+    "inStock": true
+  },
+  {
+    "id": "4",
+    "name": "Heavy-Duty Shipping Box",
+    "description": "Extra-strength double-wall boxes for heavy items",
+    "price": 2.5,
+    "image": "https://images.unsplash.com/photo-1721937127582-ed331de95a04?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzaGlwcGluZyUyMHN1cHBsaWVzJTIwd2FyZWhvdXNlfGVufDF8fHx8MTc2NTYzMjQxMHww&ixlib=rb-4.1.0&q=80&w=1080",
+    "category": "Boxes",
+    "sizes": ["Medium", "Large", "X-Large"],
+    "materials": ["Double Wall", "Triple Wall"],
+    "minOrder": 50,
+    "inStock": true
+  },
+  {
+    "id": "5",
+    "name": "Poly Mailer Bags",
+    "description": "Waterproof polyethylene mailers with strong seal",
+    "price": 0.45,
+    "image": "https://images.unsplash.com/photo-1686632800715-b705ba1b0eb6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxlY28lMjBmcmllbmRseSUyMHBhY2thZ2luZ3xlbnwxfHx8fDE3NjU1NzA5MDl8MA&ixlib=rb-4.1.0&q=80&w=1080",
+    "category": "Mailers",
+    "sizes": ["6x9", "9x12", "10x13", "14x17"],
+    "materials": ["Standard Poly", "Recyclable Poly"],
+    "minOrder": 500,
+    "inStock": true
+  },
+  {
+    "id": "6",
+    "name": "Packing Peanuts",
+    "description": "Biodegradable void fill peanuts for package protection",
+    "price": 18.99,
+    "image": "https://images.unsplash.com/photo-1624607702617-a65d6c56dd8c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxidWJibGUlMjB3cmFwJTIwcGFja2FnaW5nJTIwbWF0ZXJpYWxzfGVufDF8fHx8MTc2NTYzMjQxMXww&ixlib=rb-4.1.0&q=80&w=1080",
+    "category": "Protective",
+    "sizes": ["5 cu ft", "10 cu ft", "15 cu ft"],
+    "materials": ["Biodegradable", "Styrofoam"],
+    "minOrder": 5,
+    "inStock": true
+  }
+]

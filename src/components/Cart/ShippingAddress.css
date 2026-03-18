@@ -1,0 +1,125 @@
+.shipping-panel {
+  padding: 24px 28px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.shipping-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0 0 24px;
+}
+
+.shipping-title svg {
+  color: var(--primary);
+}
+
+.shipping-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.shipping-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.shipping-row.full {
+  grid-column: 1 / -1;
+}
+
+.shipping-row label {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.shipping-row input {
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--input-background);
+  font-size: 14px;
+  color: var(--foreground);
+}
+
+.shipping-row input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.shipping-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.shipping-form .shipping-row.full {
+  grid-column: 1 / -1;
+}
+
+.shipping-submit {
+  grid-column: 1 / -1;
+  padding: 14px 24px;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 8px;
+}
+
+.shipping-submit:hover {
+  filter: brightness(0.92);
+}
+
+.shipping-summary {
+  padding: 24px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  position: sticky;
+  top: 24px;
+}
+
+.shipping-summary-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0 0 20px;
+}
+
+.shipping-summary-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.shipping-summary-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  color: var(--muted-foreground);
+}
+
+.shipping-summary-total {
+  display: flex;
+  justify-content: space-between;
+  font-size: 18px;
+  font-weight: 600;
+  padding-top: 16px;
+  margin-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.shipping-summary-items {
+  font-size: 13px;
+  color: var(--muted-foreground);
+  margin: 16px 0 0;
+}

@@ -1,0 +1,90 @@
+[
+    {
+      "id": "ORD-2450",
+      "customer": "Acme Corporation",
+      "email": "john@acme.com",
+      "product": "Custom Boxes - Premium (500 units)",
+      "quantity": 500,
+      "amount": "$2,450",
+      "status": "processing",
+      "date": "Feb 22, 2026",
+      "address": "123 Business St, New York, NY 10001"
+    },
+    {
+      "id": "ORD-2449",
+      "customer": "Tech Startup Inc",
+      "email": "sarah@techstartup.com",
+      "product": "Eco-Friendly Mailers (1000 units)",
+      "quantity": 1000,
+      "amount": "$1,850",
+      "status": "shipped",
+      "date": "Feb 22, 2026",
+      "address": "456 Innovation Ave, San Francisco, CA 94102"
+    },
+    {
+      "id": "ORD-2448",
+      "customer": "Retail Solutions LLC",
+      "email": "mike@retailsolutions.com",
+      "product": "Bubble Wrap Rolls (50 units)",
+      "quantity": 50,
+      "amount": "$890",
+      "status": "delivered",
+      "date": "Feb 21, 2026",
+      "address": "789 Commerce Blvd, Chicago, IL 60601"
+    },
+    {
+      "id": "ORD-2447",
+      "customer": "Global Shipping Co",
+      "email": "contact@globalshipping.com",
+      "product": "Corrugated Boxes (2000 units)",
+      "quantity": 2000,
+      "amount": "$3,200",
+      "status": "processing",
+      "date": "Feb 21, 2026",
+      "address": "321 Logistics Rd, Houston, TX 77001"
+    },
+    {
+      "id": "ORD-2446",
+      "customer": "E-commerce Solutions",
+      "email": "orders@ecomsolutions.com",
+      "product": "Packing Tape (200 units)",
+      "quantity": 200,
+      "amount": "$450",
+      "status": "shipped",
+      "date": "Feb 20, 2026",
+      "address": "654 Digital Way, Seattle, WA 98101"
+    },
+    {
+      "id": "ORD-2445",
+      "customer": "Premium Goods Inc",
+      "email": "info@premiumgoods.com",
+      "product": "Gift Boxes - Luxury (300 units)",
+      "quantity": 300,
+      "amount": "$1,950",
+      "status": "pending",
+      "date": "Feb 20, 2026",
+      "address": "987 Luxury Ave, Los Angeles, CA 90001"
+    },
+    {
+      "id": "ORD-2444",
+      "customer": "Fast Delivery Co",
+      "email": "admin@fastdelivery.com",
+      "product": "Poly Mailers (1500 units)",
+      "quantity": 1500,
+      "amount": "$980",
+      "status": "delivered",
+      "date": "Feb 19, 2026",
+      "address": "147 Speed Ln, Miami, FL 33101"
+    },
+    {
+      "id": "ORD-2443",
+      "customer": "Organic Products Ltd",
+      "email": "contact@organicproducts.com",
+      "product": "Recycled Boxes (800 units)",
+      "quantity": 800,
+      "amount": "$1,640",
+      "status": "cancelled",
+      "date": "Feb 19, 2026",
+      "address": "258 Green St, Portland, OR 97201"
+    }
+  ]
