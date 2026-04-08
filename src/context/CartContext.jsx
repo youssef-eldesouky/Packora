@@ -14,7 +14,7 @@ export function CartProvider({ children }) {
     phone: '(555) 123-4567',
   });
   const [paymentMethods, setPaymentMethods] = useState([
-    { id: '1', last4: '1234', name: 'John Business', expMonth: 12, expYear: 2027, isDefault: true },
+    { id: '1', last4: '4242', name: 'John Smith', expMonth: 12, expYear: 2025, isDefault: true },
   ]);
   const [selectedPaymentId, setSelectedPaymentId] = useState('1');
   const [checkoutStep, setCheckoutStep] = useState('shipping'); // shipping | payment | review
@@ -50,17 +50,31 @@ export function CartProvider({ children }) {
 
   const addPaymentMethod = (card) => {
     const id = String(Date.now());
-    const newCard = { ...card, id, isDefault: paymentMethods.length === 0 };
-    setPaymentMethods((prev) => [...prev, newCard]);
+    setPaymentMethods((prev) => {
+      const newCard = { ...card, id, isDefault: prev.length === 0 };
+      return [...prev, newCard];
+    });
     setSelectedPaymentId(id);
   };
 
   const removePaymentMethod = (id) => {
-    setPaymentMethods((prev) => prev.filter((c) => c.id !== id));
-    if (selectedPaymentId === id) {
-      const remaining = paymentMethods.filter((c) => c.id !== id);
-      setSelectedPaymentId(remaining[0]?.id || null);
-    }
+    setPaymentMethods((prev) => {
+      const next = prev.filter((c) => c.id !== id);
+      if (selectedPaymentId === id) {
+        setSelectedPaymentId(next[0]?.id || null);
+      }
+      if (next.length && !next.some((c) => c.isDefault)) {
+        return next.map((c, i) => ({ ...c, isDefault: i === 0 }));
+      }
+      return next;
+    });
+  };
+
+  const setDefaultPaymentMethod = (id) => {
+    setPaymentMethods((prev) =>
+      prev.map((c) => ({ ...c, isDefault: c.id === id }))
+    );
+    setSelectedPaymentId(id);
   };
 
   const value = {
@@ -76,6 +90,7 @@ export function CartProvider({ children }) {
     setSelectedPaymentId,
     addPaymentMethod,
     removePaymentMethod,
+    setDefaultPaymentMethod,
     checkoutStep,
     setCheckoutStep,
   };

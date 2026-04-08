@@ -2,18 +2,23 @@ import React, { useState } from 'react';
 import { Package, Mail, Lock } from 'lucide-react';
 import './LoginPage.css';
 import { Link, useNavigate } from 'react-router-dom';
-import { useForm } from "react-hook-form";
-import { useAuth } from "../context/AuthContext";
+import { useAdminAuth, ADMIN_EMAIL } from '../../context/AdminAuthContext';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
   const navigate = useNavigate();
+  const { loginAdmin } = useAdminAuth();
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Add your login logic here (e.g. validate, call API)
+    const em = email.trim().toLowerCase();
+    if (em === ADMIN_EMAIL && password.length > 0) {
+      loginAdmin();
+      navigate('/admin');
+      return;
+    }
     navigate('/HomePage');
   };
 
@@ -34,7 +39,7 @@ export default function LoginPage() {
             marginBottom: 24,
           }}
         >
-          <Package size={32} color="var(--primary-foreground)" />
+          <Package size={32} color="var(--secondary-foreground)" />
         </div>
 
         {/* Welcome text */}

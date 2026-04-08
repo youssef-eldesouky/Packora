@@ -59,7 +59,7 @@ export default function Cart() {
               <HelpCircle size={18} />
               Support
             </Link>
-            <Link to="#" className="cart-nav-item">
+            <Link to="/Profile" className="cart-nav-item">
               <User size={18} />
               Profile
             </Link>
@@ -122,11 +122,11 @@ export default function Cart() {
             Cart
             <span className="cart-badge">{cartItems.length}</span>
           </Link>
-          <Link to="#" className="cart-nav-item">
+          <Link to="/Support" className="cart-nav-item">
             <HelpCircle size={18} />
             Support
           </Link>
-          <Link to="#" className="cart-nav-item">
+          <Link to="/Profile" className="cart-nav-item">
             <User size={18} />
             Profile
           </Link>

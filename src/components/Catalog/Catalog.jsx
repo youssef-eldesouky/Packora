@@ -66,7 +66,7 @@ export default function Catalog() {
             <HelpCircle size={18} />
             Support
           </Link>
-          <Link to="#" className="catalog-nav-item">
+          <Link to="/Profile" className="catalog-nav-item">
             <User size={18} />
             Profile
           </Link>
