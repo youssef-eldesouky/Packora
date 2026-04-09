@@ -15,6 +15,21 @@ import Track from './components/Track/Track';
 import Cart from './components/Cart/Cart';
 import Checkout from './components/Cart/Checkout';
 import Support from './components/Support/Support';
+import Profile from './components/Profile/Profile';
+import { ProfileProvider } from './context/ProfileContext';
+import { AdminProvider } from './context/AdminContext';
+import AdminLayout from './components/Admin/AdminLayout';
+import AdminDashboard from './components/Admin/AdminDashboard';
+import AdminOrders from './components/Admin/AdminOrders';
+import AdminProducts from './components/Admin/AdminProducts';
+import AdminCustomers from './components/Admin/AdminCustomers';
+import AdminCustomerDetail from './components/Admin/AdminCustomerDetail';
+import AdminAnalytics from './components/Admin/AdminAnalytics';
+import { AdminAuthProvider } from './context/AdminAuthContext';
+import RequireAdmin from './components/Admin/RequireAdmin';
+import AdminOrderDetail from './components/Admin/AdminOrderDetail';
+import AdminProductDetail from './components/Admin/AdminProductDetail';
+import AdminInsights from './components/Admin/AdminInsights';
 
 let router = createBrowserRouter([
   {
@@ -61,14 +76,43 @@ let router = createBrowserRouter([
     path: "Support",
     element: <Support />,
   },
+  {
+    path: "Profile",
+    element: <Profile />,
+  },
+  {
+    path: "admin",
+    element: (
+      <RequireAdmin>
+        <AdminProvider>
+          <AdminLayout />
+        </AdminProvider>
+      </RequireAdmin>
+    ),
+    children: [
+      { index: true, element: <AdminDashboard /> },
+      { path: "insights/:slug", element: <AdminInsights /> },
+      { path: "orders", element: <AdminOrders /> },
+      { path: "orders/:orderId", element: <AdminOrderDetail /> },
+      { path: "products", element: <AdminProducts /> },
+      { path: "products/:productId", element: <AdminProductDetail /> },
+      { path: "customers", element: <AdminCustomers /> },
+      { path: "customers/:customerId", element: <AdminCustomerDetail /> },
+      { path: "analytics", element: <AdminAnalytics /> },
+    ],
+  },
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <AllData>
-    <CartProvider>
-      <ScrollToTop smooth/>
-      <RouterProvider router={router} />
-    </CartProvider>
-  </AllData>
+  <AdminAuthProvider>
+    <AllData>
+      <CartProvider>
+        <ProfileProvider>
+          <ScrollToTop smooth/>
+          <RouterProvider router={router} />
+        </ProfileProvider>
+      </CartProvider>
+    </AllData>
+  </AdminAuthProvider>
 
 );

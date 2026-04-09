@@ -1,5 +1,5 @@
-import React, { useState, useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useMemo, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import {
   Package,
   LayoutGrid,
@@ -66,8 +66,16 @@ function formatTimelineDate(d, time) {
 }
 
 export default function Track() {
+  const location = useLocation();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedOrder, setSelectedOrder] = useState(null);
+
+  useEffect(() => {
+    const focusId = location.state?.focusOrderId;
+    if (!focusId) return;
+    const found = orders.find((o) => o.id === focusId);
+    if (found) setSelectedOrder(found);
+  }, [location.state]);
 
   const filteredOrders = useMemo(() => {
     if (!searchQuery.trim()) return orders;
@@ -117,7 +125,7 @@ export default function Track() {
             <HelpCircle size={18} />
             Support
           </Link>
-          <Link to="#" className="track-nav-item">
+          <Link to="/Profile" className="track-nav-item">
             <User size={18} />
             Profile
           </Link>

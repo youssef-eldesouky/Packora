@@ -93,7 +93,7 @@ export default function HomePage() {
             <HelpCircle size={18} />
             Support
           </Link>
-          <Link to="#" className="nav-item">
+          <Link to="/Profile" className="nav-item">
             <User size={18} />
             Profile
           </Link>

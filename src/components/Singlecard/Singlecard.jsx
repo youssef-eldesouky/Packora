@@ -86,7 +86,7 @@ export default function Singlecard() {
             <HelpCircle size={18} />
             Support
           </Link>
-          <Link to="#" className="singlecard-nav-item">
+          <Link to="/Profile" className="singlecard-nav-item">
             <User size={18} />
             Profile
           </Link>

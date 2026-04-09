@@ -140,7 +140,7 @@ function SupportHeader({ activeTab, setActiveTab, cartItems }) {
           <HelpCircle size={18} />
           Support
         </Link>
-        <Link to="#" className="support-nav-item">
+        <Link to="/Profile" className="support-nav-item">
           <User size={18} />
           Profile
         </Link>

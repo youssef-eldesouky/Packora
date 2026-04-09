@@ -55,7 +55,7 @@ export default function Checkout() {
             <Link to="/Support" className="checkout-nav-item">
               <HelpCircle size={18} /> Support
             </Link>
-            <Link to="#" className="checkout-nav-item">
+            <Link to="/Profile" className="checkout-nav-item">
               <User size={18} /> Profile
             </Link>
             <Link to="/" className="checkout-nav-item">
@@ -106,10 +106,10 @@ export default function Checkout() {
             <ShoppingCart size={18} /> Cart
             <span className="checkout-badge">{cartItems.length}</span>
           </Link>
-          <Link to="#" className="checkout-nav-item">
+          <Link to="/Support" className="checkout-nav-item">
             <HelpCircle size={18} /> Support
           </Link>
-          <Link to="#" className="checkout-nav-item">
+          <Link to="/Profile" className="checkout-nav-item">
             <User size={18} /> Profile
           </Link>
           <Link to="/" className="checkout-nav-item">
