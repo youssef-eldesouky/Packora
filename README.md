@@ -4,7 +4,7 @@
  **Packora** is a comprehensive, full-stack B2B e-commerce platform designed to seamlessly connect business owners with top-tier packaging options, unique product designs, and integrated shipping functionalities.
 
 
-## 📖 Table of Contents
+## Table of Contents
 - [Features](#-features)
 - [Tech Stack](#-tech-stack)
 - [Project Architecture](#-project-architecture)
