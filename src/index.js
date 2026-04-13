@@ -30,75 +30,51 @@ import RequireAdmin from './components/Admin/RequireAdmin';
 import AdminOrderDetail from './components/Admin/AdminOrderDetail';
 import AdminProductDetail from './components/Admin/AdminProductDetail';
 import AdminInsights from './components/Admin/AdminInsights';
-
+import GlobalLayout from './components/Layout/GlobalLayout';
+import LandingPage from './components/LandingPage/LandingPage';
+import Design from './components/Design/Design';
+import Footer from './components/Footer/Footer';
 let router = createBrowserRouter([
   {
-    path: "/",
-    element: <App />,
-  },
-  {
-    path: "HomePage",
-    element: <HomePage />,
-  },
-  {
-    path: "SignUp",
-    element: <SignUp />,
-  },
-  {
-    path: "ForgetPassword",
-    element: <ForgetPassword />,
-  },
-  {
-    path: "EmailCheck",
-    element: <EmailCheck />,
-  },
-  {
-    path: "Catalog",
-    element: <Catalog />,
-  },
-  {
-    path: "Catalog/:productId",
-    element: <Singlecard />,
-  },
-  {
-    path: "Track",
-    element: <Track />,
-  },
-  {
-    path: "Cart",
-    element: <Cart />,
-  },
-  {
-    path: "Cart/checkout",
-    element: <Checkout />,
-  },
-  {
-    path: "Support",
-    element: <Support />,
-  },
-  {
-    path: "Profile",
-    element: <Profile />,
-  },
-  {
-    path: "admin",
-    element: (
-      <RequireAdmin>
-        <AdminProvider>
-          <AdminLayout />
-        </AdminProvider>
-      </RequireAdmin>
-    ),
+    path: '/',
+    element: <GlobalLayout />,
     children: [
-      { index: true, element: <AdminDashboard /> },
-      { path: "insights/:slug", element: <AdminInsights /> },
-      { path: "orders", element: <AdminOrders /> },
-      { path: "orders/:orderId", element: <AdminOrderDetail /> },
-      { path: "products", element: <AdminProducts /> },
-      { path: "products/:productId", element: <AdminProductDetail /> },
-      { path: "customers", element: <AdminCustomers /> },
-      { path: "customers/:customerId", element: <AdminCustomerDetail /> },
-      { path: "analytics", element: <AdminAnalytics /> },
+      { index: true, element: <App /> },
+      { path: 'LandingPage', element: <LandingPage /> },
+      { path: 'HomePage', element: <HomePage /> },
+      { path: 'SignUp', element: <SignUp /> },
+      { path: 'ForgetPassword', element: <ForgetPassword /> },
+      { path: 'EmailCheck', element: <EmailCheck /> },
+      { path: 'Catalog', element: <Catalog /> },
+      { path: 'Catalog/:productId', element: <Singlecard /> },
+      { path: 'Track', element: <Track /> },
+      { path: 'Cart', element: <Cart /> },
+      { path: 'Cart/checkout', element: <Checkout /> },
+      { path: 'Support', element: <Support /> },
+      { path: 'Profile', element: <Profile /> },
+      { path: 'Design', element: <Design /> },
+      { path: 'Footer', element: <Footer /> },
+      {
+        path: 'admin',
+        element: (
+          <RequireAdmin>
+            <AdminProvider>
+              <AdminLayout />
+            </AdminProvider>
+          </RequireAdmin>
+        ),
+        children: [
+          { index: true, element: <AdminDashboard /> },
+          { path: 'insights/:slug', element: <AdminInsights /> },
+          { path: 'orders', element: <AdminOrders /> },
+          { path: 'orders/:orderId', element: <AdminOrderDetail /> },
+          { path: 'products', element: <AdminProducts /> },
+          { path: 'products/:productId', element: <AdminProductDetail /> },
+          { path: 'customers', element: <AdminCustomers /> },
+          { path: 'customers/:customerId', element: <AdminCustomerDetail /> },
+          { path: 'analytics', element: <AdminAnalytics /> },
+        ],
+      },
     ],
   },
 ]);

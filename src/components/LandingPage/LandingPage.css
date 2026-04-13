@@ -1,0 +1,165 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,192;1,192&family=Orbitron:wght@400..900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap');
+
+:root {
+    --deep-teal: #52796F;
+    --vintage-grape: #5D536B;
+    --thistle: #CBC0D3;
+    --lavender-grey: #8E9AAF;
+    --almond-silk: #C9ADA7;
+}
+body{
+    font-family:'Montserrat', system-ui, -apple-system, sans-serif
+}
+
+* {
+    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, box-shadow;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 280ms;
+}
+
+.glass {
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(28px);
+    
+}
+
+.hero-bg {
+    background: linear-gradient(135deg, #52796F 0%, #5D536B 100%);
+}
+
+.heading-font {
+font-family: "Montserrat", sans-serif;
+font-weight: 700;
+}
+.heading-3d{
+    
+    font-family: 'Orbitron', sans-serif;
+    
+}
+
+.section-header {
+    letter-spacing: -0.05em;
+}
+
+.nav-link {
+    position: relative;
+}
+.nav-link:after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: -2px;
+    left: 0;
+    background-color: #52796F;
+}
+.nav-link:hover:after {
+    width: 100%;
+}
+
+.brand-button {
+    background: linear-gradient(90deg, #52796F, #5D536B);
+    box-shadow: 0 14px 25px -6px rgb(82 121 111 / 0.3);
+}
+
+.brand-button:hover {
+    box-shadow: 0 22px 35px -8px rgb(82 121 111 / 0.4);
+    transform: translateY(-2px);
+}
+
+/* ENHANCED 3D TEASER CUBE – only in hero, bigger & smoother */
+.cube {
+    width: 340px;
+    height: 340px;
+    position: relative;
+    transform-style: preserve-3d;
+    transform: rotateX(-28deg) rotateY(42deg);
+    animation: heroFloat 6s infinite ease-in-out;
+    box-shadow: 0 60px 80px -20px rgba(82, 121, 111, 0.4);
+}
+
+.face {
+    position: absolute;
+    width: 340px;
+    height: 340px;
+    border: 3px solid rgba(255,255,255,0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+    color: white;
+    text-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    backdrop-filter: blur(4px);
+}
+
+.front  { background: linear-gradient(135deg, #52796F, #5D536B); transform: rotateY(  0deg) translateZ(170px); }
+.back   { background: linear-gradient(135deg, #CBC0D3, #8E9AAF); transform: rotateY(180deg) translateZ(170px); }
+.right  { background: linear-gradient(135deg, #5D536B, #8E9AAF); transform: rotateY( 90deg) translateZ(170px); }
+.left   { background: linear-gradient(135deg, #8E9AAF, #52796F); transform: rotateY(-90deg) translateZ(170px); }
+.top    { background: linear-gradient(135deg, #C9ADA7, #5D536B); transform: rotateX( 90deg) translateZ(170px); }
+.bottom { background: linear-gradient(135deg, #3d5850, #52796F); transform: rotateX(-90deg) translateZ(170px); }
+
+@keyframes heroFloat {
+    0%, 100% { transform: rotateX(-28deg) rotateY(42deg) translateY(0); }
+    50% { transform: rotateX(-28deg) rotateY(42deg) translateY(-30px); }
+}
+
+/* Enhanced last part – modern testimonials & final CTA */
+.testimonial-card {
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.testimonial-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 30px 40px -15px rgb(82 121 111);
+}
+
+.enhanced-cta {
+    background: linear-gradient(135deg, #52796F 0%, #5D536B 100%);
+    position: relative;
+    overflow: hidden;
+}
+.enhanced-cta::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 40%;
+    height: 300%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+    animation: shine 8s linear infinite;
+}
+@keyframes shine {
+    0% { transform: translateX(-150%); }
+    100% { transform: translateX(400%); }
+}
+
+/* ==================== FEATURE SLIDER STYLES (merged without design change) ==================== */
+.feature-slider {
+    background: #f8f7f4;
+}
+
+.slide-container {
+    transition: transform 700ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.feature-card {
+    box-shadow: 0 25px 50px -12px rgb(82 121 111 / 0.15);
+}
+
+.arrow-btn {
+    transition: all 0.3s ease;
+}
+.arrow-btn:hover {
+    background: #52796F;
+    color: white;
+    transform: scale(1.1);
+}
+
+.dot {
+    transition: all 0.3s ease;
+}
+
+.image-overlay-text {
+    background: linear-gradient(90deg, transparent 30%, rgba(31,31,31,0.85) 60%);
+}

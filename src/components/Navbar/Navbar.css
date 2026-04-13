@@ -1,0 +1,97 @@
+.global-navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 32px;
+  background-color: var(--card);
+  border-bottom: 1px solid var(--border);
+}
+
+.global-navbar-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: var(--foreground);
+  font-weight: 600;
+  font-size: 18px;
+}
+
+.global-navbar-logo-icon {
+  width: 40px;
+  height: 40px;
+  background-color: var(--primary);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.global-navbar-nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.global-navbar-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  text-decoration: none;
+  color: var(--muted-foreground);
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.global-navbar-item:hover {
+  color: var(--foreground);
+  background-color: var(--sidebar);
+}
+
+.global-navbar-item.active {
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+}
+
+.global-navbar-item.has-badge {
+  padding-right: 20px;
+}
+
+.global-navbar-badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 6px;
+  font-size: 11px;
+  font-weight: 600;
+  background: var(--primary-foreground);
+  color: var(--primary);
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.global-navbar-share {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--card);
+  color: var(--foreground);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.global-navbar-share:hover {
+  background: var(--sidebar);
+}

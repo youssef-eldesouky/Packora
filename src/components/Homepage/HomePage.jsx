@@ -2,24 +2,19 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import {
   Package,
-  LayoutGrid,
   Truck,
   ShoppingCart,
   HelpCircle,
-  User,
-  LogOut,
-  Share2,
   BarChart3,
   Box,
-  BoxSelect,
   Palette,
   Leaf,
 } from 'lucide-react';
 import products from '../../mockdata/product.json';
 import orders from '../../mockdata/Orders.json';
-import { useCart } from '../../context/CartContext';
+import Navbar from '../Navbar/Navbar';
 import './Homepage.css';
-
+import Footer from '../Footer/Footer';
 // Group products by category for Browse by Category (use first product per category)
 const categoryDisplay = {};
 products.forEach((p) => {
@@ -57,57 +52,9 @@ const metricIcons = [
 ];
 
 export default function HomePage() {
-  const { cartItems } = useCart();
   return (
     <div className="homepage">
-      {/* Header */}
-      <header className="home-header">
-        <Link to="/HomePage" className="home-logo">
-          <div className="logo-icon">
-            <Package size={24} color="white" />
-          </div>
-          <span>Packora</span>
-        </Link>
-
-        <nav className="home-nav">
-          <Link to="/HomePage" className="nav-item active">
-            <LayoutGrid size={18} />
-            Dashboard
-          </Link>
-          <Link to="/Catalog" className="nav-item">
-            <Box size={18} />
-            Catalog
-          </Link>
-          <Link to="/Track" className="nav-item">
-            <Truck size={18} />
-            Track
-          </Link>
-          <Link to="/Cart" className={`nav-item ${cartItems.length > 0 ? 'cart-with-badge' : ''}`}>
-            <ShoppingCart size={18} />
-            Cart
-            {cartItems.length > 0 && (
-              <span className="nav-cart-badge">{cartItems.length}</span>
-            )}
-          </Link>
-          <Link to="/Support" className="nav-item">
-            <HelpCircle size={18} />
-            Support
-          </Link>
-          <Link to="/Profile" className="nav-item">
-            <User size={18} />
-            Profile
-          </Link>
-          <Link to="/" className="nav-item">
-            <LogOut size={18} />
-            Logout
-          </Link>
-        </nav>
-
-        <button type="button" className="share-btn">
-          <Share2 size={18} />
-          Share
-        </button>
-      </header>
+      <Navbar />
 
       {/* Main content */}
       <main className="home-main">
@@ -149,7 +96,7 @@ export default function HomePage() {
               Use our interactive 3D customizer to design your perfect packaging.Change colors,
               upload logos, add patterns, and see your design come to life in real-time.
             </p>
-            <Link to="#" className="launch-3d-btn">
+            <Link to="/Design" className="launch-3d-btn">
               <Box size={18} />
               Launch 3D Customizer
             </Link>
@@ -237,7 +184,9 @@ export default function HomePage() {
             ))}
           </div>
         </section>
+      
       </main>
+  <Footer />
     </div>
   );
 }

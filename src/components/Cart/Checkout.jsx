@@ -1,14 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import {
-  Package,
-  LayoutGrid,
-  Truck,
   ShoppingCart,
-  HelpCircle,
-  User,
-  LogOut,
-  Share2,
   Box,
   MapPin,
   CreditCard,
@@ -18,7 +11,9 @@ import { useCart } from '../../context/CartContext';
 import ShippingAddress from './ShippingAddress';
 import Payment from './Payment';
 import ReviewOrder from './ReviewOrder';
+import Navbar from '../Navbar/Navbar';
 import './Checkout.css';
+import Footer from '../Footer/Footer';
 
 const STEPS = [
   { key: 'shipping', label: 'Shipping', icon: MapPin },
@@ -32,40 +27,7 @@ export default function Checkout() {
   if (cartItems.length === 0) {
     return (
       <div className="checkout-page">
-        <header className="checkout-header">
-          <Link to="/HomePage" className="checkout-logo">
-            <div className="checkout-logo-icon">
-              <Package size={24} color="white" />
-            </div>
-            <span>Packora</span>
-          </Link>
-          <nav className="checkout-nav">
-            <Link to="/HomePage" className="checkout-nav-item">
-              <LayoutGrid size={18} /> Dashboard
-            </Link>
-            <Link to="/Catalog" className="checkout-nav-item">
-              <Box size={18} /> Catalog
-            </Link>
-            <Link to="/Track" className="checkout-nav-item">
-              <Truck size={18} /> Track
-            </Link>
-            <Link to="/Cart" className="checkout-nav-item active">
-              <ShoppingCart size={18} /> Cart
-            </Link>
-            <Link to="/Support" className="checkout-nav-item">
-              <HelpCircle size={18} /> Support
-            </Link>
-            <Link to="/Profile" className="checkout-nav-item">
-              <User size={18} /> Profile
-            </Link>
-            <Link to="/" className="checkout-nav-item">
-              <LogOut size={18} /> Logout
-            </Link>
-          </nav>
-          <button type="button" className="checkout-share-btn">
-            <Share2 size={18} /> Share
-          </button>
-        </header>
+        <Navbar />
         <main className="checkout-main">
           <div className="checkout-empty">
             <ShoppingCart size={80} className="checkout-empty-icon" />
@@ -84,43 +46,7 @@ export default function Checkout() {
 
   return (
     <div className="checkout-page">
-      <header className="checkout-header">
-        <Link to="/HomePage" className="checkout-logo">
-          <div className="checkout-logo-icon">
-            <Package size={24} color="white" />
-          </div>
-          <span>Packora</span>
-        </Link>
-
-        <nav className="checkout-nav">
-          <Link to="/HomePage" className="checkout-nav-item">
-            <LayoutGrid size={18} /> Dashboard
-          </Link>
-          <Link to="/Catalog" className="checkout-nav-item">
-            <Box size={18} /> Catalog
-          </Link>
-          <Link to="/Track" className="checkout-nav-item">
-            <Truck size={18} /> Track
-          </Link>
-          <Link to="/Cart" className="checkout-nav-item active checkout-nav-badge">
-            <ShoppingCart size={18} /> Cart
-            <span className="checkout-badge">{cartItems.length}</span>
-          </Link>
-          <Link to="/Support" className="checkout-nav-item">
-            <HelpCircle size={18} /> Support
-          </Link>
-          <Link to="/Profile" className="checkout-nav-item">
-            <User size={18} /> Profile
-          </Link>
-          <Link to="/" className="checkout-nav-item">
-            <LogOut size={18} /> Logout
-          </Link>
-        </nav>
-
-        <button type="button" className="checkout-share-btn">
-          <Share2 size={18} /> Share
-        </button>
-      </header>
+      <Navbar />
 
       <main className="checkout-main">
         <Link to="/Cart" className="checkout-back">Back to Cart</Link>
@@ -158,6 +84,8 @@ export default function Checkout() {
           {checkoutStep === 'review' && <ReviewOrder />}
         </div>
       </main>
+      <Footer/>
+  
     </div>
   );
 }

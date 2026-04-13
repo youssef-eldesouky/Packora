@@ -1,21 +1,17 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import {
-  Package,
-  LayoutGrid,
   Truck,
   ShoppingCart,
-  HelpCircle,
-  User,
-  LogOut,
-  Share2,
   Box,
   Trash2,
   CreditCard,
   Lock,
 } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
+import Navbar from '../Navbar/Navbar';
 import './Cart.css';
+import Footer from '../Footer/Footer';
 
 const TAX_RATE = 0.08;
 
@@ -30,50 +26,7 @@ export default function Cart() {
   if (cartItems.length === 0) {
     return (
       <div className="cart-page">
-        <header className="cart-header">
-          <Link to="/HomePage" className="cart-logo">
-            <div className="cart-logo-icon">
-              <Package size={24} color="white" />
-            </div>
-            <span>Packora</span>
-          </Link>
-
-          <nav className="cart-nav">
-            <Link to="/HomePage" className="cart-nav-item">
-              <LayoutGrid size={18} />
-              Dashboard
-            </Link>
-            <Link to="/Catalog" className="cart-nav-item">
-              <Box size={18} />
-              Catalog
-            </Link>
-            <Link to="/Track" className="cart-nav-item">
-              <Truck size={18} />
-              Track
-            </Link>
-            <Link to="/Cart" className="cart-nav-item active">
-              <ShoppingCart size={18} />
-              Cart
-            </Link>
-            <Link to="/Support" className="cart-nav-item">
-              <HelpCircle size={18} />
-              Support
-            </Link>
-            <Link to="/Profile" className="cart-nav-item">
-              <User size={18} />
-              Profile
-            </Link>
-            <Link to="/" className="cart-nav-item">
-              <LogOut size={18} />
-              Logout
-            </Link>
-          </nav>
-
-          <button type="button" className="cart-share-btn">
-            <Share2 size={18} />
-            Share
-          </button>
-        </header>
+        <Navbar />
 
         <main className="cart-main">
           <div className="cart-empty">
@@ -90,57 +43,21 @@ export default function Cart() {
             </Link>
           </div>
         </main>
+        <br/>
+        <br/>
+        <br/>
+        <br/>
+        <br/>
+        <br/>
+        <br/>
+        <Footer/>
       </div>
     );
   }
 
   return (
     <div className="cart-page">
-      <header className="cart-header">
-        <Link to="/HomePage" className="cart-logo">
-          <div className="cart-logo-icon">
-            <Package size={24} color="white" />
-          </div>
-          <span>Packora</span>
-        </Link>
-
-        <nav className="cart-nav">
-          <Link to="/HomePage" className="cart-nav-item">
-            <LayoutGrid size={18} />
-            Dashboard
-          </Link>
-          <Link to="/Catalog" className="cart-nav-item">
-            <Box size={18} />
-            Catalog
-          </Link>
-          <Link to="/Track" className="cart-nav-item">
-            <Truck size={18} />
-            Track
-          </Link>
-          <Link to="/Cart" className="cart-nav-item active cart-nav-badge">
-            <ShoppingCart size={18} />
-            Cart
-            <span className="cart-badge">{cartItems.length}</span>
-          </Link>
-          <Link to="/Support" className="cart-nav-item">
-            <HelpCircle size={18} />
-            Support
-          </Link>
-          <Link to="/Profile" className="cart-nav-item">
-            <User size={18} />
-            Profile
-          </Link>
-          <Link to="/" className="cart-nav-item">
-            <LogOut size={18} />
-            Logout
-          </Link>
-        </nav>
-
-        <button type="button" className="cart-share-btn">
-          <Share2 size={18} />
-          Share
-        </button>
-      </header>
+      <Navbar />
 
       <main className="cart-main">
         <div className="cart-layout">
@@ -235,6 +152,7 @@ export default function Cart() {
           </aside>
         </div>
       </main>
+      <Footer/>
     </div>
   );
 }

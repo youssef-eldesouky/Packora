@@ -1,15 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import {
-  Package,
-  LayoutGrid,
-  Truck,
   ShoppingCart,
-  HelpCircle,
-  User,
-  LogOut,
-  Share2,
-  Box,
   Star,
   Check,
   Truck as TruckIcon,
@@ -18,7 +10,9 @@ import {
 } from 'lucide-react';
 import products from '../../mockdata/product.json';
 import { useCart } from '../../context/CartContext';
+import Navbar from '../Navbar/Navbar';
 import './Singlecard.css';
+import Footer from '../Footer/Footer';
 
 export default function Singlecard() {
   const { productId } = useParams();
@@ -57,50 +51,7 @@ export default function Singlecard() {
 
   return (
     <div className="singlecard-page">
-      <header className="singlecard-header">
-        <Link to="/HomePage" className="singlecard-logo">
-          <div className="singlecard-logo-icon">
-            <Package size={24} color="white" />
-          </div>
-          <span>Packora</span>
-        </Link>
-
-        <nav className="singlecard-nav">
-          <Link to="/HomePage" className="singlecard-nav-item">
-            <LayoutGrid size={18} />
-            Dashboard
-          </Link>
-          <Link to="/Catalog" className="singlecard-nav-item active">
-            <Box size={18} />
-            Catalog
-          </Link>
-          <Link to="/Track" className="singlecard-nav-item">
-            <Truck size={18} />
-            Track
-          </Link>
-          <Link to="#" className="singlecard-nav-item">
-            <ShoppingCart size={18} />
-            Cart
-          </Link>
-          <Link to="/Support" className="singlecard-nav-item">
-            <HelpCircle size={18} />
-            Support
-          </Link>
-          <Link to="/Profile" className="singlecard-nav-item">
-            <User size={18} />
-            Profile
-          </Link>
-          <Link to="/" className="singlecard-nav-item">
-            <LogOut size={18} />
-            Logout
-          </Link>
-        </nav>
-
-        <button type="button" className="singlecard-share-btn">
-          <Share2 size={18} />
-          Share
-        </button>
-      </header>
+      <Navbar />
 
       <main className="singlecard-main">
         <Link to="/Catalog" className="singlecard-back">
@@ -282,6 +233,7 @@ export default function Singlecard() {
           </div>
         </section>
       </main>
+      <Footer/>
     </div>
   );
 }
