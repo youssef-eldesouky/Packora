@@ -1,0 +1,111 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  --surface-900: #0f1117;
+  --surface-800: #161b27;
+  --surface-700: #1e2535;
+  --surface-600: #252d3f;
+  --surface-500: #2d3650;
+  --surface-400: #3c4a68;
+  --brand: #3563fa;
+  --accent: #5f8aff;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--surface-900);
+  color: #e2e8f0;
+  overflow: hidden;
+  height: 100vh;
+  width: 100vw;
+}
+
+#root {
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #3c4a68;
+  border-radius: 2px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #5f8aff;
+}
+
+/* Range slider */
+input[type=range] {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+  width: 100%;
+}
+input[type=range]::-webkit-slider-runnable-track {
+  background: #252d3f;
+  height: 4px;
+  border-radius: 2px;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  margin-top: -6px;
+  background-color: #3563fa;
+  height: 16px;
+  width: 16px;
+  border-radius: 50%;
+  border: 2px solid #5f8aff;
+  box-shadow: 0 0 0 3px rgba(95, 138, 255, 0.2);
+}
+
+/* Transitions */
+.sidebar-tab {
+  transition: all 0.15s ease;
+}
+
+/* Canvas pointer */
+canvas {
+  outline: none;
+}
+
+/* Panel transitions */
+.panel-enter {
+  animation: slideIn 0.2s ease;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Glow effect */
+.glow {
+  box-shadow: 0 0 20px rgba(53, 99, 250, 0.4);
+}
+
+/* Face label badge */
+.face-badge {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  font-size: 0.65rem;
+}
