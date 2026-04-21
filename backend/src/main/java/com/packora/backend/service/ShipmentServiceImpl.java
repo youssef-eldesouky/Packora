@@ -20,17 +20,15 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
 /**
  * Implementation of {@link ShipmentService}.
  *
- * Tracking number format: TRK-XXXXXXXX-XXXX
+ * Tracking number format: TRK-{zero-padded orderId}
  *   - TRK prefix for easy identification
- *   - 8 random hex chars (from UUID) for uniqueness
- *   - 4-char suffix derived from orderId for traceability
+ *   - 4-digit zero-padded order ID for direct traceability
  *
- * Example: TRK-3F9A1B2C-0042
+ * Example: Order 42 → TRK-0042
  */
 @Service
 @Transactional(readOnly = true)
@@ -356,23 +354,13 @@ public class ShipmentServiceImpl implements ShipmentService {
     // ══════════════════════════════════════════════════════════════════════════
 
     /**
-     * Generates a unique, human-readable tracking number.
+     * Generates a simple, human-readable tracking number.
      *
-     * Format: TRK-{8 hex chars from UUID}-{4-digit zero-padded orderId}
-     * Example: TRK-3F9A1B2C-0042
-     *
-     * The UUID portion guarantees global uniqueness.
-     * The orderId suffix makes it easy to trace a tracking number back
-     * to its source order without a database lookup.
+     * Format: TRK-{4-digit zero-padded orderId}
+     * Example: Order 42 → TRK-0042
      */
     private String generateTrackingNumber(Long orderId) {
-        String uuidPart = UUID.randomUUID()
-                .toString()
-                .replace("-", "")
-                .substring(0, 8)
-                .toUpperCase();
-        String orderPart = String.format("%04d", orderId % 10000);
-        return "TRK-" + uuidPart + "-" + orderPart;
+        return "TRK-" + String.format("%04d", orderId % 10000);
     }
 
     // ══════════════════════════════════════════════════════════════════════════
