@@ -4,7 +4,7 @@ Backend Feature Checklist
 
 ---
 
-### 🔐 Authentication & User Management
+### Authentication & User Management
 
 - [ ] **User Registration endpoint** — `POST /api/auth/register` — accepts username, email, password, role; stores a hashed password; returns a JWT or session token. The frontend has a full Sign Up page; there is no backend endpoint for it.
 - [ ] **Login endpoint** — `POST /api/auth/login` — validates credentials, returns a JWT. The LoginPage exists on the frontend but currently does nothing with a real API.
@@ -19,7 +19,7 @@ Backend Feature Checklist
 
 ---
 
-### 📦 Product Catalog
+### Product Catalog
 
 - [ ] **List all products** — `GET /api/products` — the Catalog page pulls from a local JSON file (`mockdata/product.json`). It needs to pull from the database.
 - [ ] **Get single product by ID** — `GET /api/products/{id}`
@@ -31,36 +31,36 @@ Backend Feature Checklist
 
 ---
 
-### 🛒 Orders
+~~### Orders~~
 
-- [ ] **Place an order** — `POST /api/orders` — the full Cart → Checkout → Review flow exists on the frontend. When the user clicks "Confirm Order", nothing is sent to the backend.
-- [ ] **Get orders for current user** — `GET /api/orders/me` — the Profile Order History tab and the Track page read from `mockdata/Orders.json`.
-- [ ] **Get all orders (Admin only)** — `GET /api/orders`
-- [ ] **Get single order by ID** — `GET /api/orders/{id}`
-- [ ] **Update order status (Admin only)** — `PUT /api/orders/{id}/status`
-- [ ] **Cancel an order** — `PUT /api/orders/{id}/cancel`
-- [ ] **OrderService and OrderController** — the `OrderRepository` exists with several queries defined, but no service or controller is wired up.
-
----
-
-### 🚚 Shipment / Order Tracking
-
-- [ ] **Get shipment by order ID** — `GET /api/shipments/order/{orderId}` — the Track page currently generates fake tracking numbers from mock data. It needs real shipment records.
-- [ ] **Update shipment status (Admin/Partner only)** — `PUT /api/shipments/{id}/status`
-- [ ] **Assign shipping partner to shipment** — `PUT /api/shipments/{id}/assign-partner`
-- [ ] **ShipmentService and ShipmentController** — `ShipmentRepository` is defined but unused.
+~~- [ ] **Place an order** — `POST /api/orders` — the full Cart → Checkout → Review flow exists on the frontend. When the user clicks "Confirm Order", nothing is sent to the backend.~~
+~~- [ ] **Get orders for current user** — `GET /api/orders/me` — the Profile Order History tab and the Track page read from `mockdata/Orders.json`.~~
+~~- [ ] **Get all orders (Admin only)** — `GET /api/orders`~~
+~~- [ ] **Get single order by ID** — `GET /api/orders/{id}`~~
+~~- [ ] **Update order status (Admin only)** — `PUT /api/orders/{id}/status`~~
+~~- [ ] **Cancel an order** — `PUT /api/orders/{id}/cancel`~~
+~~- [ ] **OrderService and OrderController** — the `OrderRepository` exists with several queries defined, but no service or controller is wired up.~~
 
 ---
 
-### 💳 Payment
+~~### Shipment / Order Tracking~~
+
+~~- [ ] **Get shipment by order ID** — `GET /api/shipments/order/{orderId}` — the Track page currently generates fake tracking numbers from mock data. It needs real shipment records.~~
+~~- [ ] **Update shipment status (Admin/Partner only)** — `PUT /api/shipments/{id}/status`~~
+~~- [ ] **Assign shipping partner to shipment** — `PUT /api/shipments/{id}/assign-partner`~~
+~~- [ ] **ShipmentService and ShipmentController** — `ShipmentRepository` is defined but unused.~~
+
+---
+
+### Payment
 
 - [ ] **Save payment result to database** — the Paymob payment flow (`PaymobService`, `PaymentController`) exists and is the most complete part of the backend, but the `processCallback` method needs to actually write a `Payment` record to the `payments` table when Paymob confirms success. Currently the callback handler has no DB write logic.
 - [ ] **Get payments for an order** — `GET /api/orders/{id}/payments`
-- [ ] **`PaymentRepository` is defined** but never injected into any service. Wire it into `PaymobService` (or a dedicated `PaymentService`) so that transaction results are persisted.
+- [ ] **`PaymentRepository` is defined** but never injected into any service. Wire it into `PaymobService` (or a dedicated `PaymentService`) so that transaction results are persisted.~~
 
 ---
 
-### 🗂️ Admin Panel APIs
+### Admin Panel APIs
 
 The entire admin frontend (Dashboard, Orders, Products, Customers, Analytics, Insights) currently runs completely on `mockdata/` JSON files and hardcoded numbers. None of it is real. All of the following need backend counterparts:
 
@@ -72,7 +72,7 @@ The entire admin frontend (Dashboard, Orders, Products, Customers, Analytics, In
 
 ---
 
-### 🤝 Partner Management
+### Partner Management
 
 - [ ] **List packaging partners** — `GET /api/partners/packaging`
 - [ ] **List shipping partners** — `GET /api/partners/shipping`
@@ -81,7 +81,7 @@ The entire admin frontend (Dashboard, Orders, Products, Customers, Analytics, In
 
 ---
 
-### 🎨 Packaging & Design
+### Packaging & Design
 
 - [ ] **List packagings (catalog-style)** — `GET /api/packagings`
 - [ ] **Create / update / delete packaging** — full CRUD for packaging configurations.
@@ -91,7 +91,7 @@ The entire admin frontend (Dashboard, Orders, Products, Customers, Analytics, In
 
 ---
 
-### 🎫 Support / Ticket System
+### Support / Ticket System
 
 - [ ] **Submit a support ticket** — `POST /api/support/tickets` — the Support page has a full Contact Us form and a Report Issue form that submit locally and show a success screen, but nothing reaches the server.
 - [ ] **Get tickets for current user** — `GET /api/support/tickets/me`
@@ -101,7 +101,7 @@ The entire admin frontend (Dashboard, Orders, Products, Customers, Analytics, In
 
 ---
 
-### ⚙️ Infrastructure & Cross-Cutting Concerns
+### Infrastructure & Cross-Cutting Concerns
 
 - [ ] **Add Spring Security dependency to `pom.xml`** — no security starter is included yet.
 - [ ] **Add JWT library** (`jjwt` or Spring Security OAuth2 resource server) to `pom.xml`.
