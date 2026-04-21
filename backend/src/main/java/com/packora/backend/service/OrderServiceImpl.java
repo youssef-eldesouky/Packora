@@ -12,6 +12,7 @@ import com.packora.backend.repository.ProductRepository;
 import com.packora.backend.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -49,13 +50,21 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository    orderRepository;
     private final UserRepository     userRepository;
     private final ProductRepository  productRepository;
+    private final ShipmentService    shipmentService;
 
+    /**
+     * @Lazy on ShipmentService breaks the potential circular dependency:
+     *   OrderService → ShipmentService → OrderRepository → (no cycle back)
+     * Spring resolves this cleanly at runtime via a proxy.
+     */
     public OrderServiceImpl(OrderRepository orderRepository,
                             UserRepository userRepository,
-                            ProductRepository productRepository) {
+                            ProductRepository productRepository,
+                            @Lazy ShipmentService shipmentService) {
         this.orderRepository   = orderRepository;
         this.userRepository    = userRepository;
         this.productRepository = productRepository;
+        this.shipmentService   = shipmentService;
     }
 
     // ══════════════════════════════════════════════════════════════════════════
@@ -98,6 +107,18 @@ public class OrderServiceImpl implements OrderService {
 
         Order saved = orderRepository.save(order);
         log.info("[OrderService] Order {} saved successfully. Total: {}", saved.getId(), saved.getTotalAmount());
+
+        // Auto-create a Shipment for this order in the same transaction.
+        // This ensures the Track page has a real shipment record (with a real
+        // tracking number) from the moment the order is confirmed.
+        try {
+            shipmentService.createShipmentForOrder(saved.getId());
+        } catch (Exception e) {
+            // Log but do not fail the order — the order is primary, the shipment
+            // can be manually created by an admin if something goes wrong here.
+            log.error("[OrderService] Failed to auto-create shipment for order {}. Manual creation required. Error: {}",
+                    saved.getId(), e.getMessage());
+        }
 
         return toOrderResponse(saved);
     }
