@@ -3,6 +3,8 @@ import { Package, Mail, Lock } from 'lucide-react';
 import './LoginPage.css';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAdminAuth, ADMIN_EMAIL } from '../../context/AdminAuthContext';
+import { useAuth, emailToDisplayName } from '../../context/AuthContext';
+import { useProfile } from '../../context/ProfileContext';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -10,16 +12,26 @@ export default function LoginPage() {
   const [rememberMe, setRememberMe] = useState(false);
   const navigate = useNavigate();
   const { loginAdmin } = useAdminAuth();
+  const { login } = useAuth();
+  const { setAccountProfile } = useProfile();
 
   const handleSubmit = (e) => {
     e.preventDefault();
     const em = email.trim().toLowerCase();
     if (em === ADMIN_EMAIL && password.length > 0) {
       loginAdmin();
+      login(em, { displayName: 'Admin' });
       navigate('/admin');
       return;
     }
-    navigate('/HomePage');
+    const displayName = emailToDisplayName(em);
+    login(em);
+    setAccountProfile((prev) => ({
+      ...prev,
+      email: em,
+      fullName: displayName,
+    }));
+    navigate('/');
   };
 
   return (
@@ -169,7 +181,7 @@ export default function LoginPage() {
                 Remember me
               </label>
               <Link
-                to="ForgetPassword"
+                to="/ForgetPassword"
                 style={{
                   color: 'var(--primary)',
                   fontSize: 14,

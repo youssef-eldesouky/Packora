@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   Package,
   LayoutGrid,
@@ -9,32 +9,51 @@ import {
   HelpCircle,
   User,
   LogOut,
-  Share2,
+  LogIn,
   House,
 } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
+import { useAuth } from '../../context/AuthContext';
+import { useAdminAuth } from '../../context/AdminAuthContext';
 import './Navbar.css';
 
-const navItems = [
-  { to: '/LandingPage', label: 'Home', icon: House, match: '/LandingPage' },
+const baseNavItems = [
+  { to: '/', label: 'Home', icon: House, match: '/' },
   { to: '/HomePage', label: 'Dashboard', icon: LayoutGrid, match: '/HomePage' },
   { to: '/Catalog', label: 'Catalog', icon: Box, match: '/Catalog' },
   { to: '/Track', label: 'Track', icon: Truck, match: '/Track' },
   { to: '/Cart', label: 'Cart', icon: ShoppingCart, match: '/Cart' },
   { to: '/Support', label: 'Support', icon: HelpCircle, match: '/Support' },
-  { to: '/Profile', label: 'Profile', icon: User, match: '/Profile' },
 ];
+
+const profileNavItem = { to: '/Profile', label: 'Profile', icon: User, match: '/Profile' };
 
 export default function Navbar() {
   const location = useLocation();
+  const navigate = useNavigate();
   const { cartItems } = useCart();
+  const { user, logout } = useAuth();
+  const { logoutAdmin } = useAdminAuth();
   const currentPath = location.pathname;
 
-  const isActive = (matchPath) => currentPath === matchPath || currentPath.startsWith(`${matchPath}/`);
+  const isActive = (matchPath) => {
+    if (matchPath === '/') {
+      return currentPath === '/' || currentPath === '/LandingPage';
+    }
+    return currentPath === matchPath || currentPath.startsWith(`${matchPath}/`);
+  };
+
+  const handleLogout = () => {
+    logout();
+    logoutAdmin();
+    navigate('/');
+  };
+
+  const navItems = user ? [...baseNavItems, profileNavItem] : baseNavItems;
 
   return (
     <header className="global-navbar">
-      <Link to="/HomePage" className="global-navbar-logo">
+      <Link to="/" className="global-navbar-logo">
         <div className="global-navbar-logo-icon">
           <Package size={24} color="white" />
         </div>
@@ -57,17 +76,29 @@ export default function Navbar() {
             )}
           </Link>
         ))}
-
-        <Link to="/" className="global-navbar-item">
-          <LogOut size={18} />
-          Logout
-        </Link>
       </nav>
 
-      <button type="button" className="global-navbar-share">
-        <Share2 size={18} />
-        Share
-      </button>
+      <div className="global-navbar-right">
+        {user && (
+          <Link to="/Profile" className="global-navbar-user-block" title="Profile">
+            <span className="global-navbar-user-icon" aria-hidden>
+              <User size={18} />
+            </span>
+            <span className="global-navbar-user">{user.displayName}</span>
+          </Link>
+        )}
+        {user ? (
+          <button type="button" className="global-navbar-item global-navbar-logout" onClick={handleLogout}>
+            <LogOut size={18} />
+            Logout
+          </button>
+        ) : (
+          <Link to="/login" className="global-navbar-item global-navbar-login">
+            <LogIn size={18} />
+            Login
+          </Link>
+        )}
+      </div>
     </header>
   );
 }

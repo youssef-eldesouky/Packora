@@ -3,8 +3,9 @@
   align-items: center;
   justify-content: space-between;
   padding: 16px 32px;
-  background-color: var(--card);
-  border-bottom: 1px solid var(--border);
+  background-color: #f8f7f4;
+    border-bottom: 1px solid #E5E2DC;
+    font-family: 'Montserrat', system-ui, -apple-system, sans-serif;
 }
 
 .global-navbar-logo {
@@ -18,13 +19,14 @@
 }
 
 .global-navbar-logo-icon {
-  width: 40px;
-  height: 40px;
-  background-color: var(--primary);
-  border-radius: 10px;
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(135deg, #52796F, #5D536B);
+  border-radius: 9999px;
   display: flex;
   align-items: center;
   justify-content: center;
+  font-size: 30px;
 }
 
 .global-navbar-nav {
@@ -48,13 +50,13 @@
 }
 
 .global-navbar-item:hover {
-  color: var(--foreground);
-  background-color: var(--sidebar);
+   background-color: rgba(82, 121, 111, 0.1);
+    color: #1f1f1f;
 }
 
 .global-navbar-item.active {
-  background-color: var(--primary);
-  color: var(--primary-foreground);
+   background: linear-gradient(90deg, #52796F, #5D536B);
+    color: #ffffff;
 }
 
 .global-navbar-item.has-badge {
@@ -78,6 +80,51 @@
   justify-content: center;
 }
 
+.global-navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.global-navbar-user-block {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  color: inherit;
+  padding: 6px 10px;
+  border-radius: 8px;
+  max-width: 220px;
+  transition: background-color 0.2s;
+}
+
+.global-navbar-user-block:hover {
+  background-color: var(--sidebar);
+}
+
+.global-navbar-user-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--muted-foreground);
+}
+
+.global-navbar-user-block:hover .global-navbar-user-icon {
+  color: var(--foreground);
+}
+
+.global-navbar-user {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--foreground);
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .global-navbar-share {
   display: flex;
   align-items: center;
@@ -94,4 +141,15 @@
 
 .global-navbar-share:hover {
   background: var(--sidebar);
+}
+
+button.global-navbar-logout {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+}
+
+a.global-navbar-login {
+  text-decoration: none;
 }

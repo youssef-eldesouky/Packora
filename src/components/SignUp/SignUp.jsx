@@ -20,11 +20,10 @@ export default function SignUp() {
       <div className="signup-wrapper">
         {/* Logo icon */}
         <div
-          className="signup-icon"
+          className="logo-icon"
           style={{
             width: 64,
             height: 64,
-            backgroundColor: 'var(--secondary)',
             borderRadius: 12,
             display: 'flex',
             alignItems: 'center',

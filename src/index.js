@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import App from './App';
-import {createBrowserRouter,RouterProvider,} from "react-router";
+import './App.css';
+import { createBrowserRouter, RouterProvider, Navigate } from "react-router";
 import { AllData } from './Data/AllData';
 import { CartProvider } from './context/CartContext';
 import ScrollToTop from "react-scroll-to-top";
@@ -17,6 +17,7 @@ import Checkout from './components/Cart/Checkout';
 import Support from './components/Support/Support';
 import Profile from './components/Profile/Profile';
 import { ProfileProvider } from './context/ProfileContext';
+import { AuthProvider } from './context/AuthContext';
 import { AdminProvider } from './context/AdminContext';
 import AdminLayout from './components/Admin/AdminLayout';
 import AdminDashboard from './components/Admin/AdminDashboard';
@@ -34,13 +35,16 @@ import GlobalLayout from './components/Layout/GlobalLayout';
 import LandingPage from './components/LandingPage/LandingPage';
 import Design from './components/Design/Design';
 import Footer from './components/Footer/Footer';
+import LoginPage from './components/LoginPage/LoginPage';
+
 let router = createBrowserRouter([
   {
     path: '/',
     element: <GlobalLayout />,
     children: [
-      { index: true, element: <App /> },
-      { path: 'LandingPage', element: <LandingPage /> },
+      { index: true, element: <LandingPage /> },
+      { path: 'login', element: <LoginPage /> },
+      { path: 'LandingPage', element: <Navigate to="/" replace /> },
       { path: 'HomePage', element: <HomePage /> },
       { path: 'SignUp', element: <SignUp /> },
       { path: 'ForgetPassword', element: <ForgetPassword /> },
@@ -84,8 +88,10 @@ ReactDOM.createRoot(document.getElementById("root")).render(
     <AllData>
       <CartProvider>
         <ProfileProvider>
-          <ScrollToTop smooth/>
-          <RouterProvider router={router} />
+          <AuthProvider>
+            <ScrollToTop smooth />
+            <RouterProvider router={router} />
+          </AuthProvider>
         </ProfileProvider>
       </CartProvider>
     </AllData>
