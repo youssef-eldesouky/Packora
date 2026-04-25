@@ -36,6 +36,7 @@ import LandingPage from './components/LandingPage/LandingPage';
 import Design from './components/Design/Design';
 import Footer from './components/Footer/Footer';
 import LoginPage from './components/LoginPage/LoginPage';
+import RequireAuth from './components/RequireAuth';
 
 let router = createBrowserRouter([
   {
@@ -45,19 +46,24 @@ let router = createBrowserRouter([
       { index: true, element: <LandingPage /> },
       { path: 'login', element: <LoginPage /> },
       { path: 'LandingPage', element: <Navigate to="/" replace /> },
-      { path: 'HomePage', element: <HomePage /> },
       { path: 'SignUp', element: <SignUp /> },
       { path: 'ForgetPassword', element: <ForgetPassword /> },
       { path: 'EmailCheck', element: <EmailCheck /> },
-      { path: 'Catalog', element: <Catalog /> },
-      { path: 'Catalog/:productId', element: <Singlecard /> },
-      { path: 'Track', element: <Track /> },
-      { path: 'Cart', element: <Cart /> },
-      { path: 'Cart/checkout', element: <Checkout /> },
-      { path: 'Support', element: <Support /> },
-      { path: 'Profile', element: <Profile /> },
-      { path: 'Design', element: <Design /> },
-      { path: 'Footer', element: <Footer /> },
+      {
+        element: <RequireAuth />,
+        children: [
+          { path: 'HomePage', element: <HomePage /> },
+          { path: 'Catalog', element: <Catalog /> },
+          { path: 'Catalog/:productId', element: <Singlecard /> },
+          { path: 'Track', element: <Track /> },
+          { path: 'Cart', element: <Cart /> },
+          { path: 'Cart/checkout', element: <Checkout /> },
+          { path: 'Support', element: <Support /> },
+          { path: 'Profile', element: <Profile /> },
+          { path: 'Design', element: <Design /> },
+          { path: 'Footer', element: <Footer /> },
+        ],
+      },
       {
         path: 'admin',
         element: (

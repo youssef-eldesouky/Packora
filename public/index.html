@@ -5,6 +5,15 @@
     <link rel="icon" href="./assets/favicon.svg" /> 
     <meta name="viewport" content="width=device-width, initial-scale=1" />
    <title>Packora</title>
+    <!-- Tailwind CSS (Play CDN) for 3D Customizer styles. Preflight is disabled to prevent breaking the rest of the Packora app styling. -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        corePlugins: {
+          preflight: false,
+        }
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>

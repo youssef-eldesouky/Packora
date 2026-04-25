@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, /* useNavigate */ } from 'react-router-dom';
 import {
   Package,
   LayoutGrid,
@@ -11,6 +11,7 @@ import {
   LogOut,
   LogIn,
   House,
+  Wand,
 } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
@@ -21,6 +22,7 @@ const baseNavItems = [
   { to: '/', label: 'Home', icon: House, match: '/' },
   { to: '/HomePage', label: 'Dashboard', icon: LayoutGrid, match: '/HomePage' },
   { to: '/Catalog', label: 'Catalog', icon: Box, match: '/Catalog' },
+  { to: '/Design', label: 'Create New Box', icon: Wand, match: '/Design' },
   { to: '/Track', label: 'Track', icon: Truck, match: '/Track' },
   { to: '/Cart', label: 'Cart', icon: ShoppingCart, match: '/Cart' },
   { to: '/Support', label: 'Support', icon: HelpCircle, match: '/Support' },
@@ -30,7 +32,7 @@ const profileNavItem = { to: '/Profile', label: 'Profile', icon: User, match: '/
 
 export default function Navbar() {
   const location = useLocation();
-  const navigate = useNavigate();
+  //const navigate = useNavigate();
   const { cartItems } = useCart();
   const { user, logout } = useAuth();
   const { logoutAdmin } = useAdminAuth();
@@ -46,7 +48,8 @@ export default function Navbar() {
   const handleLogout = () => {
     logout();
     logoutAdmin();
-    navigate('/');
+    // Force a hard navigation to the landing page
+    window.location.href = '/';
   };
 
   const navItems = user ? [...baseNavItems, profileNavItem] : baseNavItems;
