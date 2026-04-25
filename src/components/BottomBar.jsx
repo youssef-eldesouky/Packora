@@ -13,42 +13,37 @@ export default function BottomBar() {
 
   const totalElements = Object.values(designs).reduce((sum, face) => sum + face.elements.length, 0)
   const totalPrice = price * quantity
+  const volume = (boxDimensions.length * boxDimensions.width * boxDimensions.height).toFixed(1)
 
   return (
-    <div className="h-[52px] flex items-center justify-between px-5 bg-[#161b27] border-t border-[#252d3f] shrink-0">
-      {/* Details */}
-      <div className="flex items-center gap-5 text-xs text-[#64748b]">
-        <span>
-          <span className="text-[#94a3b8]">Size:</span> {boxDimensions.length}" × {boxDimensions.width}" × {boxDimensions.height}"
-        </span>
-        <span className="hidden sm:inline">
-          <span className="text-[#94a3b8]">Material:</span> {MATERIAL_LABELS[material]}
-        </span>
-        <span className="hidden md:inline">
-          <span className="text-[#94a3b8]">Qty:</span> {quantity.toLocaleString()} units
-        </span>
-        {totalElements > 0 && (
-          <span className="hidden md:inline">
-            <span className="text-[#94a3b8]">Elements:</span> {totalElements} design items
-          </span>
-        )}
+    <div className="glass-panel flex min-h-[88px] flex-wrap items-center justify-between gap-4 px-5 py-4">
+      <div className="flex flex-wrap items-center gap-3">
+        {[
+          { label: 'Size', value: `${boxDimensions.length}" × ${boxDimensions.width}" × ${boxDimensions.height}"` },
+          { label: 'Volume', value: `${volume} in³` },
+          { label: 'Material', value: MATERIAL_LABELS[material] },
+          { label: 'Design', value: `${totalElements} item${totalElements === 1 ? '' : 's'}` },
+        ].map(item => (
+          <div key={item.label} className="rounded-2xl border border-border bg-card/40 px-3 py-2">
+            <div className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">{item.label}</div>
+            <div className="mt-1 text-sm font-semibold text-foreground">{item.value}</div>
+          </div>
+        ))}
       </div>
 
-      {/* Price */}
-      <div className="flex items-center gap-6">
+      <div className="flex items-center gap-4">
         <div className="text-right">
-          <div className="text-xs text-[#64748b]">Unit Price</div>
-          <div className="text-sm font-bold text-white">${price.toFixed(2)}</div>
+          <div className="text-xs text-muted-foreground">Unit Price</div>
+          <div className="text-sm font-bold text-foreground">${price.toFixed(2)}</div>
         </div>
-        <div className="w-px h-8 bg-[#252d3f]" />
+        <div className="h-10 w-px bg-card/80" />
         <div className="text-right">
-          <div className="text-xs text-[#64748b]">Total ({quantity.toLocaleString()} units)</div>
-          <div className="text-lg font-bold text-white">
+          <div className="text-xs text-muted-foreground">Total ({quantity.toLocaleString()} units)</div>
+          <div className="bg-[linear-gradient(135deg,#ffffff_0%,#c3d2ff_52%,#7fa3ff_100%)] bg-clip-text text-lg font-bold text-transparent">
             ${totalPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </div>
         </div>
-        <button className="px-4 py-2 rounded-lg bg-gradient-to-r from-brand-500 to-brand-600 text-white text-sm font-semibold
-          hover:from-brand-400 hover:to-brand-500 transition-all shadow-lg shadow-brand-500/20">
+        <button className="rounded-2xl bg-[linear-gradient(135deg,#f5c55d_0%,#ff9e67_16%,#6d92ff_62%,#3563fa_100%)] px-5 py-3 text-sm font-semibold text-foreground shadow-[0_18px_45px_rgba(53,99,250,0.28)] transition-all hover:translate-y-[-1px]">
           Get Quote
         </button>
       </div>

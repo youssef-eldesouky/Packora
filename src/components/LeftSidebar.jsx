@@ -26,17 +26,37 @@ export default function LeftSidebar() {
   } = useStore()
 
   return (
-    <aside className="w-[300px] shrink-0 bg-[#161b27] border-r border-[#252d3f] flex flex-col overflow-hidden">
-      {/* Tabs */}
-      <div className="flex border-b border-[#252d3f]">
+    <aside className="glass-panel sidebar-panel flex h-full min-h-0 w-[320px] shrink-0 flex-col overflow-hidden">
+      <div className="border-b border-border px-4 pb-4 pt-4">
+        <div className="mb-4">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.26em] text-muted-foreground">Configuration</p>
+          <h2 className="mt-2 font-['Space_Grotesk'] text-xl font-bold text-foreground">Build Your Box</h2>
+          <p className="mt-1 text-sm text-muted-foreground">Dial in structure, material, and run size before refining the artwork.</p>
+        </div>
+
+        <div className="grid grid-cols-3 gap-2">
+          {[
+            { label: 'Volume', value: `${(boxDimensions.length * boxDimensions.width * boxDimensions.height).toFixed(1)} in³` },
+            { label: 'Material', value: MATERIALS.find(item => item.value === material)?.label ?? material },
+            { label: 'Qty', value: quantity.toLocaleString() },
+          ].map(item => (
+            <div key={item.label} className="rounded-2xl border border-border bg-card/40 px-3 py-3">
+              <div className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">{item.label}</div>
+              <div className="mt-2 text-sm font-semibold text-foreground">{item.value}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="flex border-b border-border px-2 pt-2">
         {['product', 'layers'].map(tab => (
           <button
             key={tab}
             onClick={() => setLeftTab(tab)}
-            className={`flex-1 py-3 text-sm font-medium transition-all capitalize
+            className={`flex-1 rounded-t-2xl px-3 py-3 text-sm font-medium transition-all capitalize
               ${leftTab === tab
-                ? 'text-white border-b-2 border-brand-500 bg-[#1e2535]'
-                : 'text-[#64748b] hover:text-[#94a3b8] hover:bg-[#1e2535]/50'
+                ? 'border border-b-0 border-border bg-card/80 text-foreground'
+                : 'text-muted-foreground hover:bg-card/40 hover:text-foreground/80'
               }`}
           >
             {tab === 'product' ? 'Product Settings' : 'Layers'}
@@ -44,19 +64,18 @@ export default function LeftSidebar() {
         ))}
       </div>
 
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto px-2 pb-2">
         {leftTab === 'product' ? (
-          <div className="p-4 space-y-5 panel-enter">
+          <div className="panel-enter space-y-5 p-4">
             {/* Box Type */}
-            <div>
-              <label className="block text-xs font-semibold text-[#64748b] uppercase tracking-wider mb-2">
+            <div className="rounded-3xl border border-border bg-card/40 p-4">
+              <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.24em] text-muted-foreground">
                 Box Type
               </label>
               <select
                 value={boxType}
                 onChange={e => setBoxType(e.target.value)}
-                className="w-full bg-[#252d3f] border border-[#3c4a68] rounded-lg px-3 py-2.5 text-sm text-white
-                  focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500/40 transition-all"
+                className="w-full rounded-2xl border border-border bg-input-background px-3 py-3 text-sm text-foreground transition-all focus:border-primary focus:outline-none focus:ring-2 focus:ring-ring/20"
               >
                 {BOX_TYPES.map(t => (
                   <option key={t.value} value={t.value}>{t.label}</option>
@@ -65,14 +84,14 @@ export default function LeftSidebar() {
             </div>
 
             {/* Dimensions */}
-            <div>
-              <label className="block text-xs font-semibold text-[#64748b] uppercase tracking-wider mb-2">
+            <div className="rounded-3xl border border-border bg-card/40 p-4">
+              <label className="mb-3 block text-xs font-semibold uppercase tracking-[0.24em] text-muted-foreground">
                 Dimensions (inches)
               </label>
               <div className="space-y-2">
                 {['length', 'width', 'height'].map(dim => (
-                  <div key={dim} className="flex items-center gap-2">
-                    <span className="text-xs text-[#64748b] w-14 capitalize">{dim}</span>
+                  <div key={dim} className="flex items-center gap-2 rounded-2xl border border-border/50 bg-input-background px-3 py-2.5">
+                    <span className="w-14 text-xs capitalize text-muted-foreground">{dim}</span>
                     <div className="flex-1 relative">
                       <input
                         type="number"
@@ -81,32 +100,31 @@ export default function LeftSidebar() {
                         step={0.5}
                         value={boxDimensions[dim]}
                         onChange={e => setBoxDimensions({ [dim]: parseFloat(e.target.value) || 1 })}
-                        className="w-full bg-[#252d3f] border border-[#3c4a68] rounded-md px-3 py-2 text-sm text-white
-                          focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500/40 transition-all"
+                        className="w-full border-0 bg-transparent px-0 py-0 text-sm text-foreground focus:outline-none"
                       />
                     </div>
-                    <span className="text-xs text-[#64748b]">in</span>
+                    <span className="text-xs text-muted-foreground">in</span>
                   </div>
                 ))}
               </div>
             </div>
 
             {/* 3D preview dimensions display */}
-            <div className="bg-[#1e2535] rounded-lg p-3 border border-[#252d3f]">
-              <div className="text-xs text-[#64748b] mb-1.5 font-medium">Box Preview Size</div>
-              <div className="flex justify-between text-xs text-[#94a3b8]">
-                <span>L: <span className="text-white font-medium">{boxDimensions.length}"</span></span>
-                <span>W: <span className="text-white font-medium">{boxDimensions.width}"</span></span>
-                <span>H: <span className="text-white font-medium">{boxDimensions.height}"</span></span>
+            <div className="rounded-3xl border border-[#7db0ff22] bg-[linear-gradient(180deg,rgba(109,146,255,0.18),rgba(15,17,23,0.2))] p-4">
+              <div className="mb-1.5 text-xs font-medium text-foreground/90">Box Preview Size</div>
+              <div className="flex justify-between text-xs text-foreground/80">
+                <span>L: <span className="text-foreground font-medium">{boxDimensions.length}"</span></span>
+                <span>W: <span className="text-foreground font-medium">{boxDimensions.width}"</span></span>
+                <span>H: <span className="text-foreground font-medium">{boxDimensions.height}"</span></span>
               </div>
-              <div className="text-xs text-[#64748b] mt-1.5">
-                Volume: <span className="text-white">{(boxDimensions.length * boxDimensions.width * boxDimensions.height).toFixed(1)} in³</span>
+              <div className="text-xs text-muted-foreground mt-1.5">
+                Volume: <span className="text-foreground">{(boxDimensions.length * boxDimensions.width * boxDimensions.height).toFixed(1)} in³</span>
               </div>
             </div>
 
             {/* Material */}
-            <div>
-              <label className="block text-xs font-semibold text-[#64748b] uppercase tracking-wider mb-2">
+            <div className="rounded-3xl border border-border bg-card/40 p-4">
+              <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.24em] text-muted-foreground">
                 Material
               </label>
               <div className="space-y-2">
@@ -114,19 +132,21 @@ export default function LeftSidebar() {
                   <button
                     key={m.value}
                     onClick={() => setMaterial(m.value)}
-                    className={`w-full flex items-center gap-3 p-3 rounded-lg border text-left transition-all
+                    className={`w-full rounded-2xl border p-3 text-left transition-all
                       ${material === m.value
-                        ? 'border-brand-500 bg-brand-500/10 text-white'
-                        : 'border-[#252d3f] bg-[#1e2535] text-[#94a3b8] hover:border-[#3c4a68] hover:text-white'
+                        ? 'border-primary/60 bg-primary/12 text-foreground shadow-[0_12px_30px_rgba(53,99,250,0.12)]'
+                        : 'border-border bg-input-background text-foreground/80 hover:border-border/80 hover:text-foreground'
                       }`}
                   >
-                    <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0
-                      ${material === m.value ? 'border-brand-500' : 'border-[#3c4a68]'}`}>
-                      {material === m.value && <div className="w-2 h-2 rounded-full bg-brand-500" />}
-                    </div>
-                    <div>
-                      <div className="text-sm font-medium">{m.label}</div>
-                      <div className="text-xs text-[#64748b]">{m.description}</div>
+                    <div className="flex items-center gap-3">
+                      <div className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border-2
+                        ${material === m.value ? 'border-primary' : 'border-border'}`}>
+                        {material === m.value && <div className="w-2 h-2 rounded-full bg-primary" />}
+                      </div>
+                      <div>
+                        <div className="text-sm font-medium">{m.label}</div>
+                        <div className="text-xs text-muted-foreground">{m.description}</div>
+                      </div>
                     </div>
                   </button>
                 ))}
@@ -134,12 +154,12 @@ export default function LeftSidebar() {
             </div>
 
             {/* Quantity */}
-            <div>
-              <div className="flex justify-between items-center mb-2">
-                <label className="text-xs font-semibold text-[#64748b] uppercase tracking-wider">
+            <div className="rounded-3xl border border-border bg-card/40 p-4">
+              <div className="mb-2 flex items-center justify-between">
+                <label className="text-xs font-semibold uppercase tracking-[0.24em] text-muted-foreground">
                   Quantity
                 </label>
-                <span className="text-sm font-semibold text-white">{quantity.toLocaleString()} units</span>
+                <span className="text-sm font-semibold text-foreground">{quantity.toLocaleString()} units</span>
               </div>
               <input
                 type="range"
@@ -150,7 +170,7 @@ export default function LeftSidebar() {
                 onChange={e => setQuantity(parseInt(e.target.value))}
                 className="w-full"
               />
-              <div className="flex justify-between text-xs text-[#64748b] mt-1">
+              <div className="flex justify-between text-xs text-muted-foreground mt-1">
                 <span>50</span>
                 <span>2,500</span>
                 <span>10,000</span>
@@ -168,10 +188,10 @@ export default function LeftSidebar() {
                   <button
                     key={tier.qty}
                     onClick={() => setQuantity(tier.qty)}
-                    className={`text-center py-1.5 rounded-md text-xs font-medium border transition-all
+                    className={`rounded-xl border py-1.5 text-center text-xs font-medium transition-all
                       ${quantity >= tier.qty
-                        ? 'bg-brand-500/20 border-brand-500/50 text-brand-300'
-                        : 'bg-[#1e2535] border-[#252d3f] text-[#64748b] hover:border-[#3c4a68]'
+                        ? 'bg-primary/20 border-primary/50 text-primary'
+                        : 'bg-input-background border-border text-muted-foreground hover:border-border/80'
                       }`}
                   >
                     <div>{tier.qty >= 1000 ? `${tier.qty/1000}k` : tier.qty}</div>

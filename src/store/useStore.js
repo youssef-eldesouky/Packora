@@ -27,6 +27,10 @@ export function faceLabelText(face) {
 
 const INNER_DEFAULT_BG = '#d4a66a'
 
+export function defaultFaceBackground(face) {
+  return isInnerFace(face) ? INNER_DEFAULT_BG : '#ffffff'
+}
+
 function defaultFaceDesign(inner = false) {
   return { backgroundColor: inner ? INNER_DEFAULT_BG : '#ffffff', elements: [] }
 }
@@ -90,6 +94,7 @@ export const useStore = create((set, get) => ({
   setSelectedFace: (face) => set({ selectedFace: face, selectedElementId: null, cameraTarget: face }),
   setViewMode: (mode) => set({ viewMode: mode }),
   toggleBoxOpen: () => set(s => ({ isBoxOpen: !s.isBoxOpen })),
+  setBoxOpen: (isOpen) => set({ isBoxOpen: isOpen }),
   setCameraTarget: (face) => set({ cameraTarget: face }),
 
   setBoxType: (boxType) => { set({ boxType }); get().calculatePrice() },
@@ -101,6 +106,8 @@ export const useStore = create((set, get) => ({
   setQuantity: (quantity) => { set({ quantity }); get().calculatePrice() },
   setLeftTab: (tab) => set({ leftTab: tab }),
   setSelectedElement: (id) => set({ selectedElementId: id }),
+  isDraggingElement: false,
+  setIsDraggingElement: (val) => set({ isDraggingElement: val }),
   setFaceTexture: (face, dataUrl) =>
     set(s => ({ faceTextures: { ...s.faceTextures, [face]: dataUrl } })),
 
@@ -190,7 +197,17 @@ export const useStore = create((set, get) => ({
     set(s => ({ designs: { ...s.designs, [face]: { ...s.designs[face], backgroundColor: color } } }))
     get().saveHistory()
   },
-
+  setFacesBackground: (faces, color) => {
+    set(s => {
+      const nextDesigns = { ...s.designs }
+      faces.forEach(face => {
+        if (!nextDesigns[face]) return
+        nextDesigns[face] = { ...nextDesigns[face], backgroundColor: color }
+      })
+      return { designs: nextDesigns }
+    })
+    get().saveHistory()
+  },
   saveHistory: () => {
     const { designs, history, historyIndex } = get()
     const newHistory = history.slice(0, historyIndex + 1)

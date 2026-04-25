@@ -29,18 +29,18 @@ export default function LayersPanel() {
   return (
     <div className="p-4 space-y-4 panel-enter">
       {/* Outside / Inside tabs */}
-      <div className="flex rounded-lg overflow-hidden border border-[#252d3f] bg-[#1a2030]">
+      <div className="flex rounded-lg overflow-hidden border border-border bg-muted">
         <button
           onClick={() => { setTab('outside'); if (isInnerFace(selectedFace)) setSelectedFace('front') }}
           className={`flex-1 py-1.5 text-xs font-semibold transition-all
-            ${tab === 'outside' ? 'bg-brand-500 text-white' : 'text-[#64748b] hover:text-[#94a3b8]'}`}
+            ${tab === 'outside' ? 'bg-primary text-foreground' : 'text-muted-foreground hover:text-foreground/80'}`}
         >
           Outside
         </button>
         <button
           onClick={() => { setTab('inside'); if (!isInnerFace(selectedFace)) setSelectedFace('inside_front') }}
           className={`flex-1 py-1.5 text-xs font-semibold transition-all relative
-            ${tab === 'inside' ? 'bg-amber-500/80 text-white' : 'text-[#64748b] hover:text-[#94a3b8]'}`}
+            ${tab === 'inside' ? 'bg-amber-500/80 text-foreground' : 'text-muted-foreground hover:text-foreground/80'}`}
         >
           Inside
           {!isBoxOpen && tab !== 'inside' && (
@@ -57,7 +57,7 @@ export default function LayersPanel() {
 
       {/* Face Selector */}
       <div>
-        <label className="block text-xs font-semibold text-[#64748b] uppercase tracking-wider mb-2">
+        <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
           {tab === 'outside' ? 'Select Face' : 'Select Inner Face'}
         </label>
         <div className="grid grid-cols-3 gap-1.5">
@@ -85,20 +85,20 @@ export default function LayersPanel() {
       {/* Elements List */}
       <div>
         <div className="flex justify-between items-center mb-2">
-          <label className="text-xs font-semibold text-[#64748b] uppercase tracking-wider">
+          <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
             Elements
           </label>
-          <span className="text-xs text-[#64748b]">{elements.length} items</span>
+          <span className="text-xs text-muted-foreground">{elements.length} items</span>
         </div>
 
         {elements.length === 0 ? (
           <div className="py-7 text-center">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"
-              className="mx-auto text-[#3c4a68] mb-2">
+              className="mx-auto text-muted-foreground mb-2">
               <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/>
             </svg>
-            <p className="text-sm text-[#64748b]">No elements on this face</p>
-            <p className="text-xs text-[#3c4a68] mt-0.5">Add text or images from the right panel</p>
+            <p className="text-sm text-muted-foreground">No elements on this face</p>
+            <p className="text-xs text-muted-foreground mt-0.5">Add text or images from the right panel</p>
           </div>
         ) : (
           <div className="space-y-1.5">
@@ -108,12 +108,12 @@ export default function LayersPanel() {
                 onClick={() => setSelectedElement(el.id === selectedElementId ? null : el.id)}
                 className={`flex items-center gap-2.5 p-2.5 rounded-lg border cursor-pointer transition-all group
                   ${selectedElementId === el.id
-                    ? 'border-brand-500/50 bg-brand-500/10'
-                    : 'border-[#252d3f] bg-[#1e2535] hover:border-[#3c4a68]'
+                    ? 'border-primary/50 bg-primary/10'
+                    : 'border-border bg-card hover:border-border'
                   }`}
               >
                 <div className={`w-7 h-7 rounded flex items-center justify-center shrink-0
-                  ${el.type === 'text' ? 'bg-brand-500/20 text-brand-400' : 'bg-purple-500/20 text-purple-400'}`}>
+                  ${el.type === 'text' ? 'bg-primary/20 text-primary' : 'bg-purple-500/20 text-purple-400'}`}>
                   {el.type === 'text' ? (
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                       <path d="M4 7V4h16v3M9 20h6M12 4v16"/>
@@ -126,15 +126,15 @@ export default function LayersPanel() {
                   )}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="text-xs font-medium text-white truncate">
+                  <div className="text-xs font-medium text-foreground truncate">
                     {el.type === 'text' ? el.content.slice(0, 20) || 'Empty text' : 'Image'}
                   </div>
-                  <div className="text-[10px] text-[#64748b] capitalize">{el.type}</div>
+                  <div className="text-[10px] text-muted-foreground capitalize">{el.type}</div>
                 </div>
                 <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                   <button
                     onClick={e => { e.stopPropagation(); toggleElementVisibility(face, el.id) }}
-                    className="p-1 rounded hover:bg-[#252d3f] text-[#64748b] hover:text-white transition-all"
+                    className="p-1 rounded hover:bg-muted text-muted-foreground hover:text-foreground transition-all"
                   >
                     {el.visible ? (
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -149,7 +149,7 @@ export default function LayersPanel() {
                   </button>
                   <button
                     onClick={e => { e.stopPropagation(); deleteElement(face, el.id) }}
-                    className="p-1 rounded hover:bg-red-500/20 text-[#64748b] hover:text-red-400 transition-all"
+                    className="p-1 rounded hover:bg-red-500/20 text-muted-foreground hover:text-red-400 transition-all"
                   >
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <polyline points="3,6 5,6 21,6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/>

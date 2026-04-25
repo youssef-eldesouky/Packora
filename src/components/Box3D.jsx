@@ -48,13 +48,15 @@ function solidMat(hex, rough = 0.65) {
     roughness: rough,
     metalness: 0.03,
     side: THREE.DoubleSide,
+    dithering: true,
   })
 }
 
 /* ─── Face Panel ─── */
 function Panel({
   face, w, h, position, rotation, material,
-  selectedFace, hoveredFace, onClick, onHover,
+  selectedFace, hoveredFace, onHover,
+  onPointerDown, onPointerMove, onPointerUp,
   castShadow = false, receiveShadow = false,
 }) {
   const ref = useRef(null)
@@ -84,7 +86,9 @@ function Panel({
       material={material}
       castShadow={castShadow}
       receiveShadow={receiveShadow}
-      onClick={e => { e.stopPropagation(); onClick(face) }}
+      onPointerDown={e => onPointerDown(e, face)}
+      onPointerMove={e => onPointerMove(e, face)}
+      onPointerUp={e => onPointerUp(e, face)}
       onPointerOver={e => { e.stopPropagation(); onHover(face) }}
       onPointerOut={() => onHover(null)}
     >
@@ -98,11 +102,13 @@ export default function Box3D({ textures }) {
   const {
     selectedFace, setSelectedFace,
     boxDimensions, isBoxOpen, cameraTarget, setCameraTarget,
+    designs, updateElement, setSelectedElement, setIsDraggingElement
   } = useStore()
   const { camera, gl } = useThree()
   const [hoveredFace, setHoveredFace] = useState(null)
-  const isDragging = useRef(false)
+  const isDraggingCam = useRef(false)
   const mouseDown  = useRef({ x: 0, y: 0 })
+  const dragRef = useRef(null)
 
   const { length: L, width: W, height: H } = boxDimensions
   const sx = L / 8; const sy = H / 8; const sz = W / 8
@@ -122,19 +128,57 @@ export default function Box3D({ textures }) {
 
   /* ── track current texture per face so we can dispose old ones ── */
   const texMap = useRef({})
+  const texVersion = useRef({})
+
+  /* ── COLOR SYNC: keep each face solid color from store ── */
+  useEffect(() => {
+    ALL_FACES.forEach(face => {
+      const mat = mats[face]
+      const color = designs[face]?.backgroundColor
+      const hasElements = (designs[face]?.elements?.length ?? 0) > 0
+      
+      if (!mat || !color) return
+      
+      // If we are using a texture map (which now has the background color baked in),
+      // we must set the material color to white to avoid multiplying colors.
+      if (hasElements) {
+        mat.color.set('#ffffff')
+      } else {
+        mat.color.set(color)
+      }
+      mat.needsUpdate = true
+    })
+  }, [designs, mats])
 
   /* ── TEXTURE SYNC: replace material.map whenever a dataUrl arrives ── */
   useEffect(() => {
     ALL_FACES.forEach(face => {
       const dataUrl = textures[face]
-      if (!dataUrl) return
+      const hasElements = (designs[face]?.elements?.length ?? 0) > 0
+      if (!dataUrl || !hasElements) {
+        const mat = mats[face]
+        if (mat.map) {
+          texMap.current[face]?.dispose()
+          texMap.current[face] = null
+          mat.map = null
+          mat.needsUpdate = true
+        }
+        return
+      }
+      const version = (texVersion.current[face] ?? 0) + 1
+      texVersion.current[face] = version
 
       const img = new Image()
       img.onload = () => {
+        if (texVersion.current[face] !== version) return
         texMap.current[face]?.dispose()
 
         const tex = new THREE.Texture(img)
         tex.colorSpace = THREE.SRGBColorSpace
+        tex.minFilter = THREE.LinearMipmapLinearFilter
+        tex.magFilter = THREE.LinearFilter
+        tex.generateMipmaps = true
+        tex.anisotropy = gl.capabilities.getMaxAnisotropy()
         tex.needsUpdate = true
         texMap.current[face] = tex
 
@@ -144,11 +188,21 @@ export default function Box3D({ textures }) {
       }
       img.src = dataUrl
     })
-  }, [textures, mats])
+  }, [textures, designs, mats, gl])
 
   const edgeMat = useMemo(() => new THREE.MeshStandardMaterial({
-    color: KRAFT_EDGE, roughness: 0.75, metalness: 0.02,
+    color: KRAFT_EDGE, roughness: 0.75, metalness: 0.02, dithering: true,
   }), [])
+
+  useEffect(() => {
+    return () => {
+      ALL_FACES.forEach(face => {
+        texMap.current[face]?.dispose()
+      })
+      Object.values(mats).forEach(mat => mat.dispose())
+      edgeMat.dispose()
+    }
+  }, [mats, edgeMat])
 
   /* ── lid animation ── */
   const lidAngle   = useRef(0)
@@ -183,29 +237,75 @@ export default function Box3D({ textures }) {
   })
 
   /* ── pointer helpers ── */
-  const handlePointerDown = useCallback((e) => {
-    mouseDown.current = { x: e.pointer.x, y: e.pointer.y }
-    isDragging.current = false
-  }, [])
-  const handlePointerMove = useCallback((e) => {
-    const dx = e.pointer.x - mouseDown.current.x
-    const dy = e.pointer.y - mouseDown.current.y
-    if (Math.sqrt(dx * dx + dy * dy) > 0.008) isDragging.current = true
-  }, [])
-  const handlePointerOver = useCallback(() => {
-    gl.domElement.style.cursor = 'pointer'
-  }, [gl])
-  const handlePointerOut = useCallback(() => {
-    gl.domElement.style.cursor = 'default'
-    setHoveredFace(null)
-  }, [gl])
-  const handleFaceClick = useCallback((face) => {
-    if (isDragging.current) return
+  const handlePointerDown = useCallback((e, face) => {
+    e.stopPropagation()
+    mouseDown.current = { x: e.clientX, y: e.clientY }
+    isDraggingCam.current = false
+    
     setSelectedFace(face)
-  }, [setSelectedFace])
+    if (!e.uv) return
+
+    const elements = designs[face]?.elements || []
+    if (elements.length === 0) return
+
+    const clickX = e.uv.x * 1024
+    const clickY = (1 - e.uv.y) * 1024
+
+    const clickedEl = [...elements].reverse().find(el => {
+      // Allow slight padding for grabbing
+      return clickX >= el.x - 10 && clickX <= el.x + el.width + 10 &&
+             clickY >= el.y - 10 && clickY <= el.y + el.height + 10
+    })
+
+    if (clickedEl) {
+      setSelectedElement(clickedEl.id)
+      setIsDraggingElement(true)
+      dragRef.current = {
+        face,
+        elementId: clickedEl.id,
+        offsetX: clickX - clickedEl.x,
+        offsetY: clickY - clickedEl.y
+      }
+      e.target.setPointerCapture(e.pointerId)
+    } else {
+      setSelectedElement(null)
+    }
+  }, [designs, setSelectedFace, setSelectedElement, setIsDraggingElement])
+
+  const handlePointerMove = useCallback((e, face) => {
+    if (dragRef.current && e.uv) {
+      e.stopPropagation()
+      const { elementId, offsetX, offsetY } = dragRef.current
+      const currentX = e.uv.x * 1024
+      const currentY = (1 - e.uv.y) * 1024
+      updateElement(dragRef.current.face, elementId, {
+        x: currentX - offsetX,
+        y: currentY - offsetY
+      })
+    } else {
+      const dx = e.clientX - mouseDown.current.x
+      const dy = e.clientY - mouseDown.current.y
+      if (Math.sqrt(dx * dx + dy * dy) > 6) isDraggingCam.current = true
+    }
+  }, [updateElement])
+
+  const handlePointerUp = useCallback((e, face) => {
+    if (dragRef.current) {
+      e.stopPropagation()
+      dragRef.current = null
+      setIsDraggingElement(false)
+      if (e.target.hasPointerCapture(e.pointerId)) {
+        e.target.releasePointerCapture(e.pointerId)
+      }
+    } else {
+      // Normal click
+      if (!isDraggingCam.current) setSelectedFace(face)
+    }
+  }, [setIsDraggingElement, setSelectedFace])
+
   const handleFaceHover = useCallback((face) => {
     setHoveredFace(face)
-    gl.domElement.style.cursor = face ? 'pointer' : 'default'
+    gl.domElement.style.cursor = face ? (dragRef.current ? 'grabbing' : 'pointer') : 'default'
   }, [gl])
 
   /* ── shorthand for Panel ── */
@@ -215,41 +315,39 @@ export default function Box3D({ textures }) {
       position={pos} rotation={rot}
       material={mats[face]}
       selectedFace={selectedFace} hoveredFace={hoveredFace}
-      onClick={handleFaceClick} onHover={handleFaceHover}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
+      onHover={handleFaceHover}
       castShadow={shadow} receiveShadow
     />
   )
 
   return (
-    <group
-      onPointerDown={handlePointerDown}
-      onPointerMove={handlePointerMove}
-      onPointerOver={handlePointerOver}
-      onPointerOut={handlePointerOut}
-    >
+    <group>
       {/* ════════════════════════════════
           BOX BODY — 4 walls + floor
           ════════════════════════════════ */}
 
       {/* BOTTOM */}
-      {P('bottom', sx, sz, [0, -hh, 0], [-Math.PI / 2, 0, 0], true)}
-      {P('inside_bottom', sx - T * 2, sz - T * 2, [0, -hh + T * 0.6, 0], [Math.PI / 2, 0, 0])}
+      {P('bottom', sx + T, sz + T, [0, -hh - (T / 2 + 0.001), 0], [Math.PI / 2, 0, 0], true)}
+      {isBoxOpen && P('inside_bottom', sx - T, sz - T, [0, -hh + (T / 2 + 0.001), 0], [-Math.PI / 2, 0, 0])}
 
       {/* BACK */}
-      {P('back', sx, sy, [0, 0, -hz], [0, Math.PI, 0], true)}
-      {P('inside_back', sx - T * 2, sy - T, [0, T * 0.25, -hz + T * 0.6], [0, 0, 0])}
+      {P('back', sx + T, sy + T, [0, 0, -hz - (T / 2 + 0.001)], [0, Math.PI, 0], true)}
+      {isBoxOpen && P('inside_back', sx - T, sy - T, [0, 0, -hz + (T / 2 + 0.001)], [0, 0, 0])}
 
       {/* LEFT */}
-      {P('left', sz, sy, [-hw, 0, 0], [0, Math.PI / 2, 0], true)}
-      {P('inside_left', sz - T * 2, sy - T, [-hw + T * 0.6, T * 0.25, 0], [0, Math.PI / 2, 0])}
+      {P('left', sz + T, sy + T, [-hw - (T / 2 + 0.001), 0, 0], [0, -Math.PI / 2, 0], true)}
+      {isBoxOpen && P('inside_left', sz - T, sy - T, [-hw + (T / 2 + 0.001), 0, 0], [0, Math.PI / 2, 0])}
 
       {/* RIGHT */}
-      {P('right', sz, sy, [hw, 0, 0], [0, -Math.PI / 2, 0], true)}
-      {P('inside_right', sz - T * 2, sy - T, [hw - T * 0.6, T * 0.25, 0], [0, -Math.PI / 2, 0])}
+      {P('right', sz + T, sy + T, [hw + (T / 2 + 0.001), 0, 0], [0, Math.PI / 2, 0], true)}
+      {isBoxOpen && P('inside_right', sz - T, sy - T, [hw - (T / 2 + 0.001), 0, 0], [0, -Math.PI / 2, 0])}
 
       {/* FRONT */}
-      {P('front', sx, sy, [0, 0, hz], [0, 0, 0], true)}
-      {P('inside_front', sx - T * 2, sy - T, [0, T * 0.25, hz - T * 0.6], [0, Math.PI, 0])}
+      {P('front', sx + T, sy + T, [0, 0, hz + (T / 2 + 0.001)], [0, 0, 0], true)}
+      {isBoxOpen && P('inside_front', sx - T, sy - T, [0, 0, hz - (T / 2 + 0.001)], [0, Math.PI, 0])}
 
       {/* Wall edge slabs (give physical thickness) */}
       <mesh position={[0, -hh, 0]} material={edgeMat} castShadow receiveShadow>
@@ -280,10 +378,10 @@ export default function Box3D({ textures }) {
         <group ref={lidRef}>
 
           {/* TOP outer face */}
-          {P('top', sx, sz, [0, T * 0.5, hz], [Math.PI / 2, 0, 0], true)}
+          {P('top', sx + T, sz + T, [0, T / 2 + 0.001, hz], [-Math.PI / 2, 0, 0], true)}
 
           {/* TOP inner face (inside_top) — faces downward so visible when lid is open */}
-          {P('inside_top', sx - T * 2, sz - T * 2, [0, -T * 0.1, hz], [Math.PI / 2, 0, 0])}
+          {isBoxOpen && P('inside_top', sx - T, sz - T, [0, -(T / 2 + 0.001), hz], [Math.PI / 2, 0, 0])}
 
           {/* Lid structural slab */}
           <mesh position={[0, 0, hz]} material={edgeMat} castShadow>

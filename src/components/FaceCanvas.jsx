@@ -1,7 +1,7 @@
 import { useEffect, useRef, useCallback } from 'react'
 import { useStore } from '../store/useStore'
 
-const CANVAS_SIZE = 512
+const CANVAS_SIZE = 1024
 
 function drawElement(ctx, el) {
   if (!el.visible) return
@@ -41,18 +41,26 @@ export default function FaceCanvas({ face, onTextureReady }) {
   const canvasRef = useRef(null)
   const designs = useStore(s => s.designs)
   const imgCache = useRef(new Map())
+  const redrawVersion = useRef(0)
 
   const redraw = useCallback(() => {
     const canvas = canvasRef.current
     if (!canvas) return
     const ctx = canvas.getContext('2d')
     if (!ctx) return
+    const version = redrawVersion.current + 1
+    redrawVersion.current = version
 
-    const { backgroundColor, elements } = designs[face]
+    const { elements, backgroundColor } = designs[face]
 
     ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE)
-    ctx.fillStyle = backgroundColor
+    
+    // Draw solid background color to prevent black pixels when used as a texture
+    ctx.fillStyle = backgroundColor || (isInnerFace(face) ? '#c8935a' : '#ede8d8')
     ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE)
+
+    ctx.imageSmoothingEnabled = true
+    ctx.imageSmoothingQuality = 'high'
 
     const imageElements = elements.filter(el => el.type === 'image' && el.visible)
 
@@ -73,8 +81,10 @@ export default function FaceCanvas({ face, onTextureReady }) {
     })
 
     Promise.all(loadImages).then(() => {
+      if (redrawVersion.current !== version) return
+
       ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE)
-      ctx.fillStyle = backgroundColor
+      ctx.fillStyle = backgroundColor || (isInnerFace(face) ? '#c8935a' : '#ede8d8')
       ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE)
 
       elements.forEach(el => {
@@ -105,10 +115,19 @@ export default function FaceCanvas({ face, onTextureReady }) {
           }
         }
 
+        // Draw selection highlight directly in the 3D texture!
+        const isSelected = useStore.getState().selectedElementId === el.id
+        if (isSelected) {
+          ctx.strokeStyle = '#5f8aff'
+          ctx.lineWidth = 4
+          ctx.setLineDash([12, 12])
+          ctx.strokeRect(0, 0, el.width, el.height)
+        }
+
         ctx.restore()
       })
 
-      onTextureReady(face, canvas.toDataURL())
+      onTextureReady(face, canvas.toDataURL('image/png'))
     })
   }, [face, designs, onTextureReady])
 
