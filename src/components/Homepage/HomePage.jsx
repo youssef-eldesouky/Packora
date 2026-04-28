@@ -9,6 +9,7 @@ import {
   Box,
   Palette,
   Leaf,
+  UploadCloud,
 } from 'lucide-react';
 import products from '../../mockdata/product.json';
 import orders from '../../mockdata/Orders.json';
@@ -149,6 +150,10 @@ export default function HomePage() {
             <Link to="/Track" className="action-btn">
               <Truck size={18} />
               Track Orders
+            </Link>
+            <Link to="/BulkOrder" className="action-btn">
+              <UploadCloud size={18} />
+              Bulk Upload
             </Link>
             <Link to="#" className="action-btn">
               <HelpCircle size={18} />

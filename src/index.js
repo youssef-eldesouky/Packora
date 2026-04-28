@@ -37,6 +37,7 @@ import Design from './components/Design/Design';
 import Footer from './components/Footer/Footer';
 import LoginPage from './components/LoginPage/LoginPage';
 import RequireAuth from './components/RequireAuth';
+import BulkOrder from './components/BulkOrder/BulkOrder';
 
 let router = createBrowserRouter([
   {
@@ -62,6 +63,7 @@ let router = createBrowserRouter([
           { path: 'Profile', element: <Profile /> },
           { path: 'Design', element: <Design /> },
           { path: 'Footer', element: <Footer /> },
+          { path: 'BulkOrder', element: <BulkOrder /> },
         ],
       },
       {
