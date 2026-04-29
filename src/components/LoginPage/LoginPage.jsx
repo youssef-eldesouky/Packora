@@ -11,15 +11,44 @@ export default function LoginPage() {
   const navigate = useNavigate();
   const { loginAdmin } = useAdminAuth();
 
-  const handleSubmit = (e) => {
+  const [errorMsg, setErrorMsg] = useState('');
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setErrorMsg('');
     const em = email.trim().toLowerCase();
+    
     if (em === ADMIN_EMAIL && password.length > 0) {
       loginAdmin();
       navigate('/admin');
       return;
     }
-    navigate('/HomePage');
+
+    try {
+      const response = await fetch('http://localhost:8080/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: em,
+          password: password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setErrorMsg(data.message || 'Login failed. Please check your credentials.');
+      } else {
+        // Save the token to localStorage
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data));
+        navigate('/HomePage');
+      }
+    } catch (error) {
+      setErrorMsg('Could not connect to the server. Please try again later.');
+    }
   };
 
   return (
@@ -63,6 +92,11 @@ export default function LoginPage() {
           }}
         >
           <form onSubmit={handleSubmit}>
+            {errorMsg && (
+              <div style={{ color: 'red', marginBottom: '16px', fontSize: '14px', textAlign: 'center' }}>
+                {errorMsg}
+              </div>
+            )}
             {/* Email */}
             <div className="login-field" style={{ marginBottom: 20 }}>
               <label
