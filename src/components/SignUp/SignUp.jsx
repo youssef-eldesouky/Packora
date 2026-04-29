@@ -10,9 +10,45 @@ export default function SignUp() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
-  const handleSubmit = (e) => {
+  const [errorMsg, setErrorMsg] = useState('');
+  const [successMsg, setSuccessMsg] = useState('');
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Add your signup logic here (e.g. validate password === confirmPassword)
+    setErrorMsg('');
+    setSuccessMsg('');
+
+    if (password !== confirmPassword) {
+      setErrorMsg('Passwords do not match');
+      return;
+    }
+
+    try {
+      const response = await fetch('http://localhost:8080/api/auth/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: fullName,
+          email: email,
+          password: password,
+          companyName: businessName,
+          phone: '', // Optional, or you could add a phone state
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setErrorMsg(data.message || 'Signup failed');
+      } else {
+        setSuccessMsg(data.message || 'User registered successfully!');
+        // Optionally redirect or clear form here
+      }
+    } catch (error) {
+      setErrorMsg('Could not connect to the server. Please try again later.');
+    }
   };
 
   return (
@@ -55,6 +91,16 @@ export default function SignUp() {
           }}
         >
           <form onSubmit={handleSubmit}>
+            {errorMsg && (
+              <div style={{ color: 'red', marginBottom: '16px', fontSize: '14px', textAlign: 'center' }}>
+                {errorMsg}
+              </div>
+            )}
+            {successMsg && (
+              <div style={{ color: 'green', marginBottom: '16px', fontSize: '14px', textAlign: 'center' }}>
+                {successMsg}
+              </div>
+            )}
             {/* Full Name */}
             <div className="signup-field" style={{ marginBottom: 20 }}>
               <label

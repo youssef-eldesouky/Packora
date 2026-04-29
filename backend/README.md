@@ -1,42 +1,56 @@
 # PACKORA Backend
 
-This is the backend for the PACKORA web application (packaging customization and shipment).
+This is the backend for the PACKORA web application. It provides secure REST APIs for the frontend, utilizing Spring Boot and Spring Security for authentication and authorization.
 
 ## Technologies Used
 - **Java 21**
-- **Spring Boot 3.4**
-- **Spring Web** (REST APIs)
-- **Spring Data JPA** (Prepared)
-- **PostgreSQL Driver** (Prepared)
+- **Spring Boot 3.4.x**
+- **Spring Security & JWT** (Authentication and Authorization)
+- **Spring Data JPA** (Data Access)
+- **PostgreSQL** (Database)
 - **Lombok** (Boilerplate reduction)
-- **Spring Boot DevTools**
 
-## Project Structure
-The code is organized into a clean `Controller-Service-Repository` layered architecture:
-- `com.packora.backend.controller`: REST Endpoints exposing APIs to the frontend.
-- `com.packora.backend.service`: Business Logic layer.
-- `com.packora.backend.dto`: Data Transfer Objects for moving data between layers.
-- `com.packora.backend.repository`: Data Access layer (JPA Repositories).
-- `com.packora.backend.model`: JPA Entities (Database tables).
-- `com.packora.backend.config`: Configuration classes (e.g., CORS setup).
+## Architecture & Security Implementation
+The codebase is structured using a `Controller-Service-Repository` pattern.
+- **Authentication:** Users can register and log in via the `AuthController`. 
+- **JWT:** Upon successful login, the server generates a JSON Web Token (JWT) that the client must include in the `Authorization` header (`Bearer <token>`) for subsequent requests.
+- **Authorization:** Protected routes are filtered through `JwtAuthFilter`. The token is parsed and validated, and the user's details are stored in the Spring Security context.
+- **Database:** User credentials and roles are persisted in the PostgreSQL database using JPA Entities (`User`, `Role`).
 
-## Running the Application
-To run the application locally on your machine, navigate to the `backend` directory and execute:
+## Walkthrough: Initialization & Database Connection
+
+To run this application locally and connect everything correctly, follow these steps:
+
+### 1. Database Setup
+1. Ensure **PostgreSQL** is installed and running on your local machine.
+2. Open **pgAdmin** (or your preferred SQL client) and create a new database named `packora`.
+3. The application will automatically construct the necessary tables based on the JPA `@Entity` classes (because of the `spring.jpa.hibernate.ddl-auto=update` property).
+
+### 2. Configure application.properties
+Navigate to `src/main/resources/application.properties` and verify your database credentials. 
+Update the `username` and `password` to match your local PostgreSQL setup:
+```properties
+spring.datasource.url=jdbc:postgresql://localhost:5432/packora
+spring.datasource.username=postgres
+spring.datasource.password=YourLocalPassword
+spring.datasource.driver-class-name=org.postgresql.Driver
+
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+```
+
+### 3. JWT Configuration (Optional)
+Currently, the JWT secret key is generated automatically on server startup. To persist sessions across server restarts in a production environment, you should replace the auto-generated key with a static environment variable in `JwtUtil.java`.
+
+### 4. Running the Application
+From the `backend` directory, run the application using the Maven wrapper:
 ```bash
 ./mvnw spring-boot:run
 ```
-By default, the application will start on `http://localhost:8080`.
+The server will start on `http://localhost:8080`.
 
-### Endpoints
-The backend currently has a placeholder health check endpoint:
-- **`GET /api/status`**
-Returns: `{"status": "Packora Backend is running"}`
-
-## Note for the Database Teammate
-Currently, database connection code and `@Entity` classes have not been implemented.
-To allow the project to start successfully without a database config, Data Source auto-configuration has been temporarily excluded in `src/main/resources/application.properties`.
-
-**When you are ready to implement the database:**
-1. Configure your PostgreSQL database connection properties in `src/main/resources/application.properties`.
-2. Remove the `spring.autoconfigure.exclude` line from `application.properties`.
-3. Start creating your `@Entity` classes in the `model` package and your repositories in the `repository` package.
+### 5. Testing the Auth Flow
+You can test the connectivity and responsiveness using tools like Postman or cURL:
+1. **Register:** Send a `POST` request to `/api/auth/register` with a JSON body containing user details.
+2. **Login:** Send a `POST` request to `/api/auth/login`. On success, you'll receive a JWT token.
+3. **Protected Endpoints:** Include the `Authorization: Bearer <token>` header in your requests to access protected resources.
