@@ -3,7 +3,7 @@ package com.packora.backend.controller;
 import com.packora.backend.dto.order.OrderResponse;
 import com.packora.backend.dto.order.OrderStatusUpdateRequest;
 import com.packora.backend.dto.order.PlaceOrderRequest;
-
+import com.packora.backend.model.enums.OrderStatus;
 import com.packora.backend.service.OrderService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;

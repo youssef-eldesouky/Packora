@@ -1,57 +1,86 @@
 package com.packora.backend.controller;
 
-import com.packora.backend.dto.AuthResponse;
-import com.packora.backend.dto.LoginRequest;
-import com.packora.backend.dto.RegisterRequest;
-import com.packora.backend.security.JwtUtil;
-import com.packora.backend.security.UserDetailsServiceImpl;
-import com.packora.backend.service.AuthService;
+import com.packora.backend.dto.auth.JwtResponse;
+import com.packora.backend.dto.auth.LoginRequest;
+import com.packora.backend.dto.auth.MessageResponse;
+import com.packora.backend.dto.auth.SignupRequest;
+import com.packora.backend.model.BusinessOwner;
+import com.packora.backend.model.User;
+import com.packora.backend.repository.UserRepository;
+import com.packora.backend.security.jwt.JwtUtils;
+import com.packora.backend.security.services.UserDetailsImpl;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+@CrossOrigin(origins = "http://localhost:3000", maxAge = 3600)
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
+    @Autowired
+    AuthenticationManager authenticationManager;
 
     @Autowired
-    private AuthenticationManager authenticationManager;
+    UserRepository userRepository;
 
     @Autowired
-    private JwtUtil jwtUtil;
+    PasswordEncoder encoder;
 
     @Autowired
-    private UserDetailsServiceImpl userDetailsService;
-
-    @Autowired
-    private AuthService authService;
-
-    @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterRequest registerRequest) {
-        try {
-            authService.registerUser(registerRequest);
-            return ResponseEntity.ok(new AuthResponse(null, "User registered successfully!"));
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(new AuthResponse(null, e.getMessage()));
-        }
-    }
+    JwtUtils jwtUtils;
 
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
-        try {
-            authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(loginRequest.getIdentifier(), loginRequest.getPassword()));
 
-            final UserDetails userDetails = userDetailsService.loadUserByUsername(loginRequest.getIdentifier());
-            final String jwt = jwtUtil.generateToken(userDetails);
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
 
-            return ResponseEntity.ok(new AuthResponse(jwt, "Login successful"));
-        } catch (Exception e) {
-            return ResponseEntity.status(401).body(new AuthResponse(null, "Invalid username/email or password"));
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        String jwt = jwtUtils.generateJwtToken(authentication);
+
+        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+        // Assume first authority is the role
+        String role = userDetails.getAuthorities().isEmpty() ? "ROLE_USER"
+                : userDetails.getAuthorities().iterator().next().getAuthority();
+
+        return ResponseEntity.ok(new JwtResponse(jwt,
+                userDetails.getId(),
+                userDetails.getUsername(),
+                userDetails.getEmail(),
+                role));
+    }
+
+    @PostMapping("/signup")
+    public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
+        if (userRepository.existsByUsername(signUpRequest.getUsername())) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new MessageResponse("Error: Username is already taken!"));
         }
+
+        if (userRepository.existsByEmail(signUpRequest.getEmail())) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new MessageResponse("Error: Email is already in use!"));
+        }
+
+        // Create new user's account
+        // As discussed, defaulting to BusinessOwner for standard signups
+        BusinessOwner user = new BusinessOwner();
+        user.setUsername(signUpRequest.getUsername());
+        user.setEmail(signUpRequest.getEmail());
+        user.setPassword(encoder.encode(signUpRequest.getPassword()));
+        user.setPhone(signUpRequest.getPhone());
+        user.setCompanyName(signUpRequest.getCompanyName());
+
+        userRepository.save(user);
+
+        return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
     }
 }
