@@ -73,12 +73,12 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public OrderResponse placeOrder(PlaceOrderRequest request) {
-        log.info("[OrderService] Placing order for userId={}", request.getUserId());
+    public OrderResponse placeOrder(PlaceOrderRequest request, Long userId) {
+        log.info("[OrderService] Placing order for userId={}", userId);
 
         // 1. Validate user
-        User user = userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new ResourceNotFoundException("User", request.getUserId()));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User", userId));
 
         // 2. Build OrderItems, validate each product, and compute total
         List<OrderItem> orderItems = request.getItems().stream()

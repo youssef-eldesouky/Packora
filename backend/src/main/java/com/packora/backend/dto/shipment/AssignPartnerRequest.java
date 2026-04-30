@@ -9,9 +9,6 @@ import lombok.Data;
  * The provided userId must exist in the database and
  * must have the PARTNER_SHIPPING discriminator value.
  * Both checks are enforced in ShipmentServiceImpl.
- *
- * TODO: Once JWT auth is in, optionally derive the partner
- *       from the authenticated principal instead of an explicit ID.
  */
 @Data
 public class AssignPartnerRequest {

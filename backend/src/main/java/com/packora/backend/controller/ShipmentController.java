@@ -27,7 +27,6 @@ import org.springframework.web.bind.annotation.*;
  *   - GET endpoints: public for now (should restrict to order owner or admin post-JWT)
  *   - PUT /status:   should be restricted to ADMIN or the assigned PARTNER_SHIPPING
  *   - PUT /assign:   should be restricted to ADMIN only
- *   All TODOs are marked inline.
  */
 @RestController
 @RequestMapping("/api/shipments")

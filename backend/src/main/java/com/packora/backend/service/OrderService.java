@@ -16,11 +16,9 @@ import java.util.List;
 public interface OrderService {
 
     /**
-     * Place a new order from a cart checkout.
-     * Validates user existence, validates every product, computes total,
-     * persists the Order and its OrderItems.
+     * Places a new order for a user.
      */
-    OrderResponse placeOrder(PlaceOrderRequest request);
+    OrderResponse placeOrder(PlaceOrderRequest request, Long userId);
 
     /**
      * Retrieve a single order by its primary key.

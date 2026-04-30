@@ -4,6 +4,7 @@ import com.packora.backend.dto.order.OrderResponse;
 import com.packora.backend.dto.order.OrderStatusUpdateRequest;
 import com.packora.backend.dto.order.PlaceOrderRequest;
 import com.packora.backend.model.enums.OrderStatus;
+import com.packora.backend.security.services.UserDetailsImpl;
 import com.packora.backend.service.OrderService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -11,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -67,9 +69,11 @@ public class OrderController {
      * }
      */
     @PostMapping
-    public ResponseEntity<OrderResponse> placeOrder(@Valid @RequestBody PlaceOrderRequest request) {
-        log.info("[OrderController] POST /api/orders — userId={}", request.getUserId());
-        OrderResponse response = orderService.placeOrder(request);
+    public ResponseEntity<OrderResponse> placeOrder(
+            @Valid @RequestBody PlaceOrderRequest request,
+            @AuthenticationPrincipal UserDetailsImpl principal) {
+        log.info("[OrderController] POST /api/orders — userId={}", principal.getId());
+        OrderResponse response = orderService.placeOrder(request, principal.getId());
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -77,8 +81,6 @@ public class OrderController {
 
     /**
      * Get all orders for the currently authenticated user.
-     *
-     * TEMPORARY: uses ?userId= query param until JWT is in place.
      * Results are sorted newest-first.
      *
      * Used by:
@@ -87,11 +89,10 @@ public class OrderController {
      */
     @GetMapping("/me")
     public ResponseEntity<List<OrderResponse>> getMyOrders(
-            // TODO: Replace with: @AuthenticationPrincipal UserDetails principal
-            @RequestParam Long userId) {
+            @AuthenticationPrincipal UserDetailsImpl principal) {
 
-        log.info("[OrderController] GET /api/orders/me — userId={}", userId);
-        return ResponseEntity.ok(orderService.getOrdersByUser(userId));
+        log.info("[OrderController] GET /api/orders/me — userId={}", principal.getId());
+        return ResponseEntity.ok(orderService.getOrdersByUser(principal.getId()));
     }
 
     // ── GET /api/orders ───────────────────────────────────────────────────────
