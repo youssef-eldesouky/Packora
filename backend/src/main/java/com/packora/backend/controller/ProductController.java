@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -81,6 +82,7 @@ public class ProductController {
      *   "materials": ["Corrugated", "Kraft"]
      * }
      */
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<ProductResponse> createProduct(
             @Valid @RequestBody ProductRequest request) {
@@ -95,6 +97,7 @@ public class ProductController {
      * Update an existing product.
      * Returns 404 if the product does not exist.
      */
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<ProductResponse> updateProduct(
             @PathVariable Long id,
@@ -109,6 +112,7 @@ public class ProductController {
      * Delete a product.
      * Returns 204 No Content on success, 404 if not found.
      */
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
         log.info("[ProductController] DELETE /api/products/{}", id);

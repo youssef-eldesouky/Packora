@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -53,8 +54,6 @@ public class ShipmentController {
      *
      * Returns 404 if the order does not exist, or if the order
      * exists but has no shipment created yet.
-     *
-     * TODO: Restrict to the order's owner or ADMIN once JWT is in.
      */
     @GetMapping("/order/{orderId}")
     public ResponseEntity<ShipmentResponse> getShipmentByOrderId(@PathVariable Long orderId) {
@@ -89,9 +88,8 @@ public class ShipmentController {
      *
      * Returns 400 if the transition is not allowed.
      * Returns 404 if the shipment does not exist.
-     *
-     * TODO: Restrict to @PreAuthorize("hasAnyRole('ADMIN', 'PARTNER_SHIPPING')") once JWT is in.
      */
+    @PreAuthorize("hasAnyRole('ADMIN', 'PARTNER_SHIPPING')")
     @PutMapping("/{id}/status")
     public ResponseEntity<ShipmentResponse> updateShipmentStatus(
             @PathVariable Long id,
@@ -114,9 +112,8 @@ public class ShipmentController {
      * Returns 400 if the user is not a shipping partner, or if the
      *         shipment is already in a terminal state.
      * Returns 404 if the shipment or partner user does not exist.
-     *
-     * TODO: Restrict to @PreAuthorize("hasRole('ADMIN')") once JWT is in.
      */
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}/assign-partner")
     public ResponseEntity<ShipmentResponse> assignShippingPartner(
             @PathVariable Long id,

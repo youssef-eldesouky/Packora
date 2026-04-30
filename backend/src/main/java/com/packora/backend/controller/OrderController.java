@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -101,9 +102,8 @@ public class OrderController {
      * Used by:
      *   - Admin Dashboard (recent orders widget)
      *   - Admin Orders management page
-     *
-     * TODO: Restrict with @PreAuthorize("hasRole('ADMIN')") once auth is wired up.
      */
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
     public ResponseEntity<List<OrderResponse>> getAllOrders() {
         log.info("[OrderController] GET /api/orders — fetching all orders");
@@ -131,9 +131,8 @@ public class OrderController {
      * Valid values: PENDING | PROCESSING | SHIPPED | DELIVERED | CANCELLED
      *
      * Returns 400 if the transition is not allowed (e.g. un-cancelling an order).
-     *
-     * TODO: Restrict with @PreAuthorize("hasRole('ADMIN')") once auth is wired up.
      */
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}/status")
     public ResponseEntity<OrderResponse> updateOrderStatus(
             @PathVariable Long id,
