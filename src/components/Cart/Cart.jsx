@@ -1,79 +1,36 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import {
-  Package,
-  LayoutGrid,
   Truck,
   ShoppingCart,
-  HelpCircle,
-  User,
-  LogOut,
-  Share2,
   Box,
   Trash2,
   CreditCard,
   Lock,
+  UploadCloud
 } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
+import Navbar from '../Navbar/Navbar';
 import './Cart.css';
+import Footer from '../Footer/Footer';
 
 const TAX_RATE = 0.08;
 
 export default function Cart() {
-  const { cartItems, removeFromCart, updateQuantity, clearCart } = useCart();
+  const { cartItems, removeFromCart, updateQuantity, clearCart, bulkExcelData, setBulkExcelData } = useCart();
+  const [showBulkPrompt, setShowBulkPrompt] = React.useState(false);
 
   const subtotal = cartItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
   const shipping = subtotal >= 100 ? 0 : 0;
   const tax = subtotal * TAX_RATE;
   const total = subtotal + shipping + tax;
+  const totalBoxes = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+  const showBulkBanner = totalBoxes >= 25;
 
   if (cartItems.length === 0) {
     return (
       <div className="cart-page">
-        <header className="cart-header">
-          <Link to="/HomePage" className="cart-logo">
-            <div className="cart-logo-icon">
-              <Package size={24} color="white" />
-            </div>
-            <span>Packora</span>
-          </Link>
-
-          <nav className="cart-nav">
-            <Link to="/HomePage" className="cart-nav-item">
-              <LayoutGrid size={18} />
-              Dashboard
-            </Link>
-            <Link to="/Catalog" className="cart-nav-item">
-              <Box size={18} />
-              Catalog
-            </Link>
-            <Link to="/Track" className="cart-nav-item">
-              <Truck size={18} />
-              Track
-            </Link>
-            <Link to="/Cart" className="cart-nav-item active">
-              <ShoppingCart size={18} />
-              Cart
-            </Link>
-            <Link to="/Support" className="cart-nav-item">
-              <HelpCircle size={18} />
-              Support
-            </Link>
-            <Link to="/Profile" className="cart-nav-item">
-              <User size={18} />
-              Profile
-            </Link>
-            <Link to="/" className="cart-nav-item">
-              <LogOut size={18} />
-              Logout
-            </Link>
-          </nav>
-
-          <button type="button" className="cart-share-btn">
-            <Share2 size={18} />
-            Share
-          </button>
-        </header>
+        <Navbar />
 
         <main className="cart-main">
           <div className="cart-empty">
@@ -90,61 +47,39 @@ export default function Cart() {
             </Link>
           </div>
         </main>
+        <br/>
+        <br/>
+        <br/>
+        <br/>
+        <br/>
+        <br/>
+        <br/>
+        <Footer/>
       </div>
     );
   }
 
   return (
     <div className="cart-page">
-      <header className="cart-header">
-        <Link to="/HomePage" className="cart-logo">
-          <div className="cart-logo-icon">
-            <Package size={24} color="white" />
-          </div>
-          <span>Packora</span>
-        </Link>
-
-        <nav className="cart-nav">
-          <Link to="/HomePage" className="cart-nav-item">
-            <LayoutGrid size={18} />
-            Dashboard
-          </Link>
-          <Link to="/Catalog" className="cart-nav-item">
-            <Box size={18} />
-            Catalog
-          </Link>
-          <Link to="/Track" className="cart-nav-item">
-            <Truck size={18} />
-            Track
-          </Link>
-          <Link to="/Cart" className="cart-nav-item active cart-nav-badge">
-            <ShoppingCart size={18} />
-            Cart
-            <span className="cart-badge">{cartItems.length}</span>
-          </Link>
-          <Link to="/Support" className="cart-nav-item">
-            <HelpCircle size={18} />
-            Support
-          </Link>
-          <Link to="/Profile" className="cart-nav-item">
-            <User size={18} />
-            Profile
-          </Link>
-          <Link to="/" className="cart-nav-item">
-            <LogOut size={18} />
-            Logout
-          </Link>
-        </nav>
-
-        <button type="button" className="cart-share-btn">
-          <Share2 size={18} />
-          Share
-        </button>
-      </header>
+      <Navbar />
 
       <main className="cart-main">
         <div className="cart-layout">
           <div className="cart-content">
+            {showBulkBanner && (
+              <div style={{ background: 'rgba(59, 130, 246, 0.1)', border: '1px solid var(--primary)', borderRadius: '8px', padding: '16px', marginBottom: '24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <Box color="var(--primary)" />
+                  <div>
+                    <h3 style={{ margin: 0, color: 'var(--text-main)', fontSize: '1.05rem' }}>Large Order Detected</h3>
+                    <p style={{ margin: '4px 0 0 0', color: 'var(--text-muted)', fontSize: '0.9rem' }}>Uploading your {totalBoxes} delivery addresses is faster with our Excel upload tool.</p>
+                  </div>
+                </div>
+                <Link to="/BulkOrder" style={{ padding: '8px 16px', background: 'var(--primary)', color: 'white', borderRadius: '6px', textDecoration: 'none', fontWeight: 500 }}>
+                  Upload Addresses
+                </Link>
+              </div>
+            )}
             <div className="cart-header-row">
               <h1 className="cart-title">Shopping Cart</h1>
               <button type="button" className="cart-clear-btn" onClick={clearCart}>
@@ -224,17 +159,62 @@ export default function Cart() {
               <span>Total</span>
               <span>${total.toFixed(2)}</span>
             </div>
-            <Link to="/Cart/checkout" className="cart-checkout-btn">
-              <CreditCard size={20} />
-              Proceed to Checkout
-            </Link>
+            {bulkExcelData && bulkExcelData.length > 0 ? (
+              <button 
+                className="cart-checkout-btn" 
+                onClick={() => setShowBulkPrompt(true)}
+                style={{ width: '100%', border: 'none', cursor: 'pointer' }}
+              >
+                <CreditCard size={20} />
+                Proceed to Checkout
+              </button>
+            ) : (
+              <Link to="/Cart/checkout" className="cart-checkout-btn">
+                <CreditCard size={20} />
+                Proceed to Checkout
+              </Link>
+            )}
             <div className="cart-trust">
+              <Link to="/BulkOrder" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--primary)', textDecoration: 'none', marginBottom: '12px' }}>
+                <UploadCloud size={16} /> Bulk Excel Upload for Addresses
+              </Link>
               <p><Box size={16} /> Bulk orders available for better pricing</p>
               <p><Lock size={16} /> Secure payment processing</p>
             </div>
           </aside>
         </div>
       </main>
+
+      {showBulkPrompt && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+          <div style={{ background: 'var(--accent-foreground)', padding: '30px', borderRadius: '12px', maxWidth: '500px', width: '90%', boxShadow: '0 10px 25px rgba(0,0,0,0.2)' }}>
+            <h3 style={{ marginTop: 0, fontSize: '1.3rem', color: 'var(--text-main)' }}>Continue Bulk Order?</h3>
+            <p style={{ color: 'var(--text-main)', lineHeight: 1.5, marginBottom: '24px' }}>
+              We noticed you previously uploaded an Excel sheet with <strong>{bulkExcelData.length}</strong> delivery addresses. Would you like to proceed with your bulk order, or start a new standard checkout?
+            </p>
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+              <Link 
+                to="/Cart/checkout" 
+                style={{ padding: '10px 16px', background: 'var(--chart-5)', color: 'var(--text-main)', border: '1px solid var(--border-color)', borderRadius: '6px', textDecoration: 'none', fontWeight: 500 }}
+                onClick={() => {
+                  setBulkExcelData([]);
+                  setShowBulkPrompt(false);
+                }}
+              >
+                Standard Checkout
+              </Link>
+              <Link 
+                to="/BulkOrder" 
+                style={{ padding: '10px 16px', background: 'var(--primary)', color: 'white', borderRadius: '6px', textDecoration: 'none', fontWeight: 500 }}
+              >
+                Continue Bulk Order
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <Footer/>
     </div>
   );
 }

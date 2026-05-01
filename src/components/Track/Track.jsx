@@ -1,14 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
-  Package,
-  LayoutGrid,
   Truck,
-  ShoppingCart,
-  HelpCircle,
-  User,
-  LogOut,
-  Share2,
   Box,
   Search,
   Check,
@@ -19,7 +12,9 @@ import {
   MessageCircle,
 } from 'lucide-react';
 import orders from '../../mockdata/Orders.json';
+import Navbar from '../Navbar/Navbar';
 import './Track.css';
+import Footer from '../Footer/Footer';
 
 const statusConfig = {
   delivered: { label: 'Delivered', class: 'status-delivered', Icon: Check },
@@ -96,50 +91,7 @@ export default function Track() {
 
   return (
     <div className="track-page">
-      <header className="track-header">
-        <Link to="/HomePage" className="track-logo">
-          <div className="track-logo-icon">
-            <Package size={24} color="white" />
-          </div>
-          <span>Packora</span>
-        </Link>
-
-        <nav className="track-nav">
-          <Link to="/HomePage" className="track-nav-item">
-            <LayoutGrid size={18} />
-            Dashboard
-          </Link>
-          <Link to="/Catalog" className="track-nav-item">
-            <Box size={18} />
-            Catalog
-          </Link>
-          <Link to="/Track" className="track-nav-item active">
-            <Truck size={18} />
-            Track
-          </Link>
-          <Link to="/Cart" className="track-nav-item">
-            <ShoppingCart size={18} />
-            Cart
-          </Link>
-          <Link to="/Support" className="track-nav-item">
-            <HelpCircle size={18} />
-            Support
-          </Link>
-          <Link to="/Profile" className="track-nav-item">
-            <User size={18} />
-            Profile
-          </Link>
-          <Link to="/" className="track-nav-item">
-            <LogOut size={18} />
-            Logout
-          </Link>
-        </nav>
-
-        <button type="button" className="track-share-btn">
-          <Share2 size={18} />
-          Share
-        </button>
-      </header>
+      <Navbar />
 
       <main className="track-main">
         <div className="track-hero">
@@ -295,14 +247,18 @@ export default function Track() {
                 <div className="track-need-help">
                   <h3 className="track-need-help-title">Need Help?</h3>
                   <div className="track-need-help-actions">
-                    <button type="button" className="track-help-btn">
+                    <Link to="/Support" className="track-help-btn">
+                     <button type="button" className="track-help-btn">
                       <Box size={18} />
                       Report an Issue
                     </button>
-                    <button type="button" className="track-help-btn">
+                    </Link>
+                   <Link to="/Support" className="track-help-btn">
+                   <button type="button" className="track-help-btn">
                       <MessageCircle size={18} />
                       Contact Support
-                    </button>
+                    </button> 
+                    </Link>
                   </div>
                 </div>
               </>
@@ -315,6 +271,7 @@ export default function Track() {
           </section>
         </div>
       </main>
+      <Footer/>
     </div>
   );
 }

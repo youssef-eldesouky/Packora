@@ -3,6 +3,8 @@ import { Package, Mail, Lock } from 'lucide-react';
 import './LoginPage.css';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAdminAuth, ADMIN_EMAIL } from '../../context/AdminAuthContext';
+import { useAuth, emailToDisplayName } from '../../context/AuthContext';
+import { useProfile } from '../../context/ProfileContext';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -10,45 +12,26 @@ export default function LoginPage() {
   const [rememberMe, setRememberMe] = useState(false);
   const navigate = useNavigate();
   const { loginAdmin } = useAdminAuth();
+  const { login } = useAuth();
+  const { setAccountProfile } = useProfile();
 
-  const [errorMsg, setErrorMsg] = useState('');
-
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    setErrorMsg('');
     const em = email.trim().toLowerCase();
-    
     if (em === ADMIN_EMAIL && password.length > 0) {
       loginAdmin();
+      login(em, { displayName: 'Admin' });
       navigate('/admin');
       return;
     }
-
-    try {
-      const response = await fetch('http://localhost:8080/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          username: em,
-          password: password,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        setErrorMsg(data.message || 'Login failed. Please check your credentials.');
-      } else {
-        // Save the token to localStorage
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('user', JSON.stringify(data));
-        navigate('/HomePage');
-      }
-    } catch (error) {
-      setErrorMsg('Could not connect to the server. Please try again later.');
-    }
+    const displayName = emailToDisplayName(em);
+    login(em);
+    setAccountProfile((prev) => ({
+      ...prev,
+      email: em,
+      fullName: displayName,
+    }));
+    navigate('/');
   };
 
   return (
@@ -92,11 +75,6 @@ export default function LoginPage() {
           }}
         >
           <form onSubmit={handleSubmit}>
-            {errorMsg && (
-              <div style={{ color: 'red', marginBottom: '16px', fontSize: '14px', textAlign: 'center' }}>
-                {errorMsg}
-              </div>
-            )}
             {/* Email */}
             <div className="login-field" style={{ marginBottom: 20 }}>
               <label
@@ -203,7 +181,7 @@ export default function LoginPage() {
                 Remember me
               </label>
               <Link
-                to="ForgetPassword"
+                to="/ForgetPassword"
                 style={{
                   color: 'var(--primary)',
                   fontSize: 14,

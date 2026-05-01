@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { NavLink, Outlet, /* useNavigate */ } from 'react-router-dom';
 import {
   LayoutDashboard,
   ShoppingCart,
@@ -21,12 +21,12 @@ const nav = [
 ];
 
 export default function AdminLayout() {
-  const navigate = useNavigate();
+  //const navigate = useNavigate();
   const { logoutAdmin } = useAdminAuth();
 
   function handleLogout() {
     logoutAdmin();
-    navigate('/');
+    window.location.href = '/';
   }
 
   return (
