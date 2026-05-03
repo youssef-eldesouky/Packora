@@ -1,0 +1,82 @@
+.addcard-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.addcard-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.addcard-row.full {
+  grid-column: 1 / -1;
+}
+
+.addcard-row label {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.addcard-row input,
+.addcard-select {
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--input-background);
+  font-size: 14px;
+  color: var(--foreground);
+}
+
+.addcard-row input:focus,
+.addcard-select:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.addcard-select {
+  cursor: pointer;
+}
+
+.addcard-row-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+}
+
+.addcard-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.addcard-cancel {
+  padding: 12px 24px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--card);
+  color: var(--foreground);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.addcard-cancel:hover {
+  background: var(--sidebar);
+}
+
+.addcard-submit {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.addcard-submit:hover {
+  filter: brightness(0.92);
+}
