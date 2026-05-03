@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useStore } from '../../../store/useStore'
-import { OUTER_FACES, INNER_FACES, isInnerFace, faceLabelText } from '../../../store/useStore'
+import { OUTER_FACES, INNER_FACES, isInnerFace } from '../../../store/useStore'
 
 const FACE_COLORS = {
   front: '#3563fa', back: '#8b5cf6', left: '#06b6d4',

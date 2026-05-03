@@ -1,19 +1,17 @@
 import React, { useRef, useEffect, useCallback, useState } from 'react'
-import { useStore, OUTER_FACES, INNER_FACES, isInnerFace, toOuterFace, faceLabelText } from '../../../store/useStore'
+import { useStore, OUTER_FACES, INNER_FACES, isInnerFace, faceLabelText } from '../../../store/useStore'
 
-const FACE_LABELS = {
-  front: 'Front', back: 'Back', left: 'Left', right: 'Right', top: 'Top', bottom: 'Bottom',
-}
+
 
 const CELL_SIZE = 160
 const BLEED_PX = 10
 
 const LAYOUT = {
-  top:    { col: 1, row: 0 },
-  left:   { col: 0, row: 1 },
-  front:  { col: 1, row: 1 },
-  right:  { col: 2, row: 1 },
-  back:   { col: 3, row: 1 },
+  top: { col: 1, row: 0 },
+  left: { col: 0, row: 1 },
+  front: { col: 1, row: 1 },
+  right: { col: 2, row: 1 },
+  back: { col: 3, row: 1 },
   bottom: { col: 1, row: 2 },
 }
 
@@ -24,7 +22,7 @@ function DraggableOverlay({ el, face }) {
   const handlePointerDown = (e) => {
     e.stopPropagation()
     setSelectedElement(el.id)
-    
+
     if (e.target.dataset.action === 'resize') {
       const startX = e.clientX
       const startY = e.clientY
@@ -221,7 +219,7 @@ export default function DieLine() {
     setSurfaceMode(isInnerFace(selectedFace) ? 'inside' : 'outside')
   }, [selectedFace])
 
-  const outerSelected = isInnerFace(selectedFace) ? toOuterFace(selectedFace) : selectedFace
+
   const selectedColor = designs[selectedFace]?.backgroundColor ?? '#64748b'
 
   return (
@@ -238,9 +236,8 @@ export default function DieLine() {
               setSurfaceMode('outside')
               if (isInnerFace(selectedFace)) setSelectedFace('front')
             }}
-            className={`px-3 py-1.5 text-xs font-semibold transition-all ${
-              surfaceMode === 'outside' ? 'bg-primary text-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-muted'
-            }`}
+            className={`px-3 py-1.5 text-xs font-semibold transition-all ${surfaceMode === 'outside' ? 'bg-primary text-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+              }`}
           >
             Outside
           </button>
@@ -249,9 +246,8 @@ export default function DieLine() {
               setSurfaceMode('inside')
               if (!isInnerFace(selectedFace)) setSelectedFace('inside_front')
             }}
-            className={`px-3 py-1.5 text-xs font-semibold transition-all ${
-              surfaceMode === 'inside' ? 'bg-amber-500 text-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-muted'
-            }`}
+            className={`px-3 py-1.5 text-xs font-semibold transition-all ${surfaceMode === 'inside' ? 'bg-amber-500 text-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+              }`}
           >
             Inside
           </button>
@@ -318,7 +314,7 @@ export default function DieLine() {
             hover:border-primary hover:text-foreground transition-all"
         >
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M4 7V4h16v3M9 20h6M12 4v16"/>
+            <path d="M4 7V4h16v3M9 20h6M12 4v16" />
           </svg>
           Add Text
         </button>

@@ -13,7 +13,7 @@ export default function App() {
   useEffect(() => {
     calculatePrice()
     saveHistory()
-  }, [])
+  }, [calculatePrice, saveHistory])
 
   return (
     <div className="app-shell h-screen overflow-hidden bg-[#F4F5F7] text-[#1A1A1A]">
