@@ -3,39 +3,7 @@ import { useStore, isInnerFace } from '../../../store/useStore'
 
 const CANVAS_SIZE = 1024
 
-function drawElement(ctx, el) {
-  if (!el.visible) return
 
-  ctx.save()
-  ctx.globalAlpha = el.opacity
-
-  const cx = el.x + el.width / 2
-  const cy = el.y + el.height / 2
-  ctx.translate(cx, cy)
-  ctx.rotate((el.rotation * Math.PI) / 180)
-  ctx.translate(-el.width / 2, -el.height / 2)
-
-  if (el.type === 'text') {
-    ctx.font = `${el.fontWeight} ${el.fontSize}px ${el.fontFamily}, sans-serif`
-    ctx.fillStyle = el.color
-    ctx.textAlign = el.textAlign
-    ctx.textBaseline = 'top'
-
-    const lines = el.content.split('\n')
-    lines.forEach((line, i) => {
-      const x = el.textAlign === 'left' ? 0 : el.textAlign === 'right' ? el.width : el.width / 2
-      ctx.fillText(line, x, i * el.fontSize * 1.3)
-    })
-  } else if (el.type === 'image') {
-    const img = new Image()
-    img.src = el.content
-    if (img.complete) {
-      ctx.drawImage(img, 0, 0, el.width, el.height)
-    }
-  }
-
-  ctx.restore()
-}
 
 export default function FaceCanvas({ face, onTextureReady }) {
   const canvasRef = useRef(null)

@@ -54,8 +54,9 @@ const MATERIAL_COST = {
 
 function calculatePriceUtil(dims, material, quantity, designs) {
   const basePrice = 2.5
-  const volume = dims.length * dims.width * dims.height
-  const sizeAdd = volume * 0.0008
+  const volumeCm3 = dims.length * dims.width * dims.height
+  const volumeIn3 = volumeCm3 / 16.387 // convert cubic cm to cubic inches
+  const sizeAdd = volumeIn3 * 0.0008
   const materialCost = MATERIAL_COST[material]
   const totalElements = Object.values(designs).reduce((sum, f) => sum + f.elements.length, 0)
   const printCost = totalElements * 0.3
@@ -77,7 +78,7 @@ function calculatePriceUtil(dims, material, quantity, designs) {
 export const useStore = create((set, get) => ({
   selectedFace: 'front',
   boxType: 'mailer',
-  boxDimensions: { length: 12, width: 8, height: 4 },
+  boxDimensions: { length: 30, width: 20, height: 10 },
   material: 'kraft',
   quantity: 250,
   designs: defaultDesigns(),

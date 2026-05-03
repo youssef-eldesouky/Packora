@@ -27,7 +27,7 @@ export default function Canvas3D() {
 
   const faceColor = designs[selectedFace]?.backgroundColor
     ?? designs[isInnerFace(selectedFace) ? selectedFace.replace('inside_', '') : selectedFace]?.backgroundColor
-    ?? '#64748b'
+    ?? '#fff'
   const faceLabel = faceLabelText(selectedFace)
   const isInner = isInnerFace(selectedFace)
 
@@ -114,9 +114,9 @@ export default function Canvas3D() {
 
         {/* Inside hint — shown when box is open */}
         {isBoxOpen && viewMode === '3d' && (
-          <div className="px-3 py-2 rounded-lg bg-amber-500/10 border border-amber-500/30 text-xs text-amber-300">
+          <div className="px-3 py-2 rounded-lg bg-amber-500/10 border border-amber-700/40 text-xs text-amber-300">
             <div className="font-semibold mb-0.5">Box is open</div>
-            <div className="text-[10px] text-amber-200/70">Click inner walls to design the inside</div>
+            <div className="text-[10px] text-amber-700/70">Click inner walls to design the inside</div>
           </div>
         )}
       </div>
@@ -133,12 +133,12 @@ export default function Canvas3D() {
               onClick={() => setSelectedFace(face)}
               className="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-all backdrop-blur-sm border capitalize"
               style={{
-                backgroundColor: selectedFace === face ? `${designs[face]?.backgroundColor ?? '#64748b'}25` : 'rgba(22,27,39,0.85)',
-                borderColor: selectedFace === face ? (designs[face]?.backgroundColor ?? '#64748b') : '#252d3f',
-                color: selectedFace === face ? (designs[face]?.backgroundColor ?? '#64748b') : '#64748b',
+                backgroundColor: selectedFace === face ? `${designs[face]?.backgroundColor ?? '#fff'}25` : 'rgba(22,27,39,0.85)',
+                borderColor: selectedFace === face ? (designs[face]?.backgroundColor ?? '#fff') : '#252d3f',
+                color: selectedFace === face ? (designs[face]?.backgroundColor ?? '#fff') : '#fff',
               }}
             >
-              <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: designs[face]?.backgroundColor ?? '#64748b' }} />
+              <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: designs[face]?.backgroundColor ?? '#fff' }} />
               {face}
             </button>
           ))}
@@ -150,7 +150,7 @@ export default function Canvas3D() {
               </div>
               {['inside_front', 'inside_back', 'inside_left', 'inside_right', 'inside_bottom', 'inside_top'].map(face => {
                 const outer = face.replace('inside_', '')
-                const outerColor = designs[outer]?.backgroundColor ?? '#64748b'
+                const outerColor = designs[outer]?.backgroundColor ?? '#fff'
                 return (
                   <button
                     key={face}
@@ -159,7 +159,7 @@ export default function Canvas3D() {
                     style={{
                       backgroundColor: selectedFace === face ? `${outerColor}20` : 'rgba(22,27,39,0.7)',
                       borderColor: selectedFace === face ? `${outerColor}80` : '#1e2535',
-                      color: selectedFace === face ? outerColor : '#4a5568',
+                      color: selectedFace === face ? outerColor : '#310808ff',
                     }}
                   >
                     <div className="w-1.5 h-1.5 rounded-full opacity-60" style={{ backgroundColor: outerColor }} />

@@ -1,10 +1,8 @@
 import React, { useMemo, useState } from 'react';
 import { AlertCircle, CheckCircle2 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
 
 export default function Step3Review({ data, onBack, onConfirm }) {
-  const navigate = useNavigate();
   const { cartItems } = useCart();
   const [isConfirming, setIsConfirming] = useState(false);
 

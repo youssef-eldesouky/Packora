@@ -1,7 +1,7 @@
 import React from 'react'
 import App3DBox from './3D-Box/3DApp'
 import './3D-Box/index.css'
-import Navbar from '../Navbar/Navbar'
+
 import Footer from '../Footer/Footer'
 
 export default function Design() {

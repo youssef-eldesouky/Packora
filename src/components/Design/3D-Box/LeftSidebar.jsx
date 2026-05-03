@@ -102,7 +102,7 @@ export default function LeftSidebar() {
             {/* Dimensions */}
             <div>
               <label className="mb-2 block text-xs font-bold tracking-wider uppercase text-foreground/80">
-                Dimensions (inches)
+                Dimensions (centimeter)
               </label>
               <div className="space-y-2">
                 {['length', 'width', 'height'].map(dim => (
@@ -117,7 +117,7 @@ export default function LeftSidebar() {
                       onChange={e => setBoxDimensions({ [dim]: parseFloat(e.target.value) || 1 })}
                       className="w-16 bg-transparent text-sm font-bold text-foreground focus:outline-none text-right"
                     />
-                    <span className="text-xs text-muted-foreground ml-2">in</span>
+                    <span className="text-xs text-muted-foreground ml-2">cm</span>
                   </div>
                 ))}
               </div>
@@ -183,15 +183,15 @@ export default function LeftSidebar() {
               </div>
               <input
                 type="range"
-                min={50}
+                min={10}
                 max={10000}
-                step={50}
+                step={5}
                 value={quantity}
                 onChange={e => setQuantity(parseInt(e.target.value))}
                 className="w-full"
               />
               <div className="flex justify-between text-xs text-muted-foreground mt-1">
-                <span>50</span>
+                <span>10</span>
                 <span>2,500</span>
                 <span>10,000</span>
               </div>

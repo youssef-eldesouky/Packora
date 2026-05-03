@@ -21,20 +21,7 @@ const FACE_CAMERA = {
 }
 
 /* ─── emissive tints per face ─── */
-const FACE_EM = {
-  front:         [0.08, 0.18, 0.6],
-  back:          [0.25, 0.05, 0.5],
-  left:          [0.0,  0.28, 0.45],
-  right:         [0.0,  0.38, 0.22],
-  top:           [0.4,  0.28, 0.0],
-  bottom:        [0.5,  0.05, 0.05],
-  inside_front:  [0.08, 0.18, 0.6],
-  inside_back:   [0.25, 0.05, 0.5],
-  inside_left:   [0.0,  0.28, 0.45],
-  inside_right:  [0.0,  0.38, 0.22],
-  inside_bottom: [0.5,  0.05, 0.05],
-  inside_top:    [0.4,  0.28, 0.0],
-}
+
 
 const KRAFT_OUTER  = '#ede8d8'
 const KRAFT_INNER  = '#c8935a'
@@ -110,7 +97,7 @@ export default function Box3D({ textures }) {
   const dragRef = useRef(null)
 
   const { length: L, width: W, height: H } = boxDimensions
-  const sx = L / 8; const sy = H / 8; const sz = W / 8
+  const sx = L / 20; const sy = H / 20; const sz = W / 20
   const T  = WALL_T
   const hw = sx / 2, hh = sy / 2, hz = sz / 2
 
@@ -194,9 +181,10 @@ export default function Box3D({ textures }) {
   }), [])
 
   useEffect(() => {
+    const currentTexMap = texMap.current
     return () => {
       ALL_FACES.forEach(face => {
-        texMap.current[face]?.dispose()
+        currentTexMap[face]?.dispose()
       })
       Object.values(mats).forEach(mat => mat.dispose())
       edgeMat.dispose()
