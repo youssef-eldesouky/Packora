@@ -7,7 +7,7 @@ import com.packora.backend.service.ChatbotService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -24,16 +24,24 @@ public class ChatbotController {
 
     /**
      * Ask the AI chatbot a question.
-     * Restricted to authenticated users to prevent API key abuse.
+     * Accessible by both guests and authenticated users.
      */
     @PostMapping("/ask")
     public ResponseEntity<ChatResponse> askQuestion(
-            @AuthenticationPrincipal UserDetailsImpl principal,
+            Authentication authentication,
             @RequestBody ChatRequest request) {
         
-        log.info("[ChatbotController] POST /api/chatbot/ask - user={}", principal.getUsername());
+        boolean isLoggedIn = authentication != null && authentication.isAuthenticated() 
+                && !"anonymousUser".equals(authentication.getPrincipal());
+                
+        String username = "Guest";
+        if (isLoggedIn && authentication.getPrincipal() instanceof UserDetailsImpl) {
+            username = ((UserDetailsImpl) authentication.getPrincipal()).getUsername();
+        }
         
-        ChatResponse response = chatbotService.askQuestion(request);
+        log.info("[ChatbotController] POST /api/chatbot/ask - user={}, isLoggedIn={}", username, isLoggedIn);
+        
+        ChatResponse response = chatbotService.askQuestion(request, isLoggedIn, username);
         return ResponseEntity.ok(response);
     }
 }

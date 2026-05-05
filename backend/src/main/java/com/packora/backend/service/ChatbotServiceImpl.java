@@ -30,7 +30,7 @@ public class ChatbotServiceImpl implements ChatbotService {
     private static final String GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=";
 
     @Override
-    public ChatResponse askQuestion(ChatRequest request) {
+    public ChatResponse askQuestion(ChatRequest request, boolean isLoggedIn, String username) {
         String url = GEMINI_API_URL + geminiApiKey;
 
         try {
@@ -38,13 +38,19 @@ public class ChatbotServiceImpl implements ChatbotService {
             Map<String, Object> payload = new HashMap<>();
 
             // System Instruction (Personality & Navigation instructions)
-            Map<String, Object> systemInstruction = new HashMap<>();
-            systemInstruction.put("parts", Map.of("text", 
-                "You are an interactive, helpful customer support agent for Packora, an Egyptian packaging company. " +
+            String baseInstruction = "You are an interactive, helpful customer support agent for Packora, an Egyptian packaging company. " +
                 "Help the user navigate the website by providing markdown links. Examples: [View Catalog](/catalog), " +
                 "[Go to Cart](/cart), [Checkout](/checkout), [Track Order](/track), [Dashboard](/admin). " +
-                "Answer FAQs concisely. Provide structured, interactive-feeling responses with bullet points if applicable."
-            ));
+                "Answer FAQs concisely. Provide structured, interactive-feeling responses with bullet points if applicable. ";
+                
+            if (isLoggedIn) {
+                baseInstruction += "The user is currently logged in as '" + username + "'. You can address them by name and guide them to their [Dashboard](/admin) or [Cart](/cart).";
+            } else {
+                baseInstruction += "The user is a GUEST (NOT logged in). Answer their questions helpfully, but actively encourage them to [Log In](/login) or [Sign Up](/signup) to access features like custom quotes, purchasing, and order tracking. Provide those markdown links.";
+            }
+
+            Map<String, Object> systemInstruction = new HashMap<>();
+            systemInstruction.put("parts", Map.of("text", baseInstruction));
             payload.put("system_instruction", systemInstruction);
 
             // User Message
