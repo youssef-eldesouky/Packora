@@ -18,6 +18,14 @@ export function CartProvider({ children }) {
   ]);
   const [selectedPaymentId, setSelectedPaymentId] = useState('1');
   const [checkoutStep, setCheckoutStep] = useState('shipping'); // shipping | payment | review
+  const [bulkExcelData, setBulkExcelData] = useState([]);
+  const [bulkWarehouseData, setBulkWarehouseData] = useState({
+    warehouseName: '',
+    addressLine: '',
+    city: '',
+    postalCode: '',
+    contactNumber: ''
+  });
 
   const addToCart = (item) => {
     const key = `${item.productId}-${item.size || ''}-${item.material || ''}`;
@@ -93,6 +101,10 @@ export function CartProvider({ children }) {
     setDefaultPaymentMethod,
     checkoutStep,
     setCheckoutStep,
+    bulkExcelData,
+    setBulkExcelData,
+    bulkWarehouseData,
+    setBulkWarehouseData,
   };
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

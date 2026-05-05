@@ -1,4 +1,4 @@
-/** Static analytics datasets aligned with design; revenue in dollars */
+/** Static analytics datasets aligned with design; revenue in EGP */
 export const revenueSixMonths = [
   { month: 'Jan', orders: 156, revenue: 45200 },
   { month: 'Feb', orders: 189, revenue: 52800 },

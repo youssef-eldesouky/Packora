@@ -8,7 +8,7 @@ export function parseAmount(str) {
 export function formatMoney(n) {
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
-    currency: 'USD',
+    currency: 'EGP',
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   }).format(n);
@@ -17,7 +17,7 @@ export function formatMoney(n) {
 export function formatMoneyDecimal(n) {
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
-    currency: 'USD',
+    currency: 'EGP',
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(n);

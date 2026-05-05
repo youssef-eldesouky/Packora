@@ -1,14 +1,8 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  Package,
-  LayoutGrid,
   Truck,
-  ShoppingCart,
   HelpCircle,
-  User,
-  LogOut,
-  Share2,
   Box,
   Search,
   Mail,
@@ -23,8 +17,10 @@ import {
   Check,
   Upload,
 } from 'lucide-react';
-import { useCart } from '../../context/CartContext';
+import Navbar from '../Navbar/Navbar';
 import './Support.css';
+import Footer from '../Footer/Footer';
+
 
 const SUPPORT_TABS = [
   { key: 'contact', label: 'Contact Us' },
@@ -101,61 +97,6 @@ const PRIORITIES = [
 
 function generateTicketId() {
   return `#TICK-${String(Math.floor(Math.random() * 900000) + 100000)}`;
-}
-
-function SupportHeader({ activeTab, setActiveTab, cartItems }) {
-  return (
-    <header className="support-header">
-      <Link to="/HomePage" className="support-logo">
-        <div className="support-logo-icon">
-          <Package size={24} color="white" />
-        </div>
-        <span>Packora</span>
-      </Link>
-
-      <nav className="support-nav">
-        <Link to="/HomePage" className="support-nav-item">
-          <LayoutGrid size={18} />
-          Dashboard
-        </Link>
-        <Link to="/Catalog" className="support-nav-item">
-          <Box size={18} />
-          Catalog
-        </Link>
-        <Link to="/Track" className="support-nav-item">
-          <Truck size={18} />
-          Track
-        </Link>
-        <Link
-          to="/Cart"
-          className={`support-nav-item ${cartItems.length > 0 ? 'support-nav-badge' : ''}`}
-        >
-          <ShoppingCart size={18} />
-          Cart
-          {cartItems.length > 0 && (
-            <span className="support-cart-badge">{cartItems.length}</span>
-          )}
-        </Link>
-        <Link to="/Support" className="support-nav-item active">
-          <HelpCircle size={18} />
-          Support
-        </Link>
-        <Link to="/Profile" className="support-nav-item">
-          <User size={18} />
-          Profile
-        </Link>
-        <Link to="/" className="support-nav-item">
-          <LogOut size={18} />
-          Logout
-        </Link>
-      </nav>
-
-      <button type="button" className="support-share-btn">
-        <Share2 size={18} />
-        Share
-      </button>
-    </header>
-  );
 }
 
 function ContactUs({ submitted, setSubmitted, setActiveTab }) {
@@ -668,7 +609,6 @@ function ReportIssueForm({ submitted, setSubmitted, onBack, setActiveTab, setRep
 }
 
 export default function Support() {
-  const { cartItems } = useCart();
   const [activeTab, setActiveTab] = useState('contact');
   const [contactSubmitted, setContactSubmitted] = useState(false);
   const [reportSubmitted, setReportSubmitted] = useState(false);
@@ -685,11 +625,7 @@ export default function Support() {
 
   return (
     <div className="support-page">
-      <SupportHeader
-        activeTab={activeTab}
-        setActiveTab={handleTabChange}
-        cartItems={cartItems}
-      />
+      <Navbar />
 
       <main className="support-main">
         <div className="support-hero">
@@ -738,6 +674,7 @@ export default function Support() {
             ))}
         </div>
       </main>
+     <Footer/>
     </div>
   );
 }

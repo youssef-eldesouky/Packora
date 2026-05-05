@@ -33,11 +33,9 @@ public class UserDetailsImpl implements UserDetails {
     }
 
     public static UserDetailsImpl build(User user) {
-        // Here we extract the role from the Discriminator column conceptually, 
-        // but since we don't have an explicit 'role' field, we can infer it
-        // from the class name, e.g., "ROLE_BUSINESS_OWNER", "ROLE_ADMIN".
-        // For simplicity, we can default to ROLE_USER if not mapped.
-        String roleName = "ROLE_" + user.getClass().getSimpleName().toUpperCase();
+        // Extract role from @DiscriminatorValue annotation via user.getRole()
+        // This produces correct role names: ROLE_BUSINESS_OWNER, ROLE_ADMIN, etc.
+        String roleName = "ROLE_" + (user.getRole() != null ? user.getRole() : "USER");
         
         List<GrantedAuthority> authorities = Collections.singletonList(
                 new SimpleGrantedAuthority(roleName)

@@ -386,7 +386,7 @@
   background: var(--card);
   border-radius: 12px;
   border: 1px solid var(--border);
-  padding: 30px 20px;
+  padding: 40px 15px;
 }
 
 .quick-actions h2 {

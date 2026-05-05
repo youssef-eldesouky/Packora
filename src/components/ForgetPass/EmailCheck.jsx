@@ -1,5 +1,5 @@
 import React from 'react';
-import { Package, Check, ArrowLeft } from 'lucide-react';
+import { Package, Check } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import './EmailCheck.css';
 

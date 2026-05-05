@@ -1,15 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import {
-  Package,
-  LayoutGrid,
-  Truck,
-  ShoppingCart,
-  HelpCircle,
   User,
-  LogOut,
-  Share2,
-  Box,
   Mail,
   Phone,
   MapPin,
@@ -25,7 +17,9 @@ import { useCart } from '../../context/CartContext';
 import { useProfile } from '../../context/ProfileContext';
 import AddCard from '../Cart/AddCard';
 import orders from '../../mockdata/Orders.json';
+import Navbar from '../Navbar/Navbar';
 import './Profile.css';
+import Footer from '../Footer/Footer';
 
 const TABS = [
   { key: 'account', label: 'Account' },
@@ -43,61 +37,6 @@ const statusLabel = {
   pending: 'Pending',
   cancelled: 'Cancelled',
 };
-
-function ProfileHeader({ cartItems }) {
-  return (
-    <header className="profile-header">
-      <Link to="/HomePage" className="profile-logo">
-        <div className="profile-logo-icon">
-          <Package size={24} color="white" />
-        </div>
-        <span>Packora</span>
-      </Link>
-
-      <nav className="profile-nav">
-        <Link to="/HomePage" className="profile-nav-item">
-          <LayoutGrid size={18} />
-          Dashboard
-        </Link>
-        <Link to="/Catalog" className="profile-nav-item">
-          <Box size={18} />
-          Catalog
-        </Link>
-        <Link to="/Track" className="profile-nav-item">
-          <Truck size={18} />
-          Track
-        </Link>
-        <Link
-          to="/Cart"
-          className={`profile-nav-item ${cartItems.length > 0 ? 'profile-nav-badge' : ''}`}
-        >
-          <ShoppingCart size={18} />
-          Cart
-          {cartItems.length > 0 && (
-            <span className="profile-cart-badge">{cartItems.length}</span>
-          )}
-        </Link>
-        <Link to="/Support" className="profile-nav-item">
-          <HelpCircle size={18} />
-          Support
-        </Link>
-        <Link to="/Profile" className="profile-nav-item active">
-          <User size={18} />
-          Profile
-        </Link>
-        <Link to="/" className="profile-nav-item">
-          <LogOut size={18} />
-          Logout
-        </Link>
-      </nav>
-
-      <button type="button" className="profile-share-btn">
-        <Share2 size={18} />
-        Share
-      </button>
-    </header>
-  );
-}
 
 function AccountTab() {
   const { accountProfile, setAccountProfile, stats } = useProfile();
@@ -687,12 +626,11 @@ function OrderHistoryTab() {
 }
 
 export default function Profile() {
-  const { cartItems } = useCart();
   const [activeTab, setActiveTab] = useState('account');
 
   return (
     <div className="profile-page">
-      <ProfileHeader cartItems={cartItems} />
+      <Navbar />
 
       <main className="profile-main">
         <div className="profile-hero">
@@ -722,6 +660,7 @@ export default function Profile() {
           {activeTab === 'orders' && <OrderHistoryTab />}
         </div>
       </main>
+      <Footer/>
     </div>
   );
 }

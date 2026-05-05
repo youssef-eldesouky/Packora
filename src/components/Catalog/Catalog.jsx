@@ -1,21 +1,15 @@
 import React, { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  Package,
-  LayoutGrid,
-  Truck,
-  ShoppingCart,
-  HelpCircle,
-  User,
-  LogOut,
-  Share2,
   Box,
   Search,
   Filter,
   Star,
 } from 'lucide-react';
 import products from '../../mockdata/product.json';
+import Navbar from '../Navbar/Navbar';
 import './Catalog.css';
+import Footer from '../Footer/Footer';
 
 const CATEGORIES = ['All', 'Boxes', 'Mailers', 'Protective', 'Eco-Friendly', 'Tape & Labels'];
 
@@ -37,50 +31,7 @@ export default function Catalog() {
 
   return (
     <div className="catalog-page">
-      <header className="catalog-header">
-        <Link to="/HomePage" className="catalog-logo">
-          <div className="catalog-logo-icon">
-            <Package size={24} color="white" />
-          </div>
-          <span>Packora</span>
-        </Link>
-
-        <nav className="catalog-nav">
-          <Link to="/HomePage" className="catalog-nav-item">
-            <LayoutGrid size={18} />
-            Dashboard
-          </Link>
-          <Link to="/Catalog" className="catalog-nav-item active">
-            <Box size={18} />
-            Catalog
-          </Link>
-          <Link to="/Track" className="catalog-nav-item">
-            <Truck size={18} />
-            Track
-          </Link>
-          <Link to="/Cart" className="catalog-nav-item">
-            <ShoppingCart size={18} />
-            Cart
-          </Link>
-          <Link to="/Support" className="catalog-nav-item">
-            <HelpCircle size={18} />
-            Support
-          </Link>
-          <Link to="/Profile" className="catalog-nav-item">
-            <User size={18} />
-            Profile
-          </Link>
-          <Link to="/" className="catalog-nav-item">
-            <LogOut size={18} />
-            Logout
-          </Link>
-        </nav>
-
-        <button type="button" className="catalog-share-btn">
-          <Share2 size={18} />
-          Share
-        </button>
-      </header>
+      <Navbar />
 
       <main className="catalog-main">
         <div className="catalog-hero">
@@ -154,6 +105,7 @@ export default function Catalog() {
           <p className="catalog-empty">No products match your filters.</p>
         )}
       </main>
+      <Footer/>
     </div>
   );
 }
