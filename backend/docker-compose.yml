@@ -4,7 +4,7 @@ services:
     container_name: packora-postgres
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: Youssef1234$
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: packora
     ports:
       - "5432:5432"

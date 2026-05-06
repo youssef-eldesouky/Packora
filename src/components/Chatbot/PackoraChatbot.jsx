@@ -10,30 +10,8 @@ import {
 import { useNavigate } from 'react-router-dom';
 import './PackoraChatbot.css';
 
-const productTypes = ['Food', 'Electronics', 'Cosmetics', 'Apparel'];
-
-const recommendationMap = {
-  food: {
-    style: 'Kraft tuck-end boxes with window cutouts and tamper-evident seals.',
-    colors: 'Natural kraft + warm green accents to signal freshness and sustainability.',
-    materials: 'FSC kraft board, food-safe inks, and compostable inner wraps.',
-  },
-  electronics: {
-    style: 'Rigid magnetic boxes with molded inserts for premium unboxing and safety.',
-    colors: 'Charcoal, navy, and silver with minimal geometric patterns.',
-    materials: 'Rigid board, EVA foam inserts, and matte lamination for protection.',
-  },
-  cosmetics: {
-    style: 'Slim folding cartons with embossed logo panels and sleeve packaging.',
-    colors: 'Soft neutrals, blush, and metallic highlights for a luxury look.',
-    materials: 'Coated paperboard, spot UV, and recyclable glassine wraps.',
-  },
-  apparel: {
-    style: 'Premium mailer boxes with tissue wrap and branded thank-you cards.',
-    colors: 'Monochrome base with bold brand-color interior reveal.',
-    materials: 'Corrugated board, soy-based inks, and recycled tissue paper.',
-  },
-};
+import axios from 'axios';
+import ReactMarkdown from 'react-markdown';
 
 export default function PackoraChatbot() {
   const navigate = useNavigate();
@@ -41,7 +19,6 @@ export default function PackoraChatbot() {
   const [showBadge, setShowBadge] = useState(true);
   const [chatInput, setChatInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
-  const [pendingRecommendation, setPendingRecommendation] = useState(false);
   const chatBodyRef = useRef(null);
 
   const timeStamp = useCallback(
@@ -83,106 +60,31 @@ export default function PackoraChatbot() {
   );
 
   const runBotReply = useCallback(
-    (text) => {
-      const normalized = text.toLowerCase().trim();
-      const matchedType = productTypes.find((type) =>
-        normalized.includes(type.toLowerCase())
-      );
-
+    async (text) => {
       setIsTyping(true);
-      window.setTimeout(() => {
-        setIsTyping(false);
-
-        if (pendingRecommendation && matchedType) {
-          const rec = recommendationMap[matchedType.toLowerCase()];
-          addMessage(
-            'bot',
-            `${matchedType} suggestion:\n- Style: ${rec.style}\n- Colors: ${rec.colors}\n- Materials: ${rec.materials}`
-          );
-          setPendingRecommendation(false);
-          return;
+      
+      try {
+        const token = localStorage.getItem('token');
+        const headers = { 'Content-Type': 'application/json' };
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`;
         }
-
-        if (
-          normalized.includes('recommend') ||
-          normalized.includes('design') ||
-          normalized.includes('suggest')
-        ) {
-          addMessage(
-            'bot',
-            'I would love to help you find the perfect packaging. What type of product will you be packaging? (Food, Electronics, Cosmetics, Apparel)'
-          );
-          setPendingRecommendation(true);
-          return;
-        }
-
-        if (normalized.includes('catalog') || normalized.includes('browse')) {
-          addMessage('bot', 'Taking you to the catalog so you can browse all packaging products.');
-          setTimeout(() => {
-            setIsChatOpen(false);
-            navigate('/Catalog');
-          }, 600);
-          return;
-        }
-
-        if (normalized.includes('track') || normalized.includes('order')) {
-          addMessage('bot', 'Sure, opening the order tracking page for you now.');
-          setTimeout(() => {
-            setIsChatOpen(false);
-            navigate('/Track');
-          }, 600);
-          return;
-        }
-
-        if (
-          normalized.includes('customize') ||
-          normalized.includes('customiser') ||
-          normalized.includes('customizer') ||
-          normalized.includes('logo')
-        ) {
-          addMessage(
-            'bot',
-            'You can customize logos, colors, and packaging style from our 3D Customizer section. Redirecting you there now.'
-          );
-          setTimeout(() => {
-            setIsChatOpen(false);
-            navigate('/Catalog');
-          }, 600);
-          return;
-        }
-
-        if (normalized.includes('dashboard') || normalized.includes('home')) {
-          addMessage('bot', 'Opening your dashboard now.');
-          setTimeout(() => {
-            setIsChatOpen(false);
-            navigate('/HomePage');
-          }, 600);
-          return;
-        }
-
-        if (normalized.includes('price') || normalized.includes('pricing')) {
-          addMessage(
-            'bot',
-            'Pricing depends on box type, dimensions, material, and quantity. Share your product category and estimated quantity and I can guide you with a suitable range.'
-          );
-          return;
-        }
-
-        if (normalized.includes('help') || normalized.includes('hello') || normalized.includes('hi')) {
-          addMessage(
-            'bot',
-            'I can help with design recommendations, catalog browsing, order tracking, 3D customization guidance, and pricing questions.'
-          );
-          return;
-        }
-
-        addMessage(
-          'bot',
-          'I can help with: recommend design, browse catalog, track order, 3D customizer guidance, and pricing support.'
+        
+        const response = await axios.post(
+          'http://localhost:8080/api/chatbot/ask',
+          { message: text },
+          { headers }
         );
-      }, 700);
+        
+        addMessage('bot', response.data.reply);
+      } catch (error) {
+        console.error("Chatbot API Error:", error);
+        addMessage('bot', 'Sorry, I am having trouble connecting to my servers right now.');
+      } finally {
+        setIsTyping(false);
+      }
     },
-    [addMessage, navigate, pendingRecommendation]
+    [addMessage]
   );
 
   const handleSend = useCallback(
@@ -251,7 +153,11 @@ export default function PackoraChatbot() {
                   )}
                 </span>
                 <div className="chat-message-content">
-                  <p>{message.text}</p>
+                  {message.sender === 'user' ? (
+                    <p>{message.text}</p>
+                  ) : (
+                    <ReactMarkdown>{message.text}</ReactMarkdown>
+                  )}
                   <time>{message.time}</time>
                 </div>
               </article>

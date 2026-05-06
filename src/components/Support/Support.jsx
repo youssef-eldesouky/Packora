@@ -20,6 +20,7 @@ import {
 import Navbar from '../Navbar/Navbar';
 import './Support.css';
 import Footer from '../Footer/Footer';
+import axios from 'axios';
 
 
 const SUPPORT_TABS = [
@@ -108,9 +109,32 @@ function ContactUs({ submitted, setSubmitted, setActiveTab }) {
     message: '',
   });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setSubmitted(true);
+    try {
+      const token = localStorage.getItem('token');
+      const headers = { 'Content-Type': 'application/json' };
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+      
+      await axios.post(
+        'http://localhost:8080/api/support/tickets',
+        {
+          contactName: formData.fullName,
+          contactEmail: formData.email,
+          subject: formData.subject,
+          message: formData.message,
+          category: 'contact'
+        },
+        { headers }
+      );
+      
+      setSubmitted(true);
+    } catch (error) {
+      console.error('Error submitting contact form:', error);
+      alert('Failed to send message. Please try again.');
+    }
   };
 
   const handleChange = (e) => {
@@ -363,11 +387,35 @@ function ReportIssueForm({ submitted, setSubmitted, onBack, setActiveTab, setRep
   });
   const [ticketId, setTicketId] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.category) return;
-    setTicketId(generateTicketId());
-    setSubmitted(true);
+    
+    try {
+      const token = localStorage.getItem('token');
+      const headers = { 'Content-Type': 'application/json' };
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+      
+      const response = await axios.post(
+        'http://localhost:8080/api/support/tickets',
+        {
+          subject: formData.subject,
+          message: formData.description,
+          category: formData.category,
+          priority: formData.priority,
+          orderReference: formData.orderId || formData.transactionId
+        },
+        { headers }
+      );
+      
+      setTicketId(`TICK-${response.data.id}`);
+      setSubmitted(true);
+    } catch (error) {
+      console.error('Error submitting issue:', error);
+      alert('Failed to report issue. Please try again.');
+    }
   };
 
   const handleChange = (e) => {

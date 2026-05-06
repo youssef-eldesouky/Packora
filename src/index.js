@@ -8,6 +8,7 @@ import ScrollToTop from "react-scroll-to-top";
 import SignUp from './components/SignUp/SignUp';
 import ForgetPassword from './components/ForgetPass/ForgetPassword';
 import EmailCheck from './components/ForgetPass/EmailCheck';
+import ResetPassword from './components/ForgetPass/ResetPassword';
 import HomePage from './components/Homepage/HomePage';
 import Catalog from './components/Catalog/Catalog';
 import Singlecard from './components/Singlecard/Singlecard';
@@ -50,6 +51,7 @@ let router = createBrowserRouter([
       { path: 'SignUp', element: <SignUp /> },
       { path: 'ForgetPassword', element: <ForgetPassword /> },
       { path: 'EmailCheck', element: <EmailCheck /> },
+      { path: 'reset-password', element: <ResetPassword /> },
       {
         element: <RequireAuth />,
         children: [
