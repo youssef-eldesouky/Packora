@@ -1,5 +1,5 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   Truck,
   ShoppingCart,
@@ -10,6 +10,7 @@ import {
   UploadCloud
 } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
+import { useAuth } from '../../context/AuthContext';
 import Navbar from '../Navbar/Navbar';
 import './Cart.css';
 import Footer from '../Footer/Footer';
@@ -18,7 +19,15 @@ const TAX_RATE = 0.08;
 
 export default function Cart() {
   const { cartItems, removeFromCart, updateQuantity, clearCart, bulkExcelData, setBulkExcelData } = useCart();
+  const { isLoggedIn } = useAuth();
+  const navigate = useNavigate();
   const [showBulkPrompt, setShowBulkPrompt] = React.useState(false);
+
+  useEffect(() => {
+    if (!isLoggedIn) {
+      navigate('/login', { replace: true, state: { from: '/Cart' } });
+    }
+  }, [isLoggedIn, navigate]);
 
   const subtotal = cartItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
   const shipping = subtotal >= 100 ? 0 : 0;
@@ -91,11 +100,11 @@ export default function Cart() {
 
             <div className="cart-items">
               {cartItems.map((item) => (
-                <div key={`${item.productId}-${item.size || ''}-${item.material || ''}`} className="cart-item">
+                <div key={item.id} className="cart-item">
                   <button
                     type="button"
                     className="cart-item-remove"
-                    onClick={() => removeFromCart(item.productId, item.size, item.material)}
+                    onClick={() => removeFromCart(item.id)}
                     aria-label="Remove"
                   >
                     <Trash2 size={18} />
@@ -111,14 +120,14 @@ export default function Cart() {
                     <div className="cart-item-qty">
                       <button
                         type="button"
-                        onClick={() => updateQuantity(item.productId, item.size, item.material, Math.max(1, item.quantity - 1))}
+                        onClick={() => updateQuantity(item.id, Math.max(1, item.quantity - 1))}
                       >
                         −
                       </button>
                       <span>{item.quantity}</span>
                       <button
                         type="button"
-                        onClick={() => updateQuantity(item.productId, item.size, item.material, item.quantity + 1)}
+                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
                       >
                         +
                       </button>

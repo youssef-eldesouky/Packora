@@ -224,6 +224,60 @@ export const orderApi = {
   cancel: (id) => apiFetch(`/api/orders/${id}/cancel`, { method: 'PUT' }).then(normalizeOrder),
 };
 
+// ── Cart API ─────────────────────────────────────────────────────────
+
+/** Maps a backend CartItemResponse → frontend-friendly cart item shape */
+function normalizeCartItem(item) {
+  return {
+    id: item.id,                          // backend CartItem ID — used for PUT/DELETE
+    productId: String(item.productId),
+    name: item.productName || '',
+    image: item.productImageUrl || '',
+    price: typeof item.unitPrice === 'number' ? item.unitPrice : parseFloat(item.unitPrice) || 0,
+    quantity: item.quantity || 1,
+    size: item.selectedSize || '',
+    material: item.selectedMaterial || '',
+    totalItemPrice: item.totalItemPrice || 0,
+  };
+}
+
+/** Maps a backend CartResponse → { id, items[], totalPrice } */
+function normalizeCart(cart) {
+  return {
+    id: cart.id,
+    items: (cart.items || []).map(normalizeCartItem),
+    totalPrice: cart.totalPrice || 0,
+  };
+}
+
+export const cartApi = {
+  /** GET /api/cart — get current user's cart */
+  getCart: () => apiFetch('/api/cart').then(normalizeCart),
+
+  /** POST /api/cart/items — add an item to cart */
+  addItem: (productId, quantity, selectedSize, selectedMaterial) =>
+    apiFetch('/api/cart/items', {
+      method: 'POST',
+      body: JSON.stringify({
+        productId: Number(productId),
+        quantity,
+        selectedSize: selectedSize || null,
+        selectedMaterial: selectedMaterial || null,
+      }),
+    }).then(normalizeCart),
+
+  /** PUT /api/cart/items/{itemId}?quantity={qty} — update item quantity */
+  updateItem: (itemId, quantity) =>
+    apiFetch(`/api/cart/items/${itemId}?quantity=${quantity}`, { method: 'PUT' }).then(normalizeCart),
+
+  /** DELETE /api/cart/items/{itemId} — remove a single item */
+  removeItem: (itemId) =>
+    apiFetch(`/api/cart/items/${itemId}`, { method: 'DELETE' }).then(normalizeCart),
+
+  /** DELETE /api/cart — clear entire cart (returns 204, no body) */
+  clearCart: () => apiFetch('/api/cart', { method: 'DELETE' }),
+};
+
 export const shipmentApi = {
   /** GET /api/shipments/order/:orderId - Get tracking details/timeline for an order */
   getByOrderId: (orderId) => apiFetch(`/api/shipments/order/${orderId}`),
