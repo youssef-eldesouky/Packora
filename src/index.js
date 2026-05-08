@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './App.css';
 import { createBrowserRouter, RouterProvider, Navigate } from "react-router";
-import { AllData } from './Data/AllData';
+
 import { CartProvider } from './context/CartContext';
 import ScrollToTop from "react-scroll-to-top";
 import SignUp from './components/SignUp/SignUp';
@@ -96,14 +96,12 @@ let router = createBrowserRouter([
 ReactDOM.createRoot(document.getElementById("root")).render(
   <AuthProvider>
     <AdminAuthProvider>
-      <AllData>
-        <CartProvider>
-          <ProfileProvider>
-            <ScrollToTop smooth />
-            <RouterProvider router={router} />
-          </ProfileProvider>
-        </CartProvider>
-      </AllData>
+      <CartProvider>
+        <ProfileProvider>
+          <ScrollToTop smooth />
+          <RouterProvider router={router} />
+        </ProfileProvider>
+      </CartProvider>
     </AdminAuthProvider>
   </AuthProvider>
 );

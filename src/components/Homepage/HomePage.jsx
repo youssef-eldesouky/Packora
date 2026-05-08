@@ -65,11 +65,14 @@ export default function HomePage() {
     ...prod,
   }));
 
+  const inTransitCount = orders.filter(o => o.status === 'shipped').length;
+  const totalSpent = orders.reduce((sum, o) => sum + (o.rawAmount || 0), 0);
+
   const metricIcons = [
     { icon: ShoppingCart, color: 'var(--primary)', label: 'Total Orders', value: ordersLoading ? '-' : String(orders.length), change: '+12%' },
-    { icon: Truck, color: 'var(--secondary)', label: 'In Transit', value: '42', change: '+8%' },
+    { icon: Truck, color: 'var(--secondary)', label: 'In Transit', value: ordersLoading ? '-' : String(inTransitCount), change: '+8%' },
     { icon: Box, color: 'var(--accent)', label: 'Total Products', value: String(products.length), change: '+5%' },
-    { icon: BarChart3, color: 'var(--chart-4)', label: 'Revenue', value: '$45.2k', change: '+18%' },
+    { icon: BarChart3, color: 'var(--chart-4)', label: 'Spent', value: ordersLoading ? '-' : `$${totalSpent.toFixed(2)}`, change: '+18%' },
   ];
 
   return (
