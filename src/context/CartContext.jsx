@@ -1,60 +1,126 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useCallback, useEffect, useMemo, useState } from 'react';
+import { cartApi } from '../utils/api';
+import { useAuth } from './AuthContext';
 
 const CartContext = createContext(null);
 
 export function CartProvider({ children }) {
+  const { isLoggedIn } = useAuth();
+
+  // ── Cart items (synced with backend) ──────────────────────────
   const [cartItems, setCartItems] = useState([]);
+  const [cartLoading, setCartLoading] = useState(false);
+  const [cartError, setCartError] = useState(null);
+
+  // ── Fetch cart from backend on login ──────────────────────────
+  useEffect(() => {
+    if (!isLoggedIn) {
+      setCartItems([]);
+      return;
+    }
+    let cancelled = false;
+    setCartLoading(true);
+    setCartError(null);
+
+    cartApi
+      .getCart()
+      .then((cart) => {
+        if (!cancelled) setCartItems(cart.items);
+      })
+      .catch((err) => {
+        if (!cancelled) setCartError(err.message || 'Failed to load cart.');
+      })
+      .finally(() => {
+        if (!cancelled) setCartLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isLoggedIn]);
+
+  // ── Helpers: sync from CartResponse ──────────────────────────
+  const syncCart = useCallback((cart) => {
+    setCartItems(cart?.items || []);
+  }, []);
+
+  // ── addToCart: POST /api/cart/items ──────────────────────────
+  const addToCart = useCallback(async (item) => {
+    try {
+      const cart = await cartApi.addItem(
+        item.productId,
+        item.quantity || 1,
+        item.size || null,
+        item.material || null
+      );
+      syncCart(cart);
+    } catch (err) {
+      console.error('addToCart error:', err);
+      throw err;
+    }
+  }, [syncCart]);
+
+  // ── removeFromCart: DELETE /api/cart/items/{itemId} ──────────
+  // Now accepts backend item.id (number), NOT productId+size+material
+  const removeFromCart = useCallback(async (itemId) => {
+    try {
+      const cart = await cartApi.removeItem(itemId);
+      syncCart(cart);
+    } catch (err) {
+      console.error('removeFromCart error:', err);
+      throw err;
+    }
+  }, [syncCart]);
+
+  // ── updateQuantity: PUT /api/cart/items/{itemId}?quantity={qty}
+  // Now accepts backend item.id (number) and qty
+  const updateQuantity = useCallback(async (itemId, quantity) => {
+    if (quantity < 1) return;
+    try {
+      const cart = await cartApi.updateItem(itemId, quantity);
+      syncCart(cart);
+    } catch (err) {
+      console.error('updateQuantity error:', err);
+      throw err;
+    }
+  }, [syncCart]);
+
+  // ── clearCart: DELETE /api/cart ───────────────────────────────
+  const clearCart = useCallback(async () => {
+    try {
+      await cartApi.clearCart();
+      setCartItems([]);
+    } catch (err) {
+      console.error('clearCart error:', err);
+      throw err;
+    }
+  }, []);
+
+  // ── Checkout / Shipping state (local-only) ────────────────────
   const [shippingAddress, setShippingAddress] = useState({
-    fullName: 'John Doe',
-    company: 'Your Business Inc.',
-    street: '123 Main Street',
-    city: 'New York',
-    state: 'NY',
-    zip: '10001',
-    phone: '(555) 123-4567',
+    fullName: '',
+    company: '',
+    street: '',
+    city: '',
+    state: '',
+    zip: '',
+    phone: '',
   });
-  const [paymentMethods, setPaymentMethods] = useState([
-    { id: '1', last4: '4242', name: 'John Smith', expMonth: 12, expYear: 2025, isDefault: true },
-  ]);
-  const [selectedPaymentId, setSelectedPaymentId] = useState('1');
-  const [checkoutStep, setCheckoutStep] = useState('shipping'); // shipping | payment | review
+
+  // ── Payment state (local-only, no backend support yet) ────────
+  const [paymentMethods, setPaymentMethods] = useState([]);
+  const [selectedPaymentId, setSelectedPaymentId] = useState(null);
+  const [checkoutStep, setCheckoutStep] = useState('shipping');
+
+  // ── Bulk order state ──────────────────────────────────────────
   const [bulkExcelData, setBulkExcelData] = useState([]);
   const [bulkWarehouseData, setBulkWarehouseData] = useState({
     warehouseName: '',
     addressLine: '',
     city: '',
     postalCode: '',
-    contactNumber: ''
+    contactNumber: '',
   });
-
-  const addToCart = (item) => {
-    const key = `${item.productId}-${item.size || ''}-${item.material || ''}`;
-    setCartItems((prev) => {
-      const found = prev.find((i) => `${i.productId}-${i.size || ''}-${i.material || ''}` === key);
-      if (found) {
-        return prev.map((i) =>
-          i === found ? { ...i, quantity: i.quantity + (item.quantity || 1) } : i
-        );
-      }
-      return [...prev, { ...item, quantity: item.quantity || 1 }];
-    });
-  };
-
-  const removeFromCart = (productId, size, material) => {
-    const key = `${productId}-${size || ''}-${material || ''}`;
-    setCartItems((prev) => prev.filter((i) => `${i.productId}-${i.size || ''}-${i.material || ''}` !== key));
-  };
-
-  const updateQuantity = (productId, size, material, quantity) => {
-    const key = `${productId}-${size || ''}-${material || ''}`;
-    setCartItems((prev) =>
-      prev.map((i) =>
-        `${i.productId}-${i.size || ''}-${i.material || ''}` === key ? { ...i, quantity } : i
-      )
-    );
-  };
-
-  const clearCart = () => setCartItems([]);
 
   const addPaymentMethod = (card) => {
     const id = String(Date.now());
@@ -79,33 +145,51 @@ export function CartProvider({ children }) {
   };
 
   const setDefaultPaymentMethod = (id) => {
-    setPaymentMethods((prev) =>
-      prev.map((c) => ({ ...c, isDefault: c.id === id }))
-    );
+    setPaymentMethods((prev) => prev.map((c) => ({ ...c, isDefault: c.id === id })));
     setSelectedPaymentId(id);
   };
 
-  const value = {
-    cartItems,
-    addToCart,
-    removeFromCart,
-    updateQuantity,
-    clearCart,
-    shippingAddress,
-    setShippingAddress,
-    paymentMethods,
-    selectedPaymentId,
-    setSelectedPaymentId,
-    addPaymentMethod,
-    removePaymentMethod,
-    setDefaultPaymentMethod,
-    checkoutStep,
-    setCheckoutStep,
-    bulkExcelData,
-    setBulkExcelData,
-    bulkWarehouseData,
-    setBulkWarehouseData,
-  };
+  const value = useMemo(
+    () => ({
+      cartItems,
+      cartLoading,
+      cartError,
+      addToCart,
+      removeFromCart,
+      updateQuantity,
+      clearCart,
+      shippingAddress,
+      setShippingAddress,
+      paymentMethods,
+      selectedPaymentId,
+      setSelectedPaymentId,
+      addPaymentMethod,
+      removePaymentMethod,
+      setDefaultPaymentMethod,
+      checkoutStep,
+      setCheckoutStep,
+      bulkExcelData,
+      setBulkExcelData,
+      bulkWarehouseData,
+      setBulkWarehouseData,
+    }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [
+      cartItems,
+      cartLoading,
+      cartError,
+      addToCart,
+      removeFromCart,
+      updateQuantity,
+      clearCart,
+      shippingAddress,
+      paymentMethods,
+      selectedPaymentId,
+      checkoutStep,
+      bulkExcelData,
+      bulkWarehouseData,
+    ]
+  );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }

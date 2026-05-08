@@ -100,11 +100,11 @@ export default function Cart() {
 
             <div className="cart-items">
               {cartItems.map((item) => (
-                <div key={`${item.productId}-${item.size || ''}-${item.material || ''}`} className="cart-item">
+                <div key={item.id} className="cart-item">
                   <button
                     type="button"
                     className="cart-item-remove"
-                    onClick={() => removeFromCart(item.productId, item.size, item.material)}
+                    onClick={() => removeFromCart(item.id)}
                     aria-label="Remove"
                   >
                     <Trash2 size={18} />
@@ -120,14 +120,14 @@ export default function Cart() {
                     <div className="cart-item-qty">
                       <button
                         type="button"
-                        onClick={() => updateQuantity(item.productId, item.size, item.material, Math.max(1, item.quantity - 1))}
+                        onClick={() => updateQuantity(item.id, Math.max(1, item.quantity - 1))}
                       >
                         −
                       </button>
                       <span>{item.quantity}</span>
                       <button
                         type="button"
-                        onClick={() => updateQuantity(item.productId, item.size, item.material, item.quantity + 1)}
+                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
                       >
                         +
                       </button>
