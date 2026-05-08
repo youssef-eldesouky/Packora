@@ -1,29 +1,39 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import ordersSeed from '../mockdata/Orders.json';
-import productsSeed from '../mockdata/product.json';
+
 import { parseAmount } from '../utils/adminFormat';
-import { userApi } from '../utils/api';
-
-const STOCK_BY_INDEX = [2500, 1800, 850, 1200, 3000, 900];
-
-function normalizeProducts() {
-  return productsSeed.map((p, i) => ({
-    id: String(p.id),
-    name: p.name,
-    description: p.description,
-    price: typeof p.price === 'number' ? p.price : parseFloat(String(p.price), 10),
-    image: p.image,
-    category: p.category,
-    minOrder: p.minOrder ?? 100,
-    stock: STOCK_BY_INDEX[i] ?? 500,
-  }));
-}
+import { userApi, productApi } from '../utils/api';
 
 const AdminContext = createContext(null);
 
 export function AdminProvider({ children }) {
-  const [products, setProducts] = useState(normalizeProducts);
-  const orders = useMemo(() => ordersSeed, []);
+  const orders = useMemo(() => [], []);
+
+  // ── Products: fetched from backend /api/products ──────────────
+  const [products, setProducts] = useState([]);
+  const [productsLoading, setProductsLoading] = useState(false);
+  const [productsError, setProductsError] = useState(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    setProductsLoading(true);
+    setProductsError(null);
+
+    productApi
+      .getAll()
+      .then((data) => {
+        if (!cancelled) setProducts(data);
+      })
+      .catch((err) => {
+        if (!cancelled) setProductsError(err.message || 'Failed to load products');
+      })
+      .finally(() => {
+        if (!cancelled) setProductsLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   // ── Customers: fetched from backend /api/users (ADMIN) ────────
   const [customers, setCustomers] = useState([]);
@@ -57,7 +67,6 @@ export function AdminProvider({ children }) {
       })
       .catch((err) => {
         if (!cancelled) {
-          // If the user isn't admin, the call will 403 — that's expected
           setCustomersError(err.message || 'Failed to load users');
         }
       })
@@ -70,41 +79,41 @@ export function AdminProvider({ children }) {
     };
   }, []);
 
-  const addProduct = useCallback((payload) => {
-    const id = String(Date.now());
-    setProducts((prev) => [
-      ...prev,
-      {
-        id,
-        name: payload.name,
-        description: payload.description || '',
-        price: Number(payload.price) || 0,
-        image: payload.image || 'https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=800',
-        category: payload.category || 'General',
-        minOrder: Number(payload.minOrder) || 1,
-        stock: Number(payload.stock) || 0,
-      },
-    ]);
+  // ── Product CRUD (hits real backend) ──────────────────────────
+
+  const addProduct = useCallback(async (payload) => {
+    const created = await productApi.create({
+      name: payload.name,
+      description: payload.description || '',
+      price: Number(payload.price) || 0,
+      imageUrl: payload.image || payload.imageUrl || null,
+      category: payload.category || 'General',
+      minOrder: Number(payload.minOrder) || 1,
+      stock: Number(payload.stock) || 0,
+      inStock: payload.inStock !== false,
+    });
+    setProducts((prev) => [...prev, created]);
+    return created;
   }, []);
 
-  const updateProduct = useCallback((id, payload) => {
-    setProducts((prev) =>
-      prev.map((p) =>
-        p.id === id
-          ? {
-              ...p,
-              ...payload,
-              price: payload.price != null ? Number(payload.price) : p.price,
-              minOrder: payload.minOrder != null ? Number(payload.minOrder) : p.minOrder,
-              stock: payload.stock != null ? Number(payload.stock) : p.stock,
-            }
-          : p
-      )
-    );
+  const updateProduct = useCallback(async (id, payload) => {
+    const updated = await productApi.update(id, {
+      name: payload.name,
+      description: payload.description || '',
+      price: Number(payload.price) || 0,
+      imageUrl: payload.image || payload.imageUrl || null,
+      category: payload.category || 'General',
+      minOrder: Number(payload.minOrder) || 1,
+      stock: Number(payload.stock) || 0,
+      inStock: payload.inStock !== false,
+    });
+    setProducts((prev) => prev.map((p) => (String(p.id) === String(id) ? updated : p)));
+    return updated;
   }, []);
 
-  const removeProduct = useCallback((id) => {
-    setProducts((prev) => prev.filter((p) => p.id !== id));
+  const removeProduct = useCallback(async (id) => {
+    await productApi.delete(id);
+    setProducts((prev) => prev.filter((p) => String(p.id) !== String(id)));
   }, []);
 
   const getOrdersForCustomer = useCallback(
@@ -144,6 +153,8 @@ export function AdminProvider({ children }) {
   const value = useMemo(
     () => ({
       products,
+      productsLoading,
+      productsError,
       orders,
       customers,
       customersLoading,
@@ -157,6 +168,8 @@ export function AdminProvider({ children }) {
     }),
     [
       products,
+      productsLoading,
+      productsError,
       orders,
       customers,
       customersLoading,

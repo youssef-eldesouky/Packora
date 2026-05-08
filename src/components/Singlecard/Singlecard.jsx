@@ -7,8 +7,10 @@ import {
   Truck as TruckIcon,
   Shield,
   Leaf,
+  Loader2,
+  XCircle,
 } from 'lucide-react';
-import products from '../../mockdata/product.json';
+import { productApi } from '../../utils/api';
 import { useCart } from '../../context/CartContext';
 import Navbar from '../Navbar/Navbar';
 import './Singlecard.css';
@@ -18,25 +20,66 @@ export default function Singlecard() {
   const { productId } = useParams();
   const navigate = useNavigate();
   const { addToCart } = useCart();
-  const product = products.find((p) => p.id === productId);
+
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const [selectedSize, setSelectedSize] = useState('');
   const [selectedMaterial, setSelectedMaterial] = useState('');
   const [quantity, setQuantity] = useState(10);
 
   useEffect(() => {
-    if (product) {
-      setSelectedSize(product.sizes?.[0] ?? '');
-      setSelectedMaterial(product.materials?.[0] ?? '');
-      setQuantity(Math.max(product.minOrder, 10));
-    }
-  }, [product]);
+    let cancelled = false;
+    setLoading(true);
+    setError(null);
 
-  if (!product) {
+    productApi
+      .getById(productId)
+      .then((data) => {
+        if (cancelled) return;
+        setProduct(data);
+        setSelectedSize(data.sizes?.[0] ?? '');
+        setSelectedMaterial(data.materials?.[0] ?? '');
+        setQuantity(Math.max(data.minOrder || 1, 10));
+      })
+      .catch((err) => {
+        if (!cancelled) setError(err.message || 'Failed to load product');
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [productId]);
+
+  if (loading) {
     return (
       <div className="singlecard-page">
-        <p className="singlecard-not-found">Product not found.</p>
-        <Link to="/Catalog">Back to Catalog</Link>
+        <Navbar />
+        <div style={{ textAlign: 'center', padding: '4rem' }}>
+          <Loader2 size={36} className="profile-spinner" />
+          <p>Loading product…</p>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (error || !product) {
+    return (
+      <div className="singlecard-page">
+        <Navbar />
+        <main className="singlecard-main">
+          <div style={{ textAlign: 'center', padding: '3rem' }}>
+            <XCircle size={48} style={{ opacity: 0.4, marginBottom: '1rem' }} />
+            <p className="singlecard-not-found">{error || 'Product not found.'}</p>
+            <Link to="/Catalog">Back to Catalog</Link>
+          </div>
+        </main>
+        <Footer />
       </div>
     );
   }
@@ -45,7 +88,7 @@ export default function Singlecard() {
   const total = (pricePerUnit * quantity).toFixed(2);
 
   const handleQuantityChange = (delta) => {
-    const min = product.minOrder;
+    const min = product.minOrder || 1;
     setQuantity((q) => Math.max(min, Math.min(9999, q + delta)));
   };
 
@@ -91,8 +134,14 @@ export default function Singlecard() {
             <p className="singlecard-price">${product.price.toFixed(2)} per unit</p>
 
             <div className="singlecard-stock">
-              <Check size={18} />
-              <span>In Stock - Ready to Ship</span>
+              {product.inStock ? (
+                <>
+                  <Check size={18} />
+                  <span>In Stock{product.stock > 0 ? ` — ${product.stock} available` : ' — Ready to Ship'}</span>
+                </>
+              ) : (
+                <span style={{ color: 'var(--destructive, #ef4444)' }}>Out of Stock</span>
+              )}
             </div>
 
             {product.sizes?.length > 0 && (
@@ -173,6 +222,7 @@ export default function Singlecard() {
             <button
               type="button"
               className="singlecard-add-btn"
+              disabled={!product.inStock}
               onClick={() => {
                 addToCart({
                   productId: product.id,
@@ -187,7 +237,7 @@ export default function Singlecard() {
               }}
             >
               <ShoppingCart size={20} />
-              Add to Cart
+              {product.inStock ? 'Add to Cart' : 'Out of Stock'}
             </button>
 
             <div className="singlecard-features">

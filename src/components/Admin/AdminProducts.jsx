@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
-import { Search, Plus, Pencil, Trash2 } from 'lucide-react';
+import { Search, Plus, Pencil, Trash2, Loader2 } from 'lucide-react';
 import { useAdmin } from '../../context/AdminContext';
 import { formatMoneyDecimal } from '../../utils/adminFormat';
 
@@ -11,17 +11,20 @@ const emptyForm = {
   category: 'Boxes',
   minOrder: '100',
   stock: '0',
+  inStock: true,
   image: '',
 };
 
 export default function AdminProducts() {
-  const { products, addProduct, updateProduct, removeProduct } = useAdmin();
+  const { products, productsLoading, productsError, addProduct, updateProduct, removeProduct } = useAdmin();
   const [searchParams] = useSearchParams();
   const location = useLocation();
   const navigate = useNavigate();
   const [q, setQ] = useState('');
   const [modal, setModal] = useState(null);
   const [form, setForm] = useState(emptyForm);
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState('');
 
   useEffect(() => {
     setQ(searchParams.get('q') ?? '');
@@ -38,7 +41,8 @@ export default function AdminProducts() {
         price: String(p.price),
         category: p.category,
         minOrder: String(p.minOrder),
-        stock: String(p.stock),
+        stock: String(p.stock ?? 0),
+        inStock: p.inStock !== false,
         image: p.image || '',
       });
       setModal({ mode: 'edit', id: p.id });
@@ -51,14 +55,15 @@ export default function AdminProducts() {
     if (!term) return products;
     return products.filter(
       (p) =>
-        p.name.toLowerCase().includes(term) ||
-        p.category.toLowerCase().includes(term) ||
-        p.description.toLowerCase().includes(term)
+        (p.name || '').toLowerCase().includes(term) ||
+        (p.category || '').toLowerCase().includes(term) ||
+        (p.description || '').toLowerCase().includes(term)
     );
   }, [products, q]);
 
   function openAdd() {
     setForm(emptyForm);
+    setSaveError('');
     setModal('add');
   }
 
@@ -69,28 +74,69 @@ export default function AdminProducts() {
       price: String(p.price),
       category: p.category,
       minOrder: String(p.minOrder),
-      stock: String(p.stock),
+      stock: String(p.stock ?? 0),
+      inStock: p.inStock !== false,
       image: p.image || '',
     });
+    setSaveError('');
     setModal({ mode: 'edit', id: p.id });
   }
 
-  function submit(e) {
+  async function submit(e) {
     e.preventDefault();
-    if (modal === 'add') {
-      addProduct(form);
-    } else if (modal?.mode === 'edit') {
-      updateProduct(modal.id, {
-        name: form.name,
-        description: form.description,
-        price: form.price,
-        category: form.category,
-        minOrder: form.minOrder,
-        stock: form.stock,
-        image: form.image || undefined,
-      });
+    setSaving(true);
+    setSaveError('');
+    try {
+      if (modal === 'add') {
+        await addProduct(form);
+      } else if (modal?.mode === 'edit') {
+        await updateProduct(modal.id, {
+          name: form.name,
+          description: form.description,
+          price: form.price,
+          category: form.category,
+          minOrder: form.minOrder,
+          stock: form.stock,
+          inStock: form.inStock,
+          image: form.image || undefined,
+        });
+      }
+      setModal(null);
+    } catch (err) {
+      setSaveError(err?.data?.message || err.message || 'Failed to save product');
+    } finally {
+      setSaving(false);
     }
-    setModal(null);
+  }
+
+  async function handleDelete(p) {
+    if (!window.confirm(`Remove "${p.name}" from the catalog?`)) return;
+    try {
+      await removeProduct(p.id);
+    } catch (err) {
+      alert(err?.data?.message || err.message || 'Failed to delete product');
+    }
+  }
+
+  if (productsLoading) {
+    return (
+      <>
+        <h1 className="admin-page-title">Manage Products</h1>
+        <div style={{ textAlign: 'center', padding: '3rem' }}>
+          <Loader2 size={32} className="profile-spinner" />
+          <p>Loading products…</p>
+        </div>
+      </>
+    );
+  }
+
+  if (productsError) {
+    return (
+      <>
+        <h1 className="admin-page-title">Manage Products</h1>
+        <p style={{ color: 'var(--danger, #ef4444)', padding: '1rem' }}>{productsError}</p>
+      </>
+    );
   }
 
   return (
@@ -133,9 +179,7 @@ export default function AdminProducts() {
                   type="button"
                   className="admin-icon-btn danger"
                   aria-label="Delete product"
-                  onClick={() => {
-                    if (window.confirm(`Remove “${p.name}” from the catalog?`)) removeProduct(p.id);
-                  }}
+                  onClick={() => handleDelete(p)}
                 >
                   <Trash2 size={16} />
                 </button>
@@ -153,7 +197,7 @@ export default function AdminProducts() {
               <p className="admin-product-desc">{p.description}</p>
               <div className="admin-product-foot">
                 <span>
-                  Stock: {p.stock}
+                  Stock: {p.stock ?? 0} · {p.inStock ? 'In Stock' : 'Out of Stock'}
                   <br />
                   Min. Order: {p.minOrder} units
                 </span>
@@ -231,6 +275,18 @@ export default function AdminProducts() {
                 />
               </div>
               <div className="admin-form-row">
+                <label htmlFor="p-instock" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+                  <input
+                    id="p-instock"
+                    type="checkbox"
+                    checked={form.inStock}
+                    onChange={(e) => setForm((f) => ({ ...f, inStock: e.target.checked }))}
+                    style={{ width: 'auto' }}
+                  />
+                  In Stock
+                </label>
+              </div>
+              <div className="admin-form-row">
                 <label htmlFor="p-min">Minimum order (units)</label>
                 <input
                   id="p-min"
@@ -251,12 +307,17 @@ export default function AdminProducts() {
                   onChange={(e) => setForm((f) => ({ ...f, image: e.target.value }))}
                 />
               </div>
+              {saveError && (
+                <p style={{ color: 'var(--danger, #ef4444)', fontSize: '0.875rem', marginBottom: '0.5rem' }}>
+                  {saveError}
+                </p>
+              )}
               <div className="admin-modal-actions">
                 <button type="button" className="admin-btn admin-btn-ghost" onClick={() => setModal(null)}>
                   Cancel
                 </button>
-                <button type="submit" className="admin-btn admin-btn-primary">
-                  Save
+                <button type="submit" className="admin-btn admin-btn-primary" disabled={saving}>
+                  {saving ? 'Saving…' : 'Save'}
                 </button>
               </div>
             </form>

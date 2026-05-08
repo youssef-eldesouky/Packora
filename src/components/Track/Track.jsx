@@ -11,10 +11,13 @@ import {
   AlertCircle,
   MessageCircle,
 } from 'lucide-react';
-import orders from '../../mockdata/Orders.json';
+
 import Navbar from '../Navbar/Navbar';
 import './Track.css';
 import Footer from '../Footer/Footer';
+
+const orders = [];
+
 
 const statusConfig = {
   delivered: { label: 'Delivered', class: 'status-delivered', Icon: Check },

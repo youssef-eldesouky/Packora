@@ -119,6 +119,7 @@ public class ProductServiceImpl implements ProductService {
         product.setImageUrl(request.getImageUrl());
         product.setCategory(request.getCategory());
         product.setMinOrder(request.getMinOrder());
+        product.setStock(request.getStock() != null ? request.getStock() : 0);
         product.setInStock(request.getInStock() != null ? request.getInStock() : true);
         product.setSizes(request.getSizes() != null ? request.getSizes() : new ArrayList<>());
         product.setMaterials(request.getMaterials() != null ? request.getMaterials() : new ArrayList<>());
@@ -133,6 +134,7 @@ public class ProductServiceImpl implements ProductService {
                 .imageUrl(p.getImageUrl())
                 .category(p.getCategory())
                 .minOrder(p.getMinOrder())
+                .stock(p.getStock())
                 .inStock(p.getInStock())
                 .sizes(p.getSizes())
                 .materials(p.getMaterials())

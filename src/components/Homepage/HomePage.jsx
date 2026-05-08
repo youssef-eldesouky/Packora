@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Package,
@@ -11,22 +11,10 @@ import {
   Leaf,
   UploadCloud,
 } from 'lucide-react';
-import products from '../../mockdata/product.json';
-import orders from '../../mockdata/Orders.json';
+import { productApi } from '../../utils/api';
 import Navbar from '../Navbar/Navbar';
 import './Homepage.css';
 import Footer from '../Footer/Footer';
-// Group products by category for Browse by Category (use first product per category)
-const categoryDisplay = {};
-products.forEach((p) => {
-  if (!categoryDisplay[p.category]) {
-    categoryDisplay[p.category] = p;
-  }
-});
-const categories = Object.entries(categoryDisplay).map(([cat, prod]) => ({
-  category: cat,
-  ...prod,
-}));
 
 // Category display names and descriptions
 const categoryLabels = {
@@ -36,23 +24,41 @@ const categoryLabels = {
   Mailers: 'Lightweight shipping mailers.',
 };
 
-// Map Orders.json status to display labels and CSS classes
-const statusMap = {
-  delivered: { label: 'Delivered', class: 'status-delivered' },
-  shipped: { label: 'In Transit', class: 'status-transit' },
-  processing: { label: 'Processing', class: 'status-processing' },
-  pending: { label: 'Pending', class: 'status-processing' },
-  cancelled: { label: 'Cancelled', class: 'status-transit' },
-};
-
-const metricIcons = [
-  { icon: ShoppingCart, color: 'var(--primary)', label: 'Total Orders', value: '248', change: '+12%' },
-  { icon: Truck, color: 'var(--secondary)', label: 'In Transit', value: '42', change: '+8%' },
-  { icon: Box, color: 'var(--accent)', label: 'Total Products', value: String(products.length), change: '+5%' },
-  { icon: BarChart3, color: 'var(--chart-4)', label: 'Revenue', value: '$45.2k', change: '+18%' },
-];
-
 export default function HomePage() {
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    productApi
+      .getAll()
+      .then((data) => {
+        if (!cancelled) setProducts(data);
+      })
+      .catch(() => {
+        /* silent — homepage still renders without product data */
+      });
+    return () => { cancelled = true; };
+  }, []);
+
+  // Derive categories from real product data
+  const categoryDisplay = {};
+  products.forEach((p) => {
+    if (p.category && !categoryDisplay[p.category]) {
+      categoryDisplay[p.category] = p;
+    }
+  });
+  const categories = Object.entries(categoryDisplay).map(([cat, prod]) => ({
+    category: cat,
+    ...prod,
+  }));
+
+  const metricIcons = [
+    { icon: ShoppingCart, color: 'var(--primary)', label: 'Total Orders', value: '248', change: '+12%' },
+    { icon: Truck, color: 'var(--secondary)', label: 'In Transit', value: '42', change: '+8%' },
+    { icon: Box, color: 'var(--accent)', label: 'Total Products', value: String(products.length), change: '+5%' },
+    { icon: BarChart3, color: 'var(--chart-4)', label: 'Revenue', value: '$45.2k', change: '+18%' },
+  ];
+
   return (
     <div className="homepage">
       <Navbar />
@@ -110,32 +116,6 @@ export default function HomePage() {
         </section>
 
         <div className="home-grid">
-          {/* Recent Orders */}
-          <section className="recent-orders">
-            <div className="section-header">
-              <h2>Recent Orders</h2>
-              <Link to="#" className="view-all">View All →</Link>
-            </div>
-            <div className="orders-list">
-              {orders.slice(0, 3).map((order) => {
-                const status = statusMap[order.status] || { label: order.status, class: 'status-processing' };
-                return (
-                  <div key={order.id} className="order-card">
-                    <div className="order-main">
-                      <span className="order-id">{order.id}</span>
-                      <span className={`order-status ${status.class}`}>{status.label}</span>
-                    </div>
-                    <p className="order-product">{order.product}</p>
-                    <div className="order-meta">
-                      <span>{order.quantity} units</span>
-                      <span>{order.date}</span>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </section>
-
           {/* Quick Actions */}
           <section className="quick-actions">
             <h2>Quick Actions</h2>
@@ -155,40 +135,42 @@ export default function HomePage() {
               <UploadCloud size={18} />
               Bulk Upload
             </Link>
-            <Link to="#" className="action-btn">
+            <Link to="/Support" className="action-btn">
               <HelpCircle size={18} />
               Get Support
             </Link>
           </section>
         </div>
 
-        {/* Browse by Category - from product.json */}
-        <section className="browse-section">
-          <div className="section-header">
-            <h2>Browse by Category</h2>
-            <Link to="/Catalog" className="view-all">See All →</Link>
-          </div>
-          <div className="category-grid">
-            {categories.map((item) => (
-              <Link key={item.id} to={`/Catalog/${item.id}`} className="category-card">
-                <div className="category-image-wrap">
-                  <img src={item.image} alt={item.category} />
-                  <div className="category-icon-overlay">
-                    {item.category === 'Eco-Friendly' ? (
-                      <Leaf size={20} color="white" />
-                    ) : (
-                      <Package size={20} color="white" />
-                    )}
+        {/* Browse by Category - from real API data */}
+        {categories.length > 0 && (
+          <section className="browse-section">
+            <div className="section-header">
+              <h2>Browse by Category</h2>
+              <Link to="/Catalog" className="view-all">See All →</Link>
+            </div>
+            <div className="category-grid">
+              {categories.map((item) => (
+                <Link key={item.id} to={`/Catalog/${item.id}`} className="category-card">
+                  <div className="category-image-wrap">
+                    <img src={item.image} alt={item.category} />
+                    <div className="category-icon-overlay">
+                      {item.category === 'Eco-Friendly' ? (
+                        <Leaf size={20} color="white" />
+                      ) : (
+                        <Package size={20} color="white" />
+                      )}
+                    </div>
                   </div>
-                </div>
-                <h3 className="category-title">{item.category}</h3>
-                <p className="category-desc">
-                  {categoryLabels[item.category] || item.description}
-                </p>
-              </Link>
-            ))}
-          </div>
-        </section>
+                  <h3 className="category-title">{item.category}</h3>
+                  <p className="category-desc">
+                    {categoryLabels[item.category] || item.description}
+                  </p>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
       
       </main>
   <Footer />

@@ -1,16 +1,54 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { ArrowLeft, Pencil } from 'lucide-react';
-import { useAdmin } from '../../context/AdminContext';
+import { ArrowLeft, Pencil, Loader2 } from 'lucide-react';
+import { productApi } from '../../utils/api';
 import { formatMoneyDecimal } from '../../utils/adminFormat';
 
 export default function AdminProductDetail() {
   const { productId } = useParams();
-  const { products } = useAdmin();
 
-  const product = useMemo(() => products.find((p) => String(p.id) === String(productId)), [products, productId]);
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  if (!product) {
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    setError(null);
+
+    productApi
+      .getById(productId)
+      .then((data) => {
+        if (!cancelled) setProduct(data);
+      })
+      .catch((err) => {
+        if (!cancelled) setError(err.message || 'Failed to load product');
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [productId]);
+
+  if (loading) {
+    return (
+      <>
+        <Link to="/admin/products" className="admin-link" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', marginBottom: '1rem' }}>
+          <ArrowLeft size={16} />
+          Back to products
+        </Link>
+        <div style={{ textAlign: 'center', padding: '3rem' }}>
+          <Loader2 size={32} className="profile-spinner" />
+          <p>Loading product…</p>
+        </div>
+      </>
+    );
+  }
+
+  if (error || !product) {
     return (
       <>
         <Link to="/admin/products" className="admin-link" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', marginBottom: '1rem' }}>
@@ -18,7 +56,7 @@ export default function AdminProductDetail() {
           Back to products
         </Link>
         <h1 className="admin-page-title">Product not found</h1>
-        <p className="admin-page-sub">This product may have been removed.</p>
+        <p className="admin-page-sub">{error || 'This product may have been removed.'}</p>
       </>
     );
   }
@@ -49,7 +87,8 @@ export default function AdminProductDetail() {
             {product.description}
           </p>
           <ul style={{ paddingLeft: '1.2rem', color: 'var(--admin-muted)', fontSize: '0.9rem' }}>
-            <li>Stock: {product.stock}</li>
+            <li>Stock: {product.stock ?? 0}</li>
+            <li>Status: {product.inStock ? 'In Stock' : 'Out of Stock'}</li>
             <li>Minimum order: {product.minOrder} units</li>
           </ul>
           <Link to="/admin/products" state={{ editProductId: product.id }} className="admin-btn admin-btn-primary" style={{ marginTop: '1rem', textDecoration: 'none', display: 'inline-flex' }}>

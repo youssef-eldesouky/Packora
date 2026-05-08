@@ -40,6 +40,8 @@ public class Product {
 
     private Integer minOrder;
 
+    private Integer stock = 0;
+
     @Column(nullable = false)
     private Boolean inStock = true;
 

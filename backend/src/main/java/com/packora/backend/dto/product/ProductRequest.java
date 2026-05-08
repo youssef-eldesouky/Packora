@@ -28,6 +28,8 @@ public class ProductRequest {
 
     private Integer minOrder;
 
+    private Integer stock;
+
     private Boolean inStock = true;
 
     private List<String> sizes;

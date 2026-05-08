@@ -20,6 +20,7 @@ public class ProductResponse {
     private String imageUrl;
     private String category;
     private Integer minOrder;
+    private Integer stock;
     private Boolean inStock;
     private List<String> sizes;
     private List<String> materials;

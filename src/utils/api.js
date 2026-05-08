@@ -118,3 +118,58 @@ export const userApi = {
   /** GET /api/users/:id – get specific user (ADMIN) */
   getById: (id) => apiFetch(`/api/users/${id}`),
 };
+
+// ── Product Catalog API ───────────────────────────────────────────────
+
+/** Maps backend ProductResponse (imageUrl) → frontend-friendly shape (image) */
+function normalizeProduct(p) {
+  return {
+    ...p,
+    id: String(p.id),
+    image: p.imageUrl || '',
+    price: typeof p.price === 'number' ? p.price : parseFloat(p.price) || 0,
+    minOrder: p.minOrder ?? 1,
+    stock: p.stock ?? 0,
+    inStock: p.inStock ?? true,
+    sizes: p.sizes ?? [],
+    materials: p.materials ?? [],
+  };
+}
+
+export const productApi = {
+  /** GET /api/products – list all products */
+  getAll: () => apiFetch('/api/products').then((list) => list.map(normalizeProduct)),
+
+  /** GET /api/products/:id – single product */
+  getById: (id) => apiFetch(`/api/products/${id}`).then(normalizeProduct),
+
+  /** GET /api/products/category/:category – filter by category */
+  getByCategory: (category) =>
+    apiFetch(`/api/products/category/${encodeURIComponent(category)}`).then((list) =>
+      list.map(normalizeProduct)
+    ),
+
+  /** GET /api/products/in-stock – only in-stock products */
+  getInStock: () => apiFetch('/api/products/in-stock').then((list) => list.map(normalizeProduct)),
+
+  /** GET /api/products/search?keyword= – search by name */
+  search: (keyword) =>
+    apiFetch(`/api/products/search?keyword=${encodeURIComponent(keyword)}`).then((list) =>
+      list.map(normalizeProduct)
+    ),
+
+  /** POST /api/products – create (ADMIN) */
+  create: (data) =>
+    apiFetch('/api/products', { method: 'POST', body: JSON.stringify(data) }).then(
+      normalizeProduct
+    ),
+
+  /** PUT /api/products/:id – update (ADMIN) */
+  update: (id, data) =>
+    apiFetch(`/api/products/${id}`, { method: 'PUT', body: JSON.stringify(data) }).then(
+      normalizeProduct
+    ),
+
+  /** DELETE /api/products/:id – delete (ADMIN) */
+  delete: (id) => apiFetch(`/api/products/${id}`, { method: 'DELETE' }),
+};
