@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import {
   ShoppingCart,
-  Star,
   Check,
   Truck as TruckIcon,
   Shield,
@@ -166,14 +165,6 @@ export default function Singlecard() {
           </div>
 
           <div className="singlecard-details">
-            <div className="singlecard-rating">
-              <div className="singlecard-stars">
-                {[1, 2, 3, 4, 5].map((i) => (
-                  <Star key={i} size={18} fill="#fbbf24" stroke="#fbbf24" />
-                ))}
-              </div>
-              <span className="singlecard-reviews">(245 reviews)</span>
-            </div>
 
             <h1 className="singlecard-title">{product.name}</h1>
             <p className="singlecard-desc">{product.description}</p>
