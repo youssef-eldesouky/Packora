@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
 import { useProfile } from '../../context/ProfileContext';
-import { userApi } from '../../utils/api';
+import { userApi, orderApi } from '../../utils/api';
 import AddCard from '../Cart/AddCard';
 import Navbar from '../Navbar/Navbar';
 import './Profile.css';
@@ -591,16 +591,49 @@ function SecurityTab() {
 }
 
 function OrderHistoryTab() {
+  const [recentOrders, setRecentOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    orderApi.getMyOrders()
+      .then(data => setRecentOrders(data.slice(0, 3))) // Show 3 most recent
+      .finally(() => setLoading(false));
+  }, []);
+
   return (
-    <div className="profile-card" style={{ textAlign: 'center', padding: '3rem' }}>
-      <PackageSearch size={48} style={{ opacity: 0.4, marginBottom: '1rem' }} />
-      <h2 className="profile-card-title">Order History</h2>
-      <p style={{ color: 'var(--muted-foreground)', marginBottom: '1.5rem' }}>
-        View and track all your orders from the Track page.
-      </p>
-      <Link to="/Track" className="profile-btn-primary" style={{ display: 'inline-flex', textDecoration: 'none' }}>
-        Go to Order Tracking
-      </Link>
+    <div className="profile-card">
+      <div style={{ textAlign: 'center', padding: '2rem 0' }}>
+        <PackageSearch size={48} style={{ opacity: 0.4, marginBottom: '1rem' }} />
+        <h2 className="profile-card-title">Order History</h2>
+        <p style={{ color: 'var(--muted-foreground)', marginBottom: '1.5rem' }}>
+          View and track all your orders from the Track page.
+        </p>
+        <Link to="/Track" className="profile-btn-primary" style={{ display: 'inline-flex', textDecoration: 'none' }}>
+          Go to Order Tracking
+        </Link>
+      </div>
+
+      {!loading && recentOrders.length > 0 && (
+        <div style={{ marginTop: '2rem', borderTop: '1px solid var(--border)', paddingTop: '2rem' }}>
+          <h3 style={{ fontSize: '1.1rem', marginBottom: '1rem', color: 'var(--foreground)' }}>Recent Orders</h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            {recentOrders.map(order => (
+              <div key={order.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem', border: '1px solid var(--border)', borderRadius: '8px' }}>
+                <div>
+                  <p style={{ fontWeight: '500', margin: '0 0 0.25rem 0' }}>{order.id}</p>
+                  <p style={{ margin: '0', fontSize: '0.875rem', color: 'var(--muted-foreground)' }}>{order.product} • {order.date}</p>
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                  <p style={{ fontWeight: '600', margin: '0 0 0.25rem 0' }}>{order.amount}</p>
+                  <span style={{ fontSize: '0.75rem', padding: '2px 8px', borderRadius: '12px', background: 'var(--primary-light)', color: 'var(--primary)' }}>
+                    {order.status.toUpperCase()}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

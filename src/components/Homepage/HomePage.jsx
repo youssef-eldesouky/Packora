@@ -11,7 +11,7 @@ import {
   Leaf,
   UploadCloud,
 } from 'lucide-react';
-import { productApi } from '../../utils/api';
+import { productApi, orderApi } from '../../utils/api';
 import Navbar from '../Navbar/Navbar';
 import './Homepage.css';
 import Footer from '../Footer/Footer';
@@ -26,6 +26,8 @@ const categoryLabels = {
 
 export default function HomePage() {
   const [products, setProducts] = useState([]);
+  const [orders, setOrders] = useState([]);
+  const [ordersLoading, setOrdersLoading] = useState(true);
 
   useEffect(() => {
     let cancelled = false;
@@ -37,6 +39,17 @@ export default function HomePage() {
       .catch(() => {
         /* silent — homepage still renders without product data */
       });
+
+    orderApi
+      .getMyOrders()
+      .then((data) => {
+        if (!cancelled) setOrders(data);
+      })
+      .catch(() => {})
+      .finally(() => {
+        if (!cancelled) setOrdersLoading(false);
+      });
+
     return () => { cancelled = true; };
   }, []);
 
@@ -53,7 +66,7 @@ export default function HomePage() {
   }));
 
   const metricIcons = [
-    { icon: ShoppingCart, color: 'var(--primary)', label: 'Total Orders', value: '248', change: '+12%' },
+    { icon: ShoppingCart, color: 'var(--primary)', label: 'Total Orders', value: ordersLoading ? '-' : String(orders.length), change: '+12%' },
     { icon: Truck, color: 'var(--secondary)', label: 'In Transit', value: '42', change: '+8%' },
     { icon: Box, color: 'var(--accent)', label: 'Total Products', value: String(products.length), change: '+5%' },
     { icon: BarChart3, color: 'var(--chart-4)', label: 'Revenue', value: '$45.2k', change: '+18%' },
@@ -139,6 +152,40 @@ export default function HomePage() {
               <HelpCircle size={18} />
               Get Support
             </Link>
+          </section>
+
+          {/* Recent Orders Widget */}
+          <section className="recent-orders">
+            <div className="section-header">
+              <h2>Recent Orders</h2>
+              <Link to="/Track" className="view-all">View All →</Link>
+            </div>
+            <div className="orders-list">
+              {ordersLoading ? (
+                <p style={{ color: 'var(--muted)', fontStyle: 'italic' }}>Loading orders...</p>
+              ) : orders.length === 0 ? (
+                <div className="empty-orders">
+                  <Package size={32} />
+                  <p>No orders yet</p>
+                  <Link to="/Catalog" className="action-btn outline">Start Shopping</Link>
+                </div>
+              ) : (
+                orders.slice(0, 3).map((order) => (
+                  <div key={order.id} className="order-row">
+                    <div className="order-info">
+                      <p className="order-id">{order.id}</p>
+                      <p className="order-product">{order.product}</p>
+                    </div>
+                    <div className="order-status-wrap">
+                      <span className={`status-badge ${order.status}`}>
+                        {order.status}
+                      </span>
+                      <p className="order-date">{order.date}</p>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
           </section>
         </div>
 

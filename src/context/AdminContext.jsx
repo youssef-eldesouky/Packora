@@ -1,12 +1,36 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 import { parseAmount } from '../utils/adminFormat';
-import { userApi, productApi } from '../utils/api';
+import { userApi, productApi, orderApi } from '../utils/api';
 
 const AdminContext = createContext(null);
 
 export function AdminProvider({ children }) {
-  const orders = useMemo(() => [], []);
+  const [orders, setOrders] = useState([]);
+  const [ordersLoading, setOrdersLoading] = useState(false);
+  const [ordersError, setOrdersError] = useState(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    setOrdersLoading(true);
+    setOrdersError(null);
+
+    orderApi
+      .getAll()
+      .then((data) => {
+        if (!cancelled) setOrders(data);
+      })
+      .catch((err) => {
+        if (!cancelled) setOrdersError(err.message || 'Failed to load orders');
+      })
+      .finally(() => {
+        if (!cancelled) setOrdersLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   // ── Products: fetched from backend /api/products ──────────────
   const [products, setProducts] = useState([]);
@@ -119,14 +143,14 @@ export function AdminProvider({ children }) {
   const getOrdersForCustomer = useCallback(
     (customer) => {
       const email = (customer?.email || '').toLowerCase();
-      return orders.filter((o) => (o.email || '').toLowerCase() === email);
+      return orders.filter((o) => (o.userEmail || '').toLowerCase() === email);
     },
     [orders]
   );
 
   const dashboardStats = useMemo(() => {
     const totalRevenue = orders.reduce((s, o) => s + parseAmount(o.amount), 0);
-    const uniqueCustomers = new Set(orders.map((o) => o.email)).size;
+    const uniqueCustomers = new Set(orders.map((o) => o.userEmail)).size;
     return {
       totalRevenue,
       totalOrders: orders.length,
@@ -156,6 +180,8 @@ export function AdminProvider({ children }) {
       productsLoading,
       productsError,
       orders,
+      ordersLoading,
+      ordersError,
       customers,
       customersLoading,
       customersError,
@@ -171,6 +197,8 @@ export function AdminProvider({ children }) {
       productsLoading,
       productsError,
       orders,
+      ordersLoading,
+      ordersError,
       customers,
       customersLoading,
       customersError,
