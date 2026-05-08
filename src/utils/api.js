@@ -92,3 +92,29 @@ export async function apiFetch(url, options = {}) {
 
   return data;
 }
+
+// ── User / Profile API ────────────────────────────────────────────────
+export const userApi = {
+  /** GET /api/users/me – current authenticated user's profile */
+  getMe: () => apiFetch('/api/users/me'),
+
+  /** PUT /api/users/me – update current user's profile */
+  updateMe: (data) =>
+    apiFetch('/api/users/me', {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    }),
+
+  /** PUT /api/users/me/password – change password */
+  updatePassword: (data) =>
+    apiFetch('/api/users/me/password', {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    }),
+
+  /** GET /api/users – list all users (ADMIN) */
+  getAll: () => apiFetch('/api/users'),
+
+  /** GET /api/users/:id – get specific user (ADMIN) */
+  getById: (id) => apiFetch(`/api/users/${id}`),
+};

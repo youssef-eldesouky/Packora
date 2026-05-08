@@ -1,23 +1,84 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { ArrowLeft, Mail, Phone, MapPin } from 'lucide-react';
+import { ArrowLeft, Mail, Phone, Loader2 } from 'lucide-react';
 import { useAdmin } from '../../context/AdminContext';
+import { userApi } from '../../utils/api';
 
 function StatusBadge({ status }) {
   const s = (status || '').toLowerCase();
   return <span className={`admin-badge ${s}`}>{s}</span>;
 }
 
+function formatRole(role) {
+  if (!role) return 'User';
+  return role
+    .replace(/^ROLE_/, '')
+    .replace(/_/g, ' ')
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
 export default function AdminCustomerDetail() {
   const { customerId } = useParams();
-  const { customers, getOrdersForCustomer } = useAdmin();
-  const customer = customers.find((c) => String(c.id) === String(customerId));
+  const { getOrdersForCustomer } = useAdmin();
+
+  const [customer, setCustomer] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Fetch fresh user data from backend
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    setError(null);
+
+    userApi
+      .getById(customerId)
+      .then((u) => {
+        if (cancelled) return;
+        setCustomer({
+          id: u.id,
+          name: u.username || '—',
+          businessName: u.companyName || '—',
+          email: u.email || '—',
+          phone: u.phone || '—',
+          role: u.role || 'USER',
+          memberSince: u.createdAt
+            ? new Date(u.createdAt).toLocaleDateString('en-US', {
+                month: 'short',
+                year: 'numeric',
+              })
+            : '—',
+        });
+      })
+      .catch((err) => {
+        if (!cancelled) setError(err.message || 'Failed to load user');
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [customerId]);
+
   const orders = customer ? getOrdersForCustomer(customer) : [];
 
-  if (!customer) {
+  if (loading) {
+    return (
+      <div style={{ textAlign: 'center', padding: '3rem' }}>
+        <Loader2 size={32} className="profile-spinner" />
+        <p>Loading user details…</p>
+      </div>
+    );
+  }
+
+  if (error || !customer) {
     return (
       <>
-        <p>Customer not found.</p>
+        <p style={{ color: 'var(--danger, #ef4444)', padding: '1rem' }}>
+          {error || 'Customer not found.'}
+        </p>
         <Link to="/admin/customers" className="admin-link">
           Back to customers
         </Link>
@@ -44,23 +105,11 @@ export default function AdminCustomerDetail() {
             <Phone size={14} />
             {customer.phone}
           </span>
-          <span>
-            <MapPin size={14} />
-            {customer.address}
-          </span>
         </div>
         <div className="admin-customer-stats" style={{ marginTop: '1rem' }}>
           <div>
-            Total orders
-            <strong>{customer.totalOrders}</strong>
-          </div>
-          <div>
-            Total spent
-            <strong>{customer.totalSpent}</strong>
-          </div>
-          <div>
-            Tier
-            <strong>{customer.tier}</strong>
+            Role
+            <strong>{formatRole(customer.role)}</strong>
           </div>
           <div>
             Member since

@@ -1,69 +1,109 @@
-import React, { createContext, useContext, useMemo, useState } from 'react';
-import orders from '../mockdata/Orders.json';
+import React, { createContext, useContext, useCallback, useEffect, useMemo, useState } from 'react';
+import { userApi } from '../utils/api';
+import { useAuth } from './AuthContext';
 
 const ProfileContext = createContext(null);
 
-const defaultAccount = {
-  fullName: 'John Smith',
-  businessName: 'Smith Enterprises Inc.',
-  email: 'john.smith@smithenterprises.com',
-  phone: '+1 (555) 123-4567',
-  street: '123 Business Street',
-  city: 'New York',
-  state: 'NY',
-  zip: '10001',
-};
-
-const defaultAddresses = [
-  {
-    id: 'addr-1',
-    label: 'Main Warehouse',
-    street: '123 Business Street',
-    city: 'New York',
-    state: 'NY',
-    zip: '10001',
-    isPrimary: true,
-  },
-  {
-    id: 'addr-2',
-    label: 'Distribution Center',
-    street: '456 Commerce Avenue',
-    city: 'Chicago',
-    state: 'IL',
-    zip: '60601',
-    isPrimary: false,
-  },
-];
-
-const defaultNotifications = {
-  orderUpdates: true,
-  shippingAlerts: true,
-  promotions: false,
-  newsletter: true,
-};
-
-function parseAmount(str) {
-  if (!str || typeof str !== 'string') return 0;
-  const n = parseFloat(str.replace(/[^0-9.]/g, ''));
-  return Number.isFinite(n) ? n : 0;
-}
+/* ── Provider ────────────────────────────────────────────────────── */
 
 export function ProfileProvider({ children }) {
-  const [accountProfile, setAccountProfile] = useState(defaultAccount);
-  const [savedAddresses, setSavedAddresses] = useState(defaultAddresses);
-  const [notificationPrefs, setNotificationPrefs] = useState(defaultNotifications);
+  const { isLoggedIn } = useAuth();
 
-  const stats = useMemo(() => {
-    const totalOrders = orders.length;
-    const totalSpent = orders.reduce((sum, o) => sum + parseAmount(o.amount), 0);
-    return {
-      memberSince: 'Jan 2024',
-      totalOrders,
-      totalSpent,
-      tier: 'Gold',
+  // Profile state fetched from backend
+  const [accountProfile, setAccountProfile] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  // Local-only state (no backend support yet)
+  const [savedAddresses, setSavedAddresses] = useState([]);
+  const [notificationPrefs, setNotificationPrefs] = useState({
+    orderUpdates: true,
+    shippingAlerts: true,
+    promotions: false,
+    newsletter: false,
+  });
+
+  /* ── Fetch profile on mount / login ───────────────────────────── */
+  useEffect(() => {
+    if (!isLoggedIn) {
+      setAccountProfile(null);
+      return;
+    }
+
+    let cancelled = false;
+    setLoading(true);
+    setError(null);
+
+    userApi
+      .getMe()
+      .then((data) => {
+        if (!cancelled) {
+          setAccountProfile({
+            username: data.username || '',
+            companyName: data.companyName || '',
+            email: data.email || '',
+            phone: data.phone || '',
+            role: data.role || 'USER',
+            createdAt: data.createdAt || null,
+          });
+        }
+      })
+      .catch((err) => {
+        if (!cancelled) setError(err.message || 'Failed to load profile');
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
     };
+  }, [isLoggedIn]);
+
+  /* ── Save profile to backend ──────────────────────────────────── */
+  const saveProfile = useCallback(async (draft) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const updated = await userApi.updateMe({
+        username: draft.username,
+        email: draft.email,
+        phone: draft.phone || null,
+        companyName: draft.companyName || null,
+      });
+      setAccountProfile({
+        username: updated.username || '',
+        companyName: updated.companyName || '',
+        email: updated.email || '',
+        phone: updated.phone || '',
+        role: updated.role || 'USER',
+        createdAt: updated.createdAt || null,
+      });
+      return { success: true };
+    } catch (err) {
+      const msg = err?.data?.message || err.message || 'Failed to update profile';
+      setError(msg);
+      return { success: false, message: msg };
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
+  /* ── Stats derived from real data ─────────────────────────────── */
+  const stats = useMemo(() => {
+    const created = accountProfile?.createdAt;
+    let memberSince = '—';
+    if (created) {
+      const d = new Date(created);
+      memberSince = d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+    }
+    return {
+      memberSince,
+      role: accountProfile?.role || 'USER',
+    };
+  }, [accountProfile]);
+
+  /* ── Address helpers (local-only) ─────────────────────────────── */
   const addAddress = (addr) => {
     const id = `addr-${Date.now()}`;
     const isPrimary = addr.isPrimary === true;
@@ -101,9 +141,13 @@ export function ProfileProvider({ children }) {
     setSavedAddresses((prev) => prev.map((a) => ({ ...a, isPrimary: a.id === id })));
   };
 
+  /* ── Context value ────────────────────────────────────────────── */
   const value = {
     accountProfile,
     setAccountProfile,
+    saveProfile,
+    loading,
+    error,
     savedAddresses,
     addAddress,
     updateAddress,

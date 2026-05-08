@@ -1,29 +1,38 @@
 import React, { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, Mail, Phone } from 'lucide-react';
+import { Search, Mail, Phone, Loader2 } from 'lucide-react';
 import { useAdmin } from '../../context/AdminContext';
 
-function tierClass(tier) {
-  const t = (tier || '').toLowerCase();
-  if (t === 'platinum') return 'platinum';
-  if (t === 'gold') return 'gold';
-  if (t === 'silver') return 'silver';
-  if (t === 'bronze') return 'bronze';
-  return '';
+function roleClass(role) {
+  const r = (role || '').toUpperCase();
+  if (r === 'ADMIN') return 'platinum';
+  if (r === 'BUSINESS_OWNER') return 'gold';
+  if (r === 'SUPPORT_STAFF') return 'silver';
+  return 'bronze';
+}
+
+function formatRole(role) {
+  if (!role) return 'User';
+  return role
+    .replace(/^ROLE_/, '')
+    .replace(/_/g, ' ')
+    .replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
 export default function AdminCustomers() {
-  const { customers } = useAdmin();
+  const { customers, customersLoading, customersError } = useAdmin();
   const [q, setQ] = useState('');
 
   const stats = useMemo(() => {
-    const platinum = customers.filter((c) => (c.tier || '').toLowerCase() === 'platinum').length;
-    const gold = customers.filter((c) => (c.tier || '').toLowerCase() === 'gold').length;
+    const admins = customers.filter((c) => (c.role || '').toUpperCase() === 'ADMIN').length;
+    const businessOwners = customers.filter(
+      (c) => (c.role || '').toUpperCase() === 'BUSINESS_OWNER'
+    ).length;
     return {
       total: customers.length,
-      platinum,
-      gold,
-      newThisMonth: 12,
+      admins,
+      businessOwners,
+      other: customers.length - admins - businessOwners,
     };
   }, [customers]);
 
@@ -37,6 +46,27 @@ export default function AdminCustomers() {
         (c.email || '').toLowerCase().includes(term)
     );
   }, [customers, q]);
+
+  if (customersLoading) {
+    return (
+      <>
+        <h1 className="admin-page-title">Manage Customers</h1>
+        <div style={{ textAlign: 'center', padding: '3rem' }}>
+          <Loader2 size={32} className="profile-spinner" />
+          <p>Loading users…</p>
+        </div>
+      </>
+    );
+  }
+
+  if (customersError) {
+    return (
+      <>
+        <h1 className="admin-page-title">Manage Customers</h1>
+        <p style={{ color: 'var(--danger, #ef4444)', padding: '1rem' }}>{customersError}</p>
+      </>
+    );
+  }
 
   return (
     <>
@@ -59,19 +89,19 @@ export default function AdminCustomers() {
       <div className="admin-stat-grid">
         <div className="admin-stat-card">
           <p className="admin-stat-value">{stats.total}</p>
-          <p className="admin-stat-label">Total Customers</p>
+          <p className="admin-stat-label">Total Users</p>
         </div>
         <div className="admin-stat-card">
-          <p className="admin-stat-value">{stats.platinum}</p>
-          <p className="admin-stat-label">Platinum Tier</p>
+          <p className="admin-stat-value">{stats.admins}</p>
+          <p className="admin-stat-label">Admins</p>
         </div>
         <div className="admin-stat-card">
-          <p className="admin-stat-value">{stats.gold}</p>
-          <p className="admin-stat-label">Gold Tier</p>
+          <p className="admin-stat-value">{stats.businessOwners}</p>
+          <p className="admin-stat-label">Business Owners</p>
         </div>
         <div className="admin-stat-card">
-          <p className="admin-stat-value">{stats.newThisMonth}</p>
-          <p className="admin-stat-label">New This Month</p>
+          <p className="admin-stat-value">{stats.other}</p>
+          <p className="admin-stat-label">Other Roles</p>
         </div>
       </div>
 
@@ -83,7 +113,7 @@ export default function AdminCustomers() {
                 <h3>{c.name}</h3>
                 <div className="biz">{c.businessName}</div>
               </div>
-              <span className={`admin-tier ${tierClass(c.tier)}`}>{c.tier}</span>
+              <span className={`admin-tier ${roleClass(c.role)}`}>{formatRole(c.role)}</span>
             </div>
             <div className="admin-customer-contact">
               <span>
@@ -94,16 +124,6 @@ export default function AdminCustomers() {
                 <Phone size={14} />
                 {c.phone}
               </span>
-            </div>
-            <div className="admin-customer-stats">
-              <div>
-                Orders
-                <strong>{c.totalOrders}</strong>
-              </div>
-              <div>
-                Spent
-                <strong>{c.totalSpent}</strong>
-              </div>
             </div>
             <div className="admin-member-since">Member since {c.memberSince}</div>
           </Link>

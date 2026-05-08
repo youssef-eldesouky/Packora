@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import {
   User,
   Mail,
   Phone,
-  MapPin,
   Building2,
   Save,
   CreditCard,
@@ -12,11 +11,13 @@ import {
   Bell,
   Lock,
   Plus,
+  Loader2,
+  PackageSearch,
 } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
 import { useProfile } from '../../context/ProfileContext';
+import { userApi } from '../../utils/api';
 import AddCard from '../Cart/AddCard';
-import orders from '../../mockdata/Orders.json';
 import Navbar from '../Navbar/Navbar';
 import './Profile.css';
 import Footer from '../Footer/Footer';
@@ -30,45 +31,60 @@ const TABS = [
   { key: 'orders', label: 'Order History' },
 ];
 
-const statusLabel = {
-  delivered: 'Delivered',
-  shipped: 'In Transit',
-  processing: 'Processing',
-  pending: 'Pending',
-  cancelled: 'Cancelled',
-};
-
 function AccountTab() {
-  const { accountProfile, setAccountProfile, stats } = useProfile();
+  const { accountProfile, saveProfile, loading, error, stats } = useProfile();
   const { setShippingAddress } = useCart();
-  const [draft, setDraft] = useState(accountProfile);
+  const [draft, setDraft] = useState(accountProfile || {});
+  const [saveMsg, setSaveMsg] = useState('');
 
   useEffect(() => {
-    setDraft(accountProfile);
+    if (accountProfile) setDraft(accountProfile);
   }, [accountProfile]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setDraft((prev) => ({ ...prev, [name]: value }));
+    setSaveMsg('');
   };
 
-  const handleSave = () => {
-    setAccountProfile(draft);
-    setShippingAddress((prev) => ({
-      ...prev,
-      fullName: draft.fullName,
-      company: draft.businessName,
-      street: draft.street,
-      city: draft.city,
-      state: draft.state,
-      zip: draft.zip,
-      phone: draft.phone,
-    }));
+  const handleSave = async () => {
+    setSaveMsg('');
+    const result = await saveProfile(draft);
+    if (result.success) {
+      setSaveMsg('Profile updated successfully!');
+      // Sync shipping address with updated profile
+      setShippingAddress((prev) => ({
+        ...prev,
+        fullName: draft.username,
+        company: draft.companyName,
+        phone: draft.phone,
+      }));
+    } else {
+      setSaveMsg(result.message || 'Failed to update profile');
+    }
   };
 
   const handleCancel = () => {
-    setDraft(accountProfile);
+    setDraft(accountProfile || {});
+    setSaveMsg('');
   };
+
+  if (loading && !accountProfile) {
+    return (
+      <div className="profile-card" style={{ textAlign: 'center', padding: '3rem' }}>
+        <Loader2 size={32} className="profile-spinner" />
+        <p>Loading profile…</p>
+      </div>
+    );
+  }
+
+  if (error && !accountProfile) {
+    return (
+      <div className="profile-card">
+        <p className="profile-security-message err">{error}</p>
+      </div>
+    );
+  }
 
   return (
     <div className="profile-account-layout">
@@ -81,10 +97,10 @@ function AccountTab() {
               Full Name
             </label>
             <input
-              name="fullName"
-              value={draft.fullName}
+              name="username"
+              value={draft.username || ''}
               onChange={handleChange}
-              placeholder="John Smith"
+              placeholder="Your username"
             />
           </div>
           <div className="profile-field">
@@ -93,10 +109,10 @@ function AccountTab() {
               Business Name
             </label>
             <input
-              name="businessName"
-              value={draft.businessName}
+              name="companyName"
+              value={draft.companyName || ''}
               onChange={handleChange}
-              placeholder="Smith Enterprises Inc."
+              placeholder="Your company name"
             />
           </div>
           <div className="profile-field">
@@ -107,7 +123,7 @@ function AccountTab() {
             <input
               name="email"
               type="email"
-              value={draft.email}
+              value={draft.email || ''}
               onChange={handleChange}
               placeholder="john@example.com"
             />
@@ -119,43 +135,24 @@ function AccountTab() {
             </label>
             <input
               name="phone"
-              value={draft.phone}
+              value={draft.phone || ''}
               onChange={handleChange}
               placeholder="+1 (555) 123-4567"
             />
           </div>
-          <div className="profile-field full">
-            <label>
-              <MapPin size={16} />
-              Street Address
-            </label>
-            <input
-              name="street"
-              value={draft.street}
-              onChange={handleChange}
-              placeholder="123 Business Street"
-            />
-          </div>
-          <div className="profile-field">
-            <label>City</label>
-            <input name="city" value={draft.city} onChange={handleChange} placeholder="New York" />
-          </div>
-          <div className="profile-field">
-            <label>State</label>
-            <input name="state" value={draft.state} onChange={handleChange} placeholder="NY" />
-          </div>
-          <div className="profile-field">
-            <label>ZIP Code</label>
-            <input name="zip" value={draft.zip} onChange={handleChange} placeholder="10001" />
-          </div>
         </div>
+        {saveMsg && (
+          <p className={`profile-security-message ${saveMsg.includes('success') ? 'ok' : 'err'}`}>
+            {saveMsg}
+          </p>
+        )}
         <div className="profile-form-actions">
           <button type="button" className="profile-btn-outline" onClick={handleCancel}>
             Cancel
           </button>
-          <button type="button" className="profile-btn-primary" onClick={handleSave}>
-            <Save size={18} />
-            Save Changes
+          <button type="button" className="profile-btn-primary" onClick={handleSave} disabled={loading}>
+            {loading ? <Loader2 size={18} className="profile-spinner" /> : <Save size={18} />}
+            {loading ? 'Saving…' : 'Save Changes'}
           </button>
         </div>
       </div>
@@ -166,18 +163,8 @@ function AccountTab() {
           <span className="profile-stat-value">{stats.memberSince}</span>
         </div>
         <div className="profile-stat-row">
-          <span className="profile-stat-label">Total Orders</span>
-          <span className="profile-stat-value">{stats.totalOrders}</span>
-        </div>
-        <div className="profile-stat-row">
-          <span className="profile-stat-label">Total Spent</span>
-          <span className="profile-stat-value">
-            ${stats.totalSpent.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-          </span>
-        </div>
-        <div className="profile-stat-row">
-          <span className="profile-stat-label">Account Tier</span>
-          <span className="profile-tier-badge">{stats.tier}</span>
+          <span className="profile-stat-label">Role</span>
+          <span className="profile-tier-badge">{stats.role}</span>
         </div>
       </aside>
     </div>
@@ -509,6 +496,7 @@ function SecurityTab() {
     confirm: '',
   });
   const [message, setMessage] = useState('');
+  const [saving, setSaving] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -516,7 +504,7 @@ function SecurityTab() {
     setMessage('');
   };
 
-  const handleUpdate = (e) => {
+  const handleUpdate = async (e) => {
     e.preventDefault();
     if (!passwords.current || !passwords.next || !passwords.confirm) {
       setMessage('Please fill in all fields.');
@@ -530,8 +518,22 @@ function SecurityTab() {
       setMessage('New password must be at least 8 characters.');
       return;
     }
-    setPasswords({ current: '', next: '', confirm: '' });
-    setMessage('Password updated successfully.');
+
+    setSaving(true);
+    setMessage('');
+    try {
+      await userApi.updatePassword({
+        currentPassword: passwords.current,
+        newPassword: passwords.next,
+      });
+      setPasswords({ current: '', next: '', confirm: '' });
+      setMessage('Password updated successfully!');
+    } catch (err) {
+      const msg = err?.data?.message || err.message || 'Failed to update password';
+      setMessage(msg);
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -579,9 +581,9 @@ function SecurityTab() {
             {message}
           </p>
         )}
-        <button type="submit" className="profile-btn-primary">
-          <Lock size={18} />
-          Update Password
+        <button type="submit" className="profile-btn-primary" disabled={saving}>
+          {saving ? <Loader2 size={18} className="profile-spinner" /> : <Lock size={18} />}
+          {saving ? 'Updating…' : 'Update Password'}
         </button>
       </form>
     </div>
@@ -589,38 +591,16 @@ function SecurityTab() {
 }
 
 function OrderHistoryTab() {
-  const navigate = useNavigate();
-  const sorted = [...orders].sort((a, b) => {
-    const da = new Date(a.date);
-    const db = new Date(b.date);
-    return db - da;
-  });
-
-  const goToOrder = (orderId) => {
-    navigate('/Track', { state: { focusOrderId: orderId } });
-  };
-
   return (
-    <div className="profile-card">
+    <div className="profile-card" style={{ textAlign: 'center', padding: '3rem' }}>
+      <PackageSearch size={48} style={{ opacity: 0.4, marginBottom: '1rem' }} />
       <h2 className="profile-card-title">Order History</h2>
-      <ul className="profile-order-list">
-        {sorted.map((order) => (
-          <li key={order.id}>
-            <button type="button" className="profile-order-row" onClick={() => goToOrder(order.id)}>
-              <div>
-                <span className="profile-order-id">{order.id}</span>
-                <span className="profile-order-date">{order.date}</span>
-              </div>
-              <div className="profile-order-right">
-                <span className="profile-order-amount">{order.amount}</span>
-                <span className={`profile-order-status status-${order.status}`}>
-                  {statusLabel[order.status] || order.status}
-                </span>
-              </div>
-            </button>
-          </li>
-        ))}
-      </ul>
+      <p style={{ color: 'var(--muted-foreground)', marginBottom: '1.5rem' }}>
+        View and track all your orders from the Track page.
+      </p>
+      <Link to="/Track" className="profile-btn-primary" style={{ display: 'inline-flex', textDecoration: 'none' }}>
+        Go to Order Tracking
+      </Link>
     </div>
   );
 }
@@ -660,7 +640,7 @@ export default function Profile() {
           {activeTab === 'orders' && <OrderHistoryTab />}
         </div>
       </main>
-      <Footer/>
+      <Footer />
     </div>
   );
 }

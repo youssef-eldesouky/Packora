@@ -1,8 +1,8 @@
-import React, { createContext, useCallback, useContext, useMemo, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import ordersSeed from '../mockdata/Orders.json';
-import clientsSeed from '../mockdata/Clients.json';
 import productsSeed from '../mockdata/product.json';
 import { parseAmount } from '../utils/adminFormat';
+import { userApi } from '../utils/api';
 
 const STOCK_BY_INDEX = [2500, 1800, 850, 1200, 3000, 900];
 
@@ -24,7 +24,51 @@ const AdminContext = createContext(null);
 export function AdminProvider({ children }) {
   const [products, setProducts] = useState(normalizeProducts);
   const orders = useMemo(() => ordersSeed, []);
-  const customers = useMemo(() => clientsSeed, []);
+
+  // ── Customers: fetched from backend /api/users (ADMIN) ────────
+  const [customers, setCustomers] = useState([]);
+  const [customersLoading, setCustomersLoading] = useState(false);
+  const [customersError, setCustomersError] = useState(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    setCustomersLoading(true);
+    setCustomersError(null);
+
+    userApi
+      .getAll()
+      .then((users) => {
+        if (cancelled) return;
+        const mapped = users.map((u) => ({
+          id: u.id,
+          name: u.username || '—',
+          businessName: u.companyName || '—',
+          email: u.email || '—',
+          phone: u.phone || '—',
+          role: u.role || 'USER',
+          memberSince: u.createdAt
+            ? new Date(u.createdAt).toLocaleDateString('en-US', {
+                month: 'short',
+                year: 'numeric',
+              })
+            : '—',
+        }));
+        setCustomers(mapped);
+      })
+      .catch((err) => {
+        if (!cancelled) {
+          // If the user isn't admin, the call will 403 — that's expected
+          setCustomersError(err.message || 'Failed to load users');
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setCustomersLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const addProduct = useCallback((payload) => {
     const id = String(Date.now());
@@ -102,6 +146,8 @@ export function AdminProvider({ children }) {
       products,
       orders,
       customers,
+      customersLoading,
+      customersError,
       addProduct,
       updateProduct,
       removeProduct,
@@ -113,6 +159,8 @@ export function AdminProvider({ children }) {
       products,
       orders,
       customers,
+      customersLoading,
+      customersError,
       addProduct,
       updateProduct,
       removeProduct,
