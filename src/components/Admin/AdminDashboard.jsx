@@ -14,12 +14,7 @@ export default function AdminDashboard() {
   const { orders, products, dashboardStats, topProductsFromOrders } = useAdmin();
   const recent = [...orders].slice(0, 5);
 
-  const trends = [
-    { up: true, text: '+12.5% vs last month' },
-    { up: true, text: '+8.2% vs last month' },
-    { up: true, text: '+15.3% vs last month' },
-    { up: false, text: '-2.1% vs last month' },
-  ];
+  const trends = [];
 
   const statCards = [
     {
@@ -28,7 +23,6 @@ export default function AdminDashboard() {
       iconClass: 'green',
       value: formatMoney(dashboardStats.totalRevenue),
       label: 'Total Revenue',
-      trend: trends[0],
     },
     {
       to: '/admin/insights/orders',
@@ -36,7 +30,6 @@ export default function AdminDashboard() {
       iconClass: 'purple',
       value: dashboardStats.totalOrders.toLocaleString(),
       label: 'Total Orders',
-      trend: trends[1],
     },
     {
       to: '/admin/insights/customers',
@@ -44,7 +37,6 @@ export default function AdminDashboard() {
       iconClass: 'slate',
       value: dashboardStats.activeCustomers,
       label: 'Active Customers',
-      trend: trends[2],
     },
     {
       to: '/admin/insights/products',
@@ -52,7 +44,6 @@ export default function AdminDashboard() {
       iconClass: 'rose',
       value: dashboardStats.productCount,
       label: 'Products',
-      trend: trends[3],
     },
   ];
 
@@ -72,9 +63,6 @@ export default function AdminDashboard() {
             </div>
             <p className="admin-stat-value">{value}</p>
             <p className="admin-stat-label">{label}</p>
-            <span className={`admin-stat-trend ${trend.up ? 'up' : 'down'}`}>
-              {trend.up ? '↗' : '↘'} {trend.text}
-            </span>
           </Link>
         ))}
       </div>

@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Check, MapPin, CreditCard, Lock } from 'lucide-react';
+import { Check, MapPin, CreditCard, Lock, Loader2 } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
+import { orderApi } from '../../utils/api';
 import './ReviewOrder.css';
 
 const TAX_RATE = 0.08;
@@ -22,10 +23,42 @@ export default function ReviewOrder() {
   const tax = subtotal * TAX_RATE;
   const total = subtotal + tax;
 
-  const handlePlaceOrder = () => {
-    clearCart();
-    setCheckoutStep('shipping');
-    navigate('/Cart');
+  const [isPlacingOrder, setIsPlacingOrder] = useState(false);
+  const [error, setError] = useState(null);
+
+  const handlePlaceOrder = async () => {
+    setIsPlacingOrder(true);
+    setError(null);
+    try {
+      const addressString = [
+        shippingAddress.fullName,
+        shippingAddress.company,
+        shippingAddress.street,
+        `${shippingAddress.city}, ${shippingAddress.state} ${shippingAddress.zip}`,
+        shippingAddress.phone
+      ].filter(Boolean).join(', ');
+
+      const items = cartItems.map(item => ({
+        productId: parseInt(item.productId, 10),
+        quantity: item.quantity,
+        unitPrice: item.price,
+        size: item.size || null,
+        material: item.material || null,
+      }));
+
+      await orderApi.create({
+        shippingAddress: addressString,
+        items
+      });
+
+      clearCart();
+      setCheckoutStep('shipping');
+      navigate('/Track'); // Navigate to Track page to see the new order
+    } catch (err) {
+      setError(err.message || 'Failed to place order. Please try again.');
+    } finally {
+      setIsPlacingOrder(false);
+    }
   };
 
   return (
@@ -110,6 +143,7 @@ export default function ReviewOrder() {
             type="button"
             className="review-back-btn"
             onClick={() => setCheckoutStep('payment')}
+            disabled={isPlacingOrder}
           >
             Back
           </button>
@@ -117,11 +151,17 @@ export default function ReviewOrder() {
             type="button"
             className="review-place-btn"
             onClick={handlePlaceOrder}
+            disabled={isPlacingOrder}
           >
-            <Lock size={18} />
-            Place Order
+            {isPlacingOrder ? (
+              <Loader2 size={18} className="profile-spinner" />
+            ) : (
+              <Lock size={18} />
+            )}
+            {isPlacingOrder ? 'Placing Order...' : 'Place Order'}
           </button>
         </div>
+        {error && <p style={{ color: 'var(--danger, #ef4444)', marginTop: '1rem', textAlign: 'right' }}>{error}</p>}
       </div>
 
       <aside className="review-summary">

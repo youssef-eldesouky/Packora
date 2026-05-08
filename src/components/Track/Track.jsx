@@ -10,13 +10,14 @@ import {
   Copy,
   AlertCircle,
   MessageCircle,
+  Loader2,
+  XCircle,
 } from 'lucide-react';
+import { orderApi } from '../../utils/api';
 
 import Navbar from '../Navbar/Navbar';
 import './Track.css';
 import Footer from '../Footer/Footer';
-
-const orders = [];
 
 
 const statusConfig = {
@@ -35,7 +36,7 @@ function getOrderTracking(order) {
   const b = String(Math.abs(Math.floor(n / 100) % 10000)).padStart(4, '0');
   const c = String(Math.abs(Math.floor(n / 10000) % 10000)).padStart(4, '0');
   const trackingNumber = `TRK-${a}-${b}-${c}`;
-  const baseDate = new Date(order.date);
+  const baseDate = new Date(order.rawDate || order.date || new Date());
   const steps = [
     { key: 'placed', label: 'Order Placed', date: baseDate, time: '10:30 AM' },
     { key: 'processing', label: 'Processing', date: baseDate, time: '2:15 PM' },
@@ -67,12 +68,32 @@ export default function Track() {
   const location = useLocation();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [isCancelling, setIsCancelling] = useState(false);
 
   useEffect(() => {
-    const focusId = location.state?.focusOrderId;
-    if (!focusId) return;
-    const found = orders.find((o) => o.id === focusId);
-    if (found) setSelectedOrder(found);
+    let cancelled = false;
+    setLoading(true);
+    orderApi.getMyOrders()
+      .then(data => {
+        if (!cancelled) {
+          setOrders(data);
+          const focusId = location.state?.focusOrderId;
+          if (focusId) {
+            const found = data.find((o) => o.id === focusId || String(o.rawId) === String(focusId));
+            if (found) setSelectedOrder(found);
+          }
+        }
+      })
+      .catch(err => {
+        if (!cancelled) setError(err.message || 'Failed to load orders.');
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => { cancelled = true; };
   }, [location.state]);
 
   const filteredOrders = useMemo(() => {
@@ -86,10 +107,26 @@ export default function Track() {
         tracking.includes(q)
       );
     });
-  }, [searchQuery]);
+  }, [searchQuery, orders]);
 
   const handleCopyTracking = (text) => {
     navigator.clipboard?.writeText(text);
+  };
+
+  const handleCancelOrder = async () => {
+    if (!selectedOrder || !selectedOrder.rawId) return;
+    if (!window.confirm('Are you sure you want to cancel this order?')) return;
+    
+    setIsCancelling(true);
+    try {
+      const updated = await orderApi.cancel(selectedOrder.rawId);
+      setOrders(prev => prev.map(o => o.rawId === updated.rawId ? updated : o));
+      setSelectedOrder(updated);
+    } catch (err) {
+      alert(err.message || 'Failed to cancel order.');
+    } finally {
+      setIsCancelling(false);
+    }
   };
 
   return (
@@ -116,36 +153,52 @@ export default function Track() {
             </div>
 
             <div className="track-orders-list">
-              {filteredOrders.map((order) => {
-                const config = statusConfig[order.status] || statusConfig.processing;
-                const Icon = config.Icon;
-                const isSelected = selectedOrder?.id === order.id;
-                return (
-                  <button
-                    key={order.id}
-                    type="button"
-                    className={`track-order-card ${isSelected ? 'selected' : ''}`}
-                    onClick={() => setSelectedOrder(order)}
-                  >
-                    <div className="track-order-card-top">
-                      <span className="track-order-icon">
-                        <Icon size={18} />
-                      </span>
-                      <span className="track-order-id">{order.id}</span>
-                      <span className={`track-order-badge ${config.class}`}>
-                        {config.label}
-                      </span>
-                    </div>
-                    <p className="track-order-product">
-                      {order.product} ({order.quantity} units)
-                    </p>
-                    <div className="track-order-meta">
-                      <span>{order.date}</span>
-                      <span className="track-order-amount">{order.amount}</span>
-                    </div>
-                  </button>
-                );
-              })}
+              {loading ? (
+                <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--muted)' }}>
+                  <Loader2 size={24} className="profile-spinner" />
+                  <p>Loading orders...</p>
+                </div>
+              ) : error ? (
+                <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--danger, #ef4444)' }}>
+                  <XCircle size={32} style={{ opacity: 0.5, marginBottom: '1rem' }} />
+                  <p>{error}</p>
+                </div>
+              ) : filteredOrders.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--muted)' }}>
+                  <p>No orders found.</p>
+                </div>
+              ) : (
+                filteredOrders.map((order) => {
+                  const config = statusConfig[order.status] || statusConfig.processing;
+                  const Icon = config.Icon;
+                  const isSelected = selectedOrder?.id === order.id;
+                  return (
+                    <button
+                      key={order.id}
+                      type="button"
+                      className={`track-order-card ${isSelected ? 'selected' : ''}`}
+                      onClick={() => setSelectedOrder(order)}
+                    >
+                      <div className="track-order-card-top">
+                        <span className="track-order-icon">
+                          <Icon size={18} />
+                        </span>
+                        <span className="track-order-id">{order.id}</span>
+                        <span className={`track-order-badge ${config.class}`}>
+                          {config.label}
+                        </span>
+                      </div>
+                      <p className="track-order-product">
+                        {order.product} ({order.quantity} units)
+                      </p>
+                      <div className="track-order-meta">
+                        <span>{order.date}</span>
+                        <span className="track-order-amount">{order.amount}</span>
+                      </div>
+                    </button>
+                  );
+                })
+              )}
             </div>
           </aside>
 
@@ -263,6 +316,20 @@ export default function Track() {
                     </button> 
                     </Link>
                   </div>
+                  {(selectedOrder.status === 'pending' || selectedOrder.status === 'processing') && (
+                    <div style={{ marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '1px solid var(--border)' }}>
+                      <button 
+                        type="button" 
+                        className="track-help-btn" 
+                        style={{ color: 'var(--danger, #ef4444)', borderColor: 'var(--danger, #ef4444)', background: 'transparent' }}
+                        onClick={handleCancelOrder}
+                        disabled={isCancelling}
+                      >
+                        <AlertCircle size={18} />
+                        {isCancelling ? 'Cancelling...' : 'Cancel Order'}
+                      </button>
+                    </div>
+                  )}
                 </div>
               </>
             ) : (

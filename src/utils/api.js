@@ -173,3 +173,53 @@ export const productApi = {
   /** DELETE /api/products/:id – delete (ADMIN) */
   delete: (id) => apiFetch(`/api/products/${id}`, { method: 'DELETE' }),
 };
+
+// ── Orders API ───────────────────────────────────────────────
+
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+function formatOrderDate(dateString) {
+  if (!dateString) return '—';
+  const d = new Date(dateString);
+  return `${MONTHS[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
+}
+
+/** Maps backend OrderResponse → frontend-friendly shape (for Track.jsx and Admin) */
+function normalizeOrder(o) {
+  const mainProduct = o.items && o.items.length > 0 ? o.items[0].productName : 'Custom Order';
+  const productLabel = o.items && o.items.length > 1 
+    ? `${mainProduct} + ${o.items.length - 1} more` 
+    : mainProduct;
+
+  return {
+    ...o,
+    id: `ORD-${String(o.id).padStart(4, '0')}`,
+    rawId: o.id, // For API calls (e.g. cancel, update status)
+    status: (o.status || 'PENDING').toLowerCase(),
+    date: formatOrderDate(o.orderDate),
+    amount: `$${(o.totalAmount || 0).toFixed(2)}`,
+    product: productLabel,
+    quantity: o.totalQuantity || 0,
+    rawDate: o.orderDate,
+    rawAmount: o.totalAmount,
+  };
+}
+
+export const orderApi = {
+  /** POST /api/orders – place a new order */
+  create: (data) => apiFetch('/api/orders', { method: 'POST', body: JSON.stringify(data) }).then(normalizeOrder),
+
+  /** GET /api/orders/me – get orders for current user */
+  getMyOrders: () => apiFetch('/api/orders/me').then(list => list.map(normalizeOrder)),
+
+  /** GET /api/orders – list all orders (ADMIN) */
+  getAll: () => apiFetch('/api/orders').then(list => list.map(normalizeOrder)),
+
+  /** GET /api/orders/:id – single order */
+  getById: (id) => apiFetch(`/api/orders/${id}`).then(normalizeOrder),
+
+  /** PUT /api/orders/:id/status – update order status (ADMIN) */
+  updateStatus: (id, status) => apiFetch(`/api/orders/${id}/status`, { method: 'PUT', body: JSON.stringify({ status }) }).then(normalizeOrder),
+
+  /** PUT /api/orders/:id/cancel – cancel an order */
+  cancel: (id) => apiFetch(`/api/orders/${id}/cancel`, { method: 'PUT' }).then(normalizeOrder),
+};
