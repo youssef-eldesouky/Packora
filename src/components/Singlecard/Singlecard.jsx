@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { productApi } from '../../utils/api';
 import { useCart } from '../../context/CartContext';
+import { useAuth } from '../../context/AuthContext';
 import Navbar from '../Navbar/Navbar';
 import './Singlecard.css';
 import Footer from '../Footer/Footer';
@@ -49,6 +50,7 @@ export default function Singlecard() {
   const { productId } = useParams();
   const navigate = useNavigate();
   const { addToCart } = useCart();
+  const { isLoggedIn } = useAuth();
 
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -449,6 +451,10 @@ export default function Singlecard() {
               className="singlecard-add-btn"
               disabled={!product.inStock}
               onClick={() => {
+                if (!isLoggedIn) {
+                  navigate('/login', { state: { from: `/catalog/${productId}` } });
+                  return;
+                }
                 addToCart({
                   productId: product.id,
                   name: product.name,

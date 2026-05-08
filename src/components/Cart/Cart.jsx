@@ -1,5 +1,5 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   Truck,
   ShoppingCart,
@@ -10,6 +10,7 @@ import {
   UploadCloud
 } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
+import { useAuth } from '../../context/AuthContext';
 import Navbar from '../Navbar/Navbar';
 import './Cart.css';
 import Footer from '../Footer/Footer';
@@ -18,7 +19,15 @@ const TAX_RATE = 0.08;
 
 export default function Cart() {
   const { cartItems, removeFromCart, updateQuantity, clearCart, bulkExcelData, setBulkExcelData } = useCart();
+  const { isLoggedIn } = useAuth();
+  const navigate = useNavigate();
   const [showBulkPrompt, setShowBulkPrompt] = React.useState(false);
+
+  useEffect(() => {
+    if (!isLoggedIn) {
+      navigate('/login', { replace: true, state: { from: '/Cart' } });
+    }
+  }, [isLoggedIn, navigate]);
 
   const subtotal = cartItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
   const shipping = subtotal >= 100 ? 0 : 0;
