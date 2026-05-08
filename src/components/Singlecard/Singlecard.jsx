@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import {
   ShoppingCart,
@@ -9,12 +9,41 @@ import {
   Leaf,
   Loader2,
   XCircle,
+  Ruler,
+  Upload,
+  Palette,
+  X,
+  ShoppingBag,
+  Eye,
 } from 'lucide-react';
 import { productApi } from '../../utils/api';
 import { useCart } from '../../context/CartContext';
 import Navbar from '../Navbar/Navbar';
 import './Singlecard.css';
 import Footer from '../Footer/Footer';
+
+const SIZE_CHART = [
+  { label: 'Extra Small (XS)', dims: '15 × 10 × 5 cm',  vol: '0.75 L', best: 'Jewelry, accessories' },
+  { label: 'Small (S)',        dims: '20 × 15 × 10 cm', vol: '3 L',    best: 'Cosmetics, phone cases' },
+  { label: 'Medium (M)',       dims: '30 × 20 × 15 cm', vol: '9 L',    best: 'Shoes, books, clothing' },
+  { label: 'Large (L)',        dims: '40 × 30 × 20 cm', vol: '24 L',   best: 'Electronics, bulk items' },
+  { label: 'Extra Large (XL)', dims: '50 × 40 × 30 cm', vol: '60 L',   best: 'Large shipments' },
+  { label: 'Mailer S (MS)',    dims: '25 × 20 × 5 cm',  vol: '2.5 L',  best: 'Documents, flat items' },
+  { label: 'Mailer L (ML)',    dims: '35 × 25 × 8 cm',  vol: '7 L',    best: 'Clothing, soft goods' },
+];
+
+const BAG_COLORS = [
+  { name: 'White',         hex: '#FFFFFF' },
+  { name: 'Brown Kraft',   hex: '#A0826D' },
+  { name: 'Black',         hex: '#1A1A1A' },
+  { name: 'Navy',          hex: '#1B2A4A' },
+  { name: 'Burgundy',      hex: '#6B1D2A' },
+  { name: 'Forest Green',  hex: '#2D5F3E' },
+  { name: 'Gold',          hex: '#C5A55A' },
+  { name: 'Custom',        hex: null },
+];
+
+const BAG_CATEGORIES = ['Shopping Bags', 'Mailers', 'Pouches', 'Paper Bags'];
 
 export default function Singlecard() {
   const { productId } = useParams();
@@ -28,6 +57,21 @@ export default function Singlecard() {
   const [selectedSize, setSelectedSize] = useState('');
   const [selectedMaterial, setSelectedMaterial] = useState('');
   const [quantity, setQuantity] = useState(10);
+
+  // Bag customization
+  const [bagColor, setBagColor] = useState('White');
+  const [customHex, setCustomHex] = useState('#6366F1');
+  const [logoFile, setLogoFile] = useState(null);
+  const [logoPreview, setLogoPreview] = useState(null);
+  const [addBagOption, setAddBagOption] = useState(false);
+  const [logoPos, setLogoPos] = useState({ x: 50, y: 40 }); // percentage
+  const logoInputRef = useRef(null);
+  const bagPreviewRef = useRef(null);
+
+  const isBagProduct = product ? BAG_CATEGORIES.some(c =>
+    (product.category || '').toLowerCase().includes(c.toLowerCase())
+  ) : false;
+  const showBagCustomization = isBagProduct || addBagOption;
 
   useEffect(() => {
     let cancelled = false;
@@ -180,6 +224,187 @@ export default function Singlecard() {
               </div>
             )}
 
+            {/* Bag Customization Section */}
+            {!isBagProduct && (
+              <div className="singlecard-section">
+                <button
+                  type="button"
+                  className={`sc-bag-toggle ${addBagOption ? 'active' : ''}`}
+                  onClick={() => setAddBagOption(v => !v)}
+                >
+                  <ShoppingBag size={18} />
+                  <span>{addBagOption ? 'Remove Bag Customization' : 'Add Custom Bag'}</span>
+                </button>
+              </div>
+            )}
+
+            {showBagCustomization && (
+              <div className="sc-bag-customize">
+                <div className="sc-bag-customize-header">
+                  <Palette size={18} />
+                  <h3>{isBagProduct ? 'Customize Your Bag' : 'Bag Add-On'}</h3>
+                </div>
+
+                {/* Bag Color */}
+                <div className="singlecard-section">
+                  <label className="singlecard-label">Bag Color</label>
+                  <div className="sc-bag-colors">
+                    {BAG_COLORS.map((c) => (
+                      <button
+                        key={c.name}
+                        type="button"
+                        className={`sc-bag-color-btn ${bagColor === c.name ? 'active' : ''}`}
+                        onClick={() => setBagColor(c.name)}
+                        title={c.name}
+                      >
+                        <span
+                          className="sc-bag-color-swatch"
+                          style={{
+                            background: c.hex || `conic-gradient(red, yellow, lime, aqua, blue, magenta, red)`,
+                            border: c.name === 'White' ? '1px solid var(--border)' : 'none',
+                          }}
+                        />
+                        <span className="sc-bag-color-name">{c.name}</span>
+                      </button>
+                    ))}
+                  </div>
+                  {bagColor === 'Custom' && (
+                    <div className="sc-bag-custom-color">
+                      <input
+                        type="color"
+                        value={customHex}
+                        onChange={(e) => setCustomHex(e.target.value)}
+                        className="sc-bag-color-input"
+                      />
+                      <span className="sc-bag-hex-label">{customHex.toUpperCase()}</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Logo Upload */}
+                <div className="singlecard-section">
+                  <label className="singlecard-label">Upload Logo</label>
+                  {!logoPreview ? (
+                    <div
+                      className="sc-logo-dropzone"
+                      onClick={() => logoInputRef.current?.click()}
+                      onDragOver={(e) => { e.preventDefault(); e.currentTarget.classList.add('dragover'); }}
+                      onDragLeave={(e) => e.currentTarget.classList.remove('dragover')}
+                      onDrop={(e) => {
+                        e.preventDefault();
+                        e.currentTarget.classList.remove('dragover');
+                        const file = e.dataTransfer.files[0];
+                        if (file && file.type.startsWith('image/')) {
+                          setLogoFile(file);
+                          setLogoPreview(URL.createObjectURL(file));
+                        }
+                      }}
+                    >
+                      <Upload size={28} className="sc-logo-upload-icon" />
+                      <p>Drag & drop your logo here</p>
+                      <span>or <strong>browse files</strong></span>
+                      <span className="sc-logo-formats">.PNG, .JPG, .SVG — Max 5 MB</span>
+                    </div>
+                  ) : (
+                    <div className="sc-logo-preview">
+                      <img src={logoPreview} alt="Logo preview" />
+                      <div className="sc-logo-preview-info">
+                        <span>{logoFile?.name}</span>
+                        <button
+                          type="button"
+                          className="sc-logo-remove"
+                          onClick={() => {
+                            setLogoFile(null);
+                            setLogoPreview(null);
+                          }}
+                        >
+                          <X size={16} />
+                          Remove
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                  <input
+                    ref={logoInputRef}
+                    type="file"
+                    accept="image/*"
+                    style={{ display: 'none' }}
+                    onChange={(e) => {
+                      const file = e.target.files[0];
+                      if (file) {
+                        setLogoFile(file);
+                        setLogoPreview(URL.createObjectURL(file));
+                      }
+                    }}
+                  />
+                </div>
+
+                {/* Bag Mockup Preview */}
+                <div className="singlecard-section">
+                  <label className="singlecard-label">
+                    <Eye size={15} style={{ display: 'inline', verticalAlign: '-2px', marginRight: 5 }} />
+                    Preview — Drag logo to position
+                  </label>
+                  <div
+                    className="sc-bag-mockup"
+                    ref={bagPreviewRef}
+                    onMouseMove={(e) => {
+                      if (e.buttons !== 1 || !logoPreview) return;
+                      const rect = e.currentTarget.getBoundingClientRect();
+                      setLogoPos({
+                        x: Math.min(85, Math.max(15, ((e.clientX - rect.left) / rect.width) * 100)),
+                        y: Math.min(85, Math.max(15, ((e.clientY - rect.top) / rect.height) * 100)),
+                      });
+                    }}
+                    onTouchMove={(e) => {
+                      if (!logoPreview) return;
+                      const touch = e.touches[0];
+                      const rect = e.currentTarget.getBoundingClientRect();
+                      setLogoPos({
+                        x: Math.min(85, Math.max(15, ((touch.clientX - rect.left) / rect.width) * 100)),
+                        y: Math.min(85, Math.max(15, ((touch.clientY - rect.top) / rect.height) * 100)),
+                      });
+                    }}
+                  >
+                    {/* Bag shape SVG — color fills only the bag */}
+                    {(() => {
+                      const bagHex = bagColor === 'Custom' ? customHex
+                        : BAG_COLORS.find(c => c.name === bagColor)?.hex || '#FFFFFF';
+                      const isDark = parseInt(bagHex.replace('#','').substring(0,2), 16) < 100;
+                      const handleColor = isDark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.25)';
+                      const trimColor = isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.08)';
+                      return (
+                        <svg className="sc-bag-svg" viewBox="0 0 200 260" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          {/* Bag body */}
+                          <path d="M30 60 Q30 55 35 50 L75 45 Q100 40 125 45 L165 50 Q170 55 170 60 L175 240 Q175 250 165 250 L35 250 Q25 250 25 240 Z" fill={bagHex} stroke={isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'} strokeWidth="1" />
+                          {/* Bag handles */}
+                          <path d="M65 45 Q65 20 80 15 Q100 10 120 15 Q135 20 135 45" stroke={handleColor} strokeWidth="3" fill="none" />
+                          {/* Top trim line */}
+                          <rect x="30" y="58" width="140" height="2" rx="1" fill={trimColor} />
+                        </svg>
+                      );
+                    })()}
+                    {/* Logo overlay */}
+                    {logoPreview && (
+                      <img
+                        src={logoPreview}
+                        alt="Logo on bag"
+                        className="sc-bag-logo-overlay"
+                        draggable={false}
+                        style={{
+                          left: `${logoPos.x}%`,
+                          top: `${logoPos.y}%`,
+                        }}
+                      />
+                    )}
+                    {!logoPreview && (
+                      <div className="sc-bag-placeholder-text">Upload a logo to preview</div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div className="singlecard-section">
               <label className="singlecard-label">
                 Quantity (Min: {product.minOrder})
@@ -232,6 +457,10 @@ export default function Singlecard() {
                   quantity,
                   size: selectedSize,
                   material: selectedMaterial,
+                  ...(showBagCustomization && {
+                    bagColor: bagColor === 'Custom' ? customHex : bagColor,
+                    logoFile: logoFile?.name || null,
+                  }),
                 });
                 navigate('/Cart');
               }}
@@ -280,6 +509,37 @@ export default function Singlecard() {
                 ${product.price.toFixed(2)}
               </span>
             </div>
+          </div>
+        </section>
+
+        {/* Size Chart */}
+        <section className="sc-sizechart-section">
+          <div className="sc-sizechart-section-header">
+            <Ruler size={20} />
+            <h2>Box Size Chart</h2>
+          </div>
+          <p className="sc-sizechart-desc">All dimensions in centimeters (L × W × H). Find the right box for your products.</p>
+          <div className="sc-sizechart">
+            <table className="sc-sizechart-table">
+              <thead>
+                <tr>
+                  <th>Size</th>
+                  <th>Dimensions (L×W×H)</th>
+                  <th>Volume</th>
+                  <th>Best For</th>
+                </tr>
+              </thead>
+              <tbody>
+                {SIZE_CHART.map((row) => (
+                  <tr key={row.label}>
+                    <td style={{ fontWeight: 600, whiteSpace: 'nowrap' }}>{row.label}</td>
+                    <td style={{ fontFamily: 'monospace', fontSize: 13 }}>{row.dims}</td>
+                    <td>{row.vol}</td>
+                    <td style={{ color: 'var(--muted-foreground)', fontSize: 13 }}>{row.best}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </section>
       </main>

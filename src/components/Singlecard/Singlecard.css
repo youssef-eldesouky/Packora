@@ -401,3 +401,306 @@
   font-size: 14px;
   font-weight: 600;
 }
+
+/* Size Chart Section */
+.sc-sizechart-section {
+  padding: 24px 28px;
+  background: var(--card);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  margin-top: 24px;
+}
+.sc-sizechart-section-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+  color: var(--primary);
+}
+.sc-sizechart-section-header h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--foreground);
+}
+.sc-sizechart-desc {
+  font-size: 14px;
+  color: var(--muted-foreground);
+  margin: 0 0 16px;
+}
+.sc-sizechart {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.sc-sizechart-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.sc-sizechart-table th {
+  text-align: left;
+  padding: 10px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted-foreground);
+  background: var(--sidebar, var(--card));
+  border-bottom: 2px solid var(--border);
+}
+.sc-sizechart-table td {
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--border);
+}
+.sc-sizechart-table tbody tr:last-child td {
+  border-bottom: none;
+}
+.sc-sizechart-table tbody tr:hover {
+  background: var(--sidebar, rgba(0,0,0,0.02));
+}
+
+/* Bag Customization */
+.sc-bag-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border: 2px dashed var(--border);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--muted-foreground);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  width: 100%;
+  justify-content: center;
+}
+.sc-bag-toggle:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: rgba(var(--primary-rgb, 99,102,241), 0.06);
+}
+.sc-bag-toggle.active {
+  border-color: var(--destructive, #ef4444);
+  color: var(--destructive, #ef4444);
+}
+.sc-bag-customize {
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--sidebar, var(--input-background));
+}
+.sc-bag-customize-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+  color: var(--primary);
+}
+.sc-bag-customize-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--foreground);
+}
+.sc-bag-colors {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+.sc-bag-color-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 4px;
+  border: 2px solid transparent;
+  border-radius: 10px;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.sc-bag-color-btn:hover {
+  background: var(--card);
+}
+.sc-bag-color-btn.active {
+  border-color: var(--primary);
+  background: var(--card);
+}
+.sc-bag-color-swatch {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: block;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+}
+.sc-bag-color-name {
+  font-size: 11px;
+  color: var(--muted-foreground);
+  font-weight: 500;
+}
+.sc-bag-color-btn.active .sc-bag-color-name {
+  color: var(--primary);
+  font-weight: 600;
+}
+.sc-bag-custom-color {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+}
+.sc-bag-color-input {
+  width: 40px;
+  height: 32px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  background: none;
+  padding: 0;
+}
+.sc-bag-hex-label {
+  font-family: monospace;
+  font-size: 13px;
+  color: var(--muted-foreground);
+}
+/* Logo Upload */
+.sc-logo-dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 24px 16px;
+  border: 2px dashed var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s;
+  color: var(--muted-foreground);
+}
+.sc-logo-dropzone:hover, .sc-logo-dropzone.dragover {
+  border-color: var(--primary);
+  background: rgba(var(--primary-rgb, 99,102,241), 0.04);
+}
+.sc-logo-upload-icon {
+  color: var(--primary);
+  margin-bottom: 4px;
+}
+.sc-logo-dropzone p {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--foreground);
+}
+.sc-logo-dropzone span {
+  font-size: 13px;
+}
+.sc-logo-dropzone strong {
+  color: var(--primary);
+}
+.sc-logo-formats {
+  font-size: 11px !important;
+  color: var(--muted-foreground) !important;
+  margin-top: 4px;
+}
+.sc-logo-preview {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--card);
+}
+.sc-logo-preview img {
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+  border-radius: 8px;
+  background: var(--input-background);
+  border: 1px solid var(--border);
+}
+.sc-logo-preview-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 13px;
+  min-width: 0;
+}
+.sc-logo-preview-info span:first-child {
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sc-logo-remove {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--destructive, #ef4444);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  width: fit-content;
+}
+.sc-logo-remove:hover {
+  text-decoration: underline;
+}
+
+/* Bag Mockup Preview */
+.sc-bag-mockup {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  max-height: 280px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  overflow: hidden;
+  cursor: crosshair;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    linear-gradient(45deg, var(--border) 25%, transparent 25%),
+    linear-gradient(-45deg, var(--border) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, var(--border) 75%),
+    linear-gradient(-45deg, transparent 75%, var(--border) 75%);
+  background-size: 16px 16px;
+  background-position: 0 0, 0 8px, 8px -8px, -8px 0px;
+  background-color: var(--card);
+}
+.sc-bag-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  color: rgba(0,0,0,0.7);
+  pointer-events: none;
+}
+.sc-bag-logo-overlay {
+  position: absolute;
+  width: 30%;
+  max-width: 80px;
+  max-height: 80px;
+  object-fit: contain;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.25));
+  transition: left 0.05s, top 0.05s;
+}
+.sc-bag-placeholder-text {
+  font-size: 13px;
+  color: rgba(0,0,0,0.35);
+  font-weight: 500;
+  text-align: center;
+  z-index: 1;
+  pointer-events: none;
+}
+
+
