@@ -293,3 +293,53 @@
   font-size: 16px;
   margin: 48px 0;
 }
+
+/* ── Tab toggle ── */
+.catalog-tab-toggle {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid var(--border);
+  padding-bottom: 0;
+}
+
+.catalog-tab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.55rem 1.1rem;
+  border: none;
+  background: transparent;
+  color: var(--muted-foreground);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.catalog-tab-btn.active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+}
+
+.catalog-tab-btn:hover:not(.active) {
+  color: var(--foreground);
+}
+
+/* ── Packaging card variant ── */
+.catalog-pkg-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: var(--card);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+.catalog-pkg-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-color: var(--primary);
+}

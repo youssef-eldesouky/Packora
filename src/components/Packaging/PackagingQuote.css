@@ -1,0 +1,298 @@
+/* ── PackagingQuote page ──────────────────────────────────────────── */
+
+.pquote-page {
+  min-height: 100vh;
+  background: var(--background);
+  color: var(--text-main);
+  display: flex;
+  flex-direction: column;
+}
+
+.pquote-main {
+  flex: 1;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 4rem;
+  width: 100%;
+}
+
+/* ── Hero ── */
+.pquote-hero {
+  text-align: center;
+  padding: 2.5rem 0 2rem;
+}
+
+.pquote-hero-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, var(--primary) 0%, #6366f1 100%);
+  color: white;
+  margin-bottom: 1rem;
+  box-shadow: 0 8px 24px rgba(99, 102, 241, 0.35);
+}
+
+.pquote-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem;
+  color: var(--text-main);
+}
+
+.pquote-subtitle {
+  color: var(--text-muted);
+  max-width: 540px;
+  margin: 0 auto;
+  line-height: 1.6;
+  font-size: 1rem;
+}
+
+/* ── Layout ── */
+.pquote-layout {
+  display: grid;
+  grid-template-columns: 420px 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+@media (max-width: 860px) {
+  .pquote-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Card ── */
+.pquote-card {
+  background: var(--card-bg, #ffffff08);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  padding: 1.5rem;
+}
+
+.pquote-section-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--primary);
+  margin: 0 0 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+/* ── Form fields ── */
+.pquote-field {
+  margin-bottom: 0.9rem;
+}
+
+.pquote-label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 0.35rem;
+  color: var(--text-main);
+}
+
+.pquote-required {
+  color: #ef4444;
+  margin-left: 2px;
+}
+
+.pquote-optional {
+  font-weight: 400;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+}
+
+.pquote-input {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background: var(--input-bg, #ffffff0a);
+  color: var(--text-main);
+  font-size: 0.95rem;
+  transition: border-color 0.15s;
+  box-sizing: border-box;
+}
+
+.pquote-input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.pquote-dims {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0.75rem;
+}
+
+/* ── Submit ── */
+.pquote-submit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.75rem;
+  margin-top: 1.25rem;
+  background: linear-gradient(135deg, var(--primary) 0%, #6366f1 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.15s;
+}
+
+.pquote-submit:hover:not(:disabled) {
+  opacity: 0.88;
+  transform: translateY(-1px);
+}
+
+.pquote-submit:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.pquote-spinner {
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Result panel ── */
+.pquote-result-panel {
+  position: sticky;
+  top: 5rem;
+}
+
+.pquote-error {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.85rem 1rem;
+  border-radius: 10px;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #ef4444;
+  font-size: 0.9rem;
+}
+
+.pquote-placeholder {
+  text-align: center;
+  padding: 3rem 2rem;
+  color: var(--text-muted);
+  border: 2px dashed var(--border-color);
+  border-radius: 14px;
+}
+
+.pquote-placeholder-icon {
+  opacity: 0.25;
+  margin-bottom: 1rem;
+}
+
+/* ── Quote result ── */
+.pquote-price-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.pquote-price-box {
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 1rem;
+  text-align: center;
+}
+
+.pquote-total {
+  border-color: var(--primary);
+  background: rgba(99, 102, 241, 0.06);
+}
+
+.pquote-price-label {
+  display: block;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  margin-bottom: 0.35rem;
+}
+
+.pquote-price-value {
+  display: block;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.pquote-total-value {
+  color: var(--primary);
+  font-size: 1.5rem;
+}
+
+/* ── Breakdown ── */
+.pquote-breakdown {
+  margin-bottom: 1.5rem;
+}
+
+.pquote-breakdown-title {
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  font-weight: 700;
+  margin: 0 0 0.6rem;
+}
+
+.pquote-breakdown-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.pquote-breakdown-table tr + tr td {
+  border-top: 1px solid var(--border-color);
+}
+
+.pquote-breakdown-key {
+  padding: 0.45rem 0;
+  color: var(--text-muted);
+}
+
+.pquote-breakdown-val {
+  padding: 0.45rem 0;
+  text-align: right;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+/* ── CTA link ── */
+.pquote-cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.65rem 1.25rem;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  text-decoration: none;
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  font-weight: 500;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.pquote-cta:hover {
+  color: var(--primary);
+  border-color: var(--primary);
+}

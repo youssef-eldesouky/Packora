@@ -310,3 +310,66 @@ export const paymentApi = {
       body: JSON.stringify({ orderId, amount, billingData }),
     }),
 };
+
+// ── Packaging Customization API ───────────────────────────────────────
+
+/** Maps backend PackagingResponse → frontend-friendly shape */
+function normalizePackaging(p) {
+  return {
+    ...p,
+    id: String(p.id),
+    price: typeof p.price === 'number' ? p.price : parseFloat(p.price) || 0,
+    type: p.type || '',
+    material: p.material || '',
+    size: p.size || '',
+    color: p.color || '',
+    designId: p.designId ?? null,
+    partnerId: p.partnerId ?? null,  // NOTE: partnerId UI is intentionally skipped
+  };
+}
+
+export const packagingApi = {
+  /** GET /api/packagings — list all packaging configs (public) */
+  getAll: () => apiFetch('/api/packagings').then((list) => list.map(normalizePackaging)),
+
+  /** GET /api/packagings/{id} — get single packaging (public) */
+  getById: (id) => apiFetch(`/api/packagings/${id}`).then(normalizePackaging),
+
+  /** GET /api/packagings/type/{type} — filter by type (public) */
+  getByType: (type) =>
+    apiFetch(`/api/packagings/type/${encodeURIComponent(type)}`).then((list) =>
+      list.map(normalizePackaging)
+    ),
+
+  /**
+   * GET /api/packagings/partner/{partnerId} — filter by partner (public)
+   * NOTE: Mapped for completeness — no UI is built for this (partner UI skipped).
+   */
+  getByPartner: (partnerId) =>
+    apiFetch(`/api/packagings/partner/${partnerId}`).then((list) =>
+      list.map(normalizePackaging)
+    ),
+
+  /** POST /api/packagings — create a packaging config (ADMIN only) */
+  create: (data) =>
+    apiFetch('/api/packagings', { method: 'POST', body: JSON.stringify(data) }).then(
+      normalizePackaging
+    ),
+
+  /** PUT /api/packagings/{id} — update a packaging config (ADMIN only) */
+  update: (id, data) =>
+    apiFetch(`/api/packagings/${id}`, { method: 'PUT', body: JSON.stringify(data) }).then(
+      normalizePackaging
+    ),
+
+  /** DELETE /api/packagings/{id} — delete a packaging config (ADMIN only, returns 204) */
+  delete: (id) => apiFetch(`/api/packagings/${id}`, { method: 'DELETE' }),
+
+  /**
+   * POST /api/packagings/quote — calculate a packaging quote (public)
+   * Body: { material, width, height, length, quantity, color?, type? }
+   * Returns: { unitPrice, totalPrice, currency, quantity, breakdown }
+   */
+  quote: (data) =>
+    apiFetch('/api/packagings/quote', { method: 'POST', body: JSON.stringify(data) }),
+};
