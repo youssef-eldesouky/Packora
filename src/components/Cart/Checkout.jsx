@@ -1,11 +1,11 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import {
   ShoppingCart,
   Box,
   MapPin,
   CreditCard,
-  Check,
+  CheckCircle
 } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
 import ShippingAddress from './ShippingAddress';
@@ -17,14 +17,24 @@ import Footer from '../Footer/Footer';
 
 const STEPS = [
   { key: 'shipping', label: 'Shipping', icon: MapPin },
-  { key: 'payment', label: 'Payment', icon: CreditCard },
-  { key: 'review', label: 'Review', icon: Check },
+  { key: 'payment',  label: 'Payment',  icon: CreditCard },
+  { key: 'review',   label: 'Review',   icon: CheckCircle },
 ];
 
 export default function Checkout() {
   const { cartItems, checkoutStep, setCheckoutStep } = useCart();
+  const [params] = useSearchParams();
 
-  if (cartItems.length === 0) {
+  // If redirected from Paymob, the URL will have ?step=review
+  useEffect(() => {
+    const stepFromUrl = params.get('step');
+    if (stepFromUrl === 'review') {
+      setCheckoutStep('review');
+    }
+  }, [params, setCheckoutStep]);
+
+  // If cart is empty AND we aren't on the review step (which happens after clearing cart on success)
+  if (cartItems.length === 0 && checkoutStep !== 'review') {
     return (
       <div className="checkout-page">
         <Navbar />
@@ -42,6 +52,13 @@ export default function Checkout() {
     );
   }
 
+  const handleStepClick = (stepKey) => {
+    // Only allow going back to shipping
+    if (stepKey === 'shipping') {
+      setCheckoutStep('shipping');
+    }
+  };
+
   const stepIndex = STEPS.findIndex((s) => s.key === checkoutStep);
 
   return (
@@ -55,15 +72,17 @@ export default function Checkout() {
 
         <div className="checkout-steps">
           {STEPS.map((step, i) => {
-            const Icon = step.icon;
-            const isActive = checkoutStep === step.key;
+            const Icon       = step.icon;
+            const isActive   = checkoutStep === step.key;
             const isComplete = stepIndex > i;
             return (
               <React.Fragment key={step.key}>
                 <button
                   type="button"
                   className={`checkout-step-btn ${isActive ? 'active' : ''} ${isComplete ? 'complete' : ''}`}
-                  onClick={() => setCheckoutStep(step.key)}
+                  onClick={() => handleStepClick(step.key)}
+                  disabled={stepIndex < i}
+                  style={stepIndex < i ? { opacity: 0.5, cursor: 'not-allowed' } : {}}
                 >
                   <span className="checkout-step-icon">
                     <Icon size={18} />
@@ -80,12 +99,11 @@ export default function Checkout() {
 
         <div className="checkout-content">
           {checkoutStep === 'shipping' && <ShippingAddress />}
-          {checkoutStep === 'payment' && <Payment />}
-          {checkoutStep === 'review' && <ReviewOrder />}
+          {checkoutStep === 'payment'  && <Payment />}
+          {checkoutStep === 'review'   && <ReviewOrder />}
         </div>
       </main>
-      <Footer/>
-  
+      <Footer />
     </div>
   );
 }

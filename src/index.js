@@ -39,6 +39,8 @@ import Footer from './components/Footer/Footer';
 import LoginPage from './components/LoginPage/LoginPage';
 import RequireAuth from './components/RequireAuth';
 import BulkOrder from './components/BulkOrder/BulkOrder';
+import PaymentSuccess from './components/Cart/PaymentSuccess';
+import PaymentFailed from './components/Cart/PaymentFailed';
 
 let router = createBrowserRouter([
   {
@@ -66,6 +68,8 @@ let router = createBrowserRouter([
           { path: 'Design', element: <Design /> },
           { path: 'Footer', element: <Footer /> },
           { path: 'BulkOrder', element: <BulkOrder /> },
+          { path: 'payment/success', element: <PaymentSuccess /> },
+          { path: 'payment/failed',  element: <PaymentFailed /> },
         ],
       },
       {

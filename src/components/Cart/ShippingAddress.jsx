@@ -1,28 +1,97 @@
 import React, { useState } from 'react';
-import { MapPin, UploadCloud } from 'lucide-react';
+import { MapPin, UploadCloud, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
+import { orderApi, paymentApi } from '../../utils/api';
 import './ShippingAddress.css';
 
 const TAX_RATE = 0.08;
 
 export default function ShippingAddress() {
-  const { shippingAddress, setShippingAddress, setCheckoutStep, cartItems } = useCart();
+  const { 
+    shippingAddress, 
+    setShippingAddress, 
+    setCheckoutStep, 
+    cartItems,
+    setIframeUrl,
+    setCurrentOrderId
+  } = useCart();
+  
   const [form, setForm] = useState(shippingAddress);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const handleChange = (e) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setShippingAddress(form);
-    setCheckoutStep('payment');
-  };
-
   const subtotal = cartItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
   const tax = subtotal * TAX_RATE;
   const total = subtotal + tax;
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError(null);
+    setShippingAddress(form);
+
+    try {
+      // 1. Create Order
+      const addressString = [
+        form.fullName,
+        form.company,
+        form.street,
+        `${form.city}, ${form.state} ${form.zip}`,
+        form.phone,
+      ].filter(Boolean).join(', ');
+
+      const items = cartItems.map((item) => ({
+        productId: parseInt(item.productId, 10),
+        quantity:  item.quantity,
+        unitPrice: item.price,
+        size:      item.size     || null,
+        material:  item.material || null,
+      }));
+
+      const order = await orderApi.create({ shippingAddress: addressString, items });
+      const orderId     = order.rawId;
+      const totalAmount = order.rawAmount;
+
+      setCurrentOrderId(orderId);
+
+      // 2. Initiate Paymob Payment
+      const [firstName = 'NA', ...rest] = (form.fullName || 'NA').split(' ');
+      const lastName = rest.join(' ') || 'NA';
+
+      const billingData = {
+        first_name:      firstName,
+        last_name:       lastName,
+        email:           form.email || 'na@na.com',
+        phone_number:    form.phone || 'NA',
+        street:          form.street || 'NA',
+        city:            form.city   || 'NA',
+        country:         'EG',
+        apartment:       'NA',
+        floor:           'NA',
+        building:        'NA',
+        shipping_method: 'NA',
+        postal_code:     form.zip    || 'NA',
+        state:           form.state  || 'NA',
+      };
+
+      const paymentResp = await paymentApi.initiate(orderId, totalAmount, billingData);
+      
+      // 3. Store iframe URL and go to payment step
+      setIframeUrl(paymentResp.iframeUrl);
+      setCheckoutStep('payment');
+      
+    } catch (err) {
+      console.error("Order creation failed:", err);
+      setError(err.message || 'Failed to initialize payment. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <>
@@ -44,6 +113,13 @@ export default function ShippingAddress() {
           <MapPin size={20} />
           Shipping Address
         </h2>
+        
+        {error && (
+          <div style={{ color: '#ef4444', marginBottom: '1rem', padding: '1rem', background: 'rgba(239, 68, 68, 0.1)', borderRadius: '8px' }}>
+            {error}
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="shipping-form">
           <div className="shipping-row">
             <label>Full Name *</label>
@@ -115,8 +191,9 @@ export default function ShippingAddress() {
               required
             />
           </div>
-          <button type="submit" className="shipping-submit">
-            Continue to Payment
+          <button type="submit" className="shipping-submit" disabled={isLoading}>
+            {isLoading ? <Loader2 size={18} className="profile-spinner" style={{ animation: "spin 1s linear infinite", marginRight: '8px' }} /> : null}
+            {isLoading ? 'Processing...' : 'Continue to Payment'}
           </button>
         </form>
       </div>

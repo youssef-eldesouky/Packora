@@ -292,3 +292,21 @@ export const shipmentApi = {
   assignPartner: (id, partnerId) => apiFetch(`/api/shipments/${id}/assign-partner`, { method: 'PUT', body: JSON.stringify({ partnerId }) })
 };
 
+// ── Payment API ───────────────────────────────────────────────────────
+
+export const paymentApi = {
+  /**
+   * POST /api/payment/initiate
+   * Kicks off the Paymob 3-step flow on the backend.
+   * Returns { iframeUrl, paymentKey, paymobOrderId }.
+   *
+   * @param {number} orderId      - Internal Packora order ID
+   * @param {number} amount       - Total in EGP
+   * @param {object} billingData  - Buyer info required by Paymob
+   */
+  initiate: (orderId, amount, billingData) =>
+    apiFetch('/api/payment/initiate', {
+      method: 'POST',
+      body: JSON.stringify({ orderId, amount, billingData }),
+    }),
+};

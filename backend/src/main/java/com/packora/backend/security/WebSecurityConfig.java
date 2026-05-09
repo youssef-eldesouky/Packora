@@ -88,8 +88,10 @@ public class WebSecurityConfig {
                     // Support ticket submission — guests can submit tickets
                     .requestMatchers(HttpMethod.POST, "/api/support/tickets").permitAll()
 
-                    // Payment callback — Paymob webhook (external server-to-server)
+                    // Payment callback — Paymob webhook (external server-to-server, no JWT)
                     .requestMatchers(HttpMethod.POST, "/api/payment/callback").permitAll()
+                    // Payment GET redirect — browser redirect from Paymob after card form (no JWT)
+                    .requestMatchers(HttpMethod.GET,  "/api/payment/callback").permitAll()
                     // Payment health check
                     .requestMatchers(HttpMethod.GET, "/api/payment/health").permitAll()
 

@@ -25,8 +25,8 @@ public class PaymobConfig {
     /** HMAC secret used to verify Paymob callback authenticity */
     private String hmacSecret;
 
-    /** Base URL for Paymob Accept API */
-    private String baseUrl = "https://accept.paymob.com/api";
+    /** Base URL for Paymob Accept API — using accept-alpha for test environment */
+    private String baseUrl = "https://accept-alpha.paymob.com/api";
 
     // ── getters & setters ───────────────────────────────────────────────────
 

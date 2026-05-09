@@ -111,6 +111,8 @@ export function CartProvider({ children }) {
   const [paymentMethods, setPaymentMethods] = useState([]);
   const [selectedPaymentId, setSelectedPaymentId] = useState(null);
   const [checkoutStep, setCheckoutStep] = useState('shipping');
+  const [iframeUrl, setIframeUrl] = useState(null);
+  const [currentOrderId, setCurrentOrderId] = useState(null);
 
   // ── Bulk order state ──────────────────────────────────────────
   const [bulkExcelData, setBulkExcelData] = useState([]);
@@ -168,6 +170,10 @@ export function CartProvider({ children }) {
       setDefaultPaymentMethod,
       checkoutStep,
       setCheckoutStep,
+      iframeUrl,
+      setIframeUrl,
+      currentOrderId,
+      setCurrentOrderId,
       bulkExcelData,
       setBulkExcelData,
       bulkWarehouseData,
@@ -186,6 +192,8 @@ export function CartProvider({ children }) {
       paymentMethods,
       selectedPaymentId,
       checkoutStep,
+      iframeUrl,
+      currentOrderId,
       bulkExcelData,
       bulkWarehouseData,
     ]
