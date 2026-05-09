@@ -32,6 +32,7 @@ import RequireAdmin from './components/Admin/RequireAdmin';
 import AdminOrderDetail from './components/Admin/AdminOrderDetail';
 import AdminProductDetail from './components/Admin/AdminProductDetail';
 import AdminInsights from './components/Admin/AdminInsights';
+import AdminPackagings from './components/Admin/AdminPackagings';
 import GlobalLayout from './components/Layout/GlobalLayout';
 import LandingPage from './components/LandingPage/LandingPage';
 import Design from './components/Design/Design';
@@ -90,6 +91,7 @@ let router = createBrowserRouter([
           { path: 'orders/:orderId', element: <AdminOrderDetail /> },
           { path: 'products', element: <AdminProducts /> },
           { path: 'products/:productId', element: <AdminProductDetail /> },
+          { path: 'packagings', element: <AdminPackagings /> },
           { path: 'customers', element: <AdminCustomers /> },
           { path: 'customers/:customerId', element: <AdminCustomerDetail /> },
           { path: 'analytics', element: <AdminAnalytics /> },
