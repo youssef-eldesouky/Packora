@@ -41,6 +41,7 @@ import RequireAuth from './components/RequireAuth';
 import BulkOrder from './components/BulkOrder/BulkOrder';
 import PaymentSuccess from './components/Cart/PaymentSuccess';
 import PaymentFailed from './components/Cart/PaymentFailed';
+import PackagingQuote from './components/Packaging/PackagingQuote';
 
 let router = createBrowserRouter([
   {
@@ -70,6 +71,7 @@ let router = createBrowserRouter([
           { path: 'BulkOrder', element: <BulkOrder /> },
           { path: 'payment/success', element: <PaymentSuccess /> },
           { path: 'payment/failed',  element: <PaymentFailed /> },
+          { path: 'Packaging/quote', element: <PackagingQuote /> },
         ],
       },
       {
