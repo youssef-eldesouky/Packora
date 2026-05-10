@@ -1,7 +1,7 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 import { parseAmount } from '../utils/adminFormat';
-import { userApi, productApi, orderApi } from '../utils/api';
+import { userApi, productApi, orderApi, adminAnalyticsApi } from '../utils/api';
 
 const AdminContext = createContext(null);
 
@@ -148,31 +148,43 @@ export function AdminProvider({ children }) {
     [orders]
   );
 
-  const dashboardStats = useMemo(() => {
-    const totalRevenue = orders.reduce((s, o) => s + parseAmount(o.amount), 0);
-    const uniqueCustomers = new Set(orders.map((o) => o.userEmail)).size;
-    return {
-      totalRevenue,
-      totalOrders: orders.length,
-      activeCustomers: uniqueCustomers,
-      productCount: products.length,
-    };
-  }, [orders, products.length]);
+  // ── Dashboard Analytics (from backend) ──────────────────────
+  const [dashboardStats, setDashboardStats] = useState({
+    totalRevenue: 0,
+    totalOrders: 0,
+    activeCustomers: 0,
+    productCount: 0,
+  });
+  const [topProductsFromOrders, setTopProductsFromOrders] = useState([]);
+  const [recentOrders, setRecentOrders] = useState([]);
+  const [dashboardLoading, setDashboardLoading] = useState(false);
+  const [dashboardError, setDashboardError] = useState(null);
 
-  const topProductsFromOrders = useMemo(() => {
-    const map = new Map();
-    for (const o of orders) {
-      const key = o.product || 'Unknown';
-      const prev = map.get(key) || { sales: 0, revenue: 0 };
-      prev.sales += 1;
-      prev.revenue += parseAmount(o.amount);
-      map.set(key, prev);
-    }
-    return [...map.entries()]
-      .map(([name, v]) => ({ name, ...v }))
-      .sort((a, b) => b.revenue - a.revenue)
-      .slice(0, 4);
-  }, [orders]);
+  useEffect(() => {
+    let cancelled = false;
+    setDashboardLoading(true);
+    setDashboardError(null);
+
+    adminAnalyticsApi
+      .getDashboard()
+      .then((data) => {
+        if (!cancelled) {
+          setDashboardStats(data.stats || {});
+          setTopProductsFromOrders(data.topProducts || []);
+          setRecentOrders(data.recentOrders || []);
+        }
+      })
+      .catch((err) => {
+        if (!cancelled) setDashboardError(err.message || 'Failed to load dashboard data');
+      })
+      .finally(() => {
+        if (!cancelled) setDashboardLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const value = useMemo(
     () => ({
@@ -191,6 +203,9 @@ export function AdminProvider({ children }) {
       getOrdersForCustomer,
       dashboardStats,
       topProductsFromOrders,
+      recentOrders,
+      dashboardLoading,
+      dashboardError,
     }),
     [
       products,
@@ -208,6 +223,9 @@ export function AdminProvider({ children }) {
       getOrdersForCustomer,
       dashboardStats,
       topProductsFromOrders,
+      recentOrders,
+      dashboardLoading,
+      dashboardError,
     ]
   );
 

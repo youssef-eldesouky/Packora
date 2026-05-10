@@ -11,8 +11,8 @@ function StatusBadge({ status }) {
 }
 
 export default function AdminDashboard() {
-  const { orders, products, dashboardStats, topProductsFromOrders } = useAdmin();
-  const recent = [...orders].slice(0, 5);
+  const { recentOrders, products, dashboardStats, topProductsFromOrders } = useAdmin();
+  const recent = recentOrders || [];
 
   const trends = [];
 
