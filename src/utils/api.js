@@ -373,3 +373,22 @@ export const packagingApi = {
   quote: (data) =>
     apiFetch('/api/packagings/quote', { method: 'POST', body: JSON.stringify(data) }),
 };
+
+// ── Admin Analytics API ───────────────────────────────────────────────
+
+export const adminAnalyticsApi = {
+  /** GET /api/admin/analytics/dashboard — full dashboard stats (ADMIN only) */
+  getDashboard: () =>
+    apiFetch('/api/admin/analytics/dashboard').then((data) => ({
+      ...data,
+      recentOrders: (data.recentOrders || []).map(normalizeOrder),
+    })),
+
+  /** GET /api/admin/analytics/revenue-chart?months={m} — (ADMIN only) */
+  getRevenueChart: (months = 6) =>
+    apiFetch(`/api/admin/analytics/revenue-chart?months=${months}`),
+
+  /** GET /api/admin/analytics/top-products?limit={l} — (ADMIN only) */
+  getTopProducts: (limit = 5) =>
+    apiFetch(`/api/admin/analytics/top-products?limit=${limit}`),
+};
