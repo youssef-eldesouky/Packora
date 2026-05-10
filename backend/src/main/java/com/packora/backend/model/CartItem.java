@@ -34,4 +34,8 @@ public class CartItem {
     private String selectedSize;
 
     private String selectedMaterial;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "custom_box_config_id", nullable = true)
+    private CustomBoxConfig customBoxConfig;
 }
