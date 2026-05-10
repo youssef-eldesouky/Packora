@@ -2,13 +2,18 @@ import React, { useState } from 'react'
 import { useStore } from '../../../store/useStore'
 import { useNavigate } from 'react-router-dom'
 import { useCart } from '../../../context/CartContext'
-import { apiFetch } from '../../../utils/api'
+import { customBoxConfigApi } from '../../../utils/api'
 
 export default function Navbar() {
-  const { undo, redo, history, historyIndex, designs, boxDimensions, material, quantity, price } = useStore()
+  const { 
+    undo, redo, history, historyIndex, designs, boxDimensions, material, quantity, price, 
+    savedConfigId, isDirty, setSavedConfigId, setIsDirty 
+  } = useStore()
+  
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [saveError, setSaveError] = useState(false)
+  const [isSyncing, setIsSyncing] = useState(false)
   
   const navigate = useNavigate()
   const { addToCart } = useCart()
@@ -17,18 +22,42 @@ export default function Navbar() {
   const canRedo = historyIndex < history.length - 1
   const designCount = Object.values(designs).reduce((sum, face) => sum + face.elements.length, 0)
 
+  // Internal function to sync configuration with the backend
+  const syncConfig = async (explicitSave = false) => {
+    // If it's already saved and not dirty, just return the existing ID
+    if (savedConfigId && !isDirty && !explicitSave) {
+      return savedConfigId;
+    }
+
+    const payload = JSON.stringify({ designs, boxDimensions, material, quantity });
+
+    try {
+      let config;
+      if (savedConfigId) {
+        // Update existing
+        config = await customBoxConfigApi.update(savedConfigId, payload, explicitSave);
+      } else {
+        // Create new
+        config = await customBoxConfigApi.create(payload, explicitSave);
+      }
+      
+      setSavedConfigId(config.id);
+      setIsDirty(false);
+      return config.id;
+    } catch (error) {
+      console.error("Failed to sync config:", error);
+      throw error;
+    }
+  };
+
   const handleSave = async () => {
     setSaving(true)
     setSaveError(false)
     try {
-      await apiFetch('/api/designs', {
-        method: 'POST',
-        body: JSON.stringify({ designs, boxDimensions, material, quantity }),
-      })
+      await syncConfig(true);
       setSaved(true)
       setTimeout(() => setSaved(false), 2000)
     } catch (e) {
-      console.error(e)
       setSaveError(true)
     } finally {
       setSaving(false)
@@ -47,28 +76,42 @@ export default function Navbar() {
     link.click()
   }
 
-  const handleAddToCart = () => {
-    let thumbnail = ''
-    const canvas = Array.from(document.querySelectorAll('canvas')).find(node => {
-      const style = window.getComputedStyle(node)
-      return style.display !== 'none' && node.width > 0 && node.height > 0
-    })
-    
-    if (canvas) {
-      thumbnail = canvas.toDataURL()
+  const handleAddToCart = async () => {
+    setIsSyncing(true);
+    try {
+      // 1. Sync config with backend first
+      const configId = await syncConfig(false);
+
+      // 2. Generate thumbnail
+      let thumbnail = ''
+      const canvas = Array.from(document.querySelectorAll('canvas')).find(node => {
+        const style = window.getComputedStyle(node)
+        return style.display !== 'none' && node.width > 0 && node.height > 0
+      })
+      
+      if (canvas) {
+        thumbnail = canvas.toDataURL()
+      }
+      
+      // 3. Add to cart with configId
+      await addToCart({
+        productId: 'custom-3d-box',
+        name: 'Custom 3D Box',
+        image: thumbnail,
+        price: price, 
+        quantity: quantity,
+        size: `${boxDimensions.length}"x${boxDimensions.width}"x${boxDimensions.height}"`,
+        material: material,
+        customBoxConfigId: configId
+      })
+      
+      navigate('/Cart')
+    } catch (error) {
+      console.error("Failed to add to cart:", error);
+      alert("Failed to synchronize design with server. Please try again.");
+    } finally {
+      setIsSyncing(false);
     }
-    
-    addToCart({
-      productId: 'custom-3d-box',
-      name: 'Custom 3D Box',
-      image: thumbnail, // We save a snapshot of their 3D design
-      price: price, // Derived from store price which is per unit
-      quantity: quantity,
-      size: `${boxDimensions.length}"x${boxDimensions.width}"x${boxDimensions.height}"`,
-      material: material,
-    })
-    
-    navigate('/Cart')
   }
 
   return (
@@ -167,13 +210,18 @@ export default function Navbar() {
 
         <button 
           onClick={handleAddToCart}
-          className="flex h-11 items-center gap-1.5 rounded-2xl bg-[var(--deep-teal)] px-4 text-sm font-semibold text-white shadow-md transition-all hover:bg-[var(--vintage-grape)] hover:translate-y-[-1px] hover:shadow-lg"
+          disabled={isSyncing}
+          className={`flex h-11 items-center gap-1.5 rounded-2xl bg-[var(--deep-teal)] px-4 text-sm font-semibold text-white shadow-md transition-all ${isSyncing ? 'opacity-70 cursor-not-allowed' : 'hover:bg-[var(--vintage-grape)] hover:translate-y-[-1px] hover:shadow-lg'}`}
         >
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
-            <path d="M1 1h4l2.68 13.39a2 2 0 001.98 1.61h9.72a2 2 0 001.98-1.61L23 6H6"/>
-          </svg>
-          Add to Cart
+          {isSyncing ? (
+            <div className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white"></div>
+          ) : (
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+              <path d="M1 1h4l2.68 13.39a2 2 0 001.98 1.61h9.72a2 2 0 001.98-1.61L23 6H6"/>
+            </svg>
+          )}
+          {isSyncing ? 'Syncing...' : 'Add to Cart'}
         </button>
       </div>
     </nav>

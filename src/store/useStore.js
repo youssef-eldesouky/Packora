@@ -91,6 +91,11 @@ export const useStore = create((set, get) => ({
   viewMode: '3d',
   isBoxOpen: false,
   cameraTarget: null,
+  savedConfigId: null,
+  isDirty: false,
+
+  setSavedConfigId: (id) => set({ savedConfigId: id, isDirty: false }),
+  setIsDirty: (dirty) => set({ isDirty: dirty }),
 
   setSelectedFace: (face) => set({ selectedFace: face, selectedElementId: null, cameraTarget: face }),
   setViewMode: (mode) => set({ viewMode: mode }),
@@ -98,13 +103,13 @@ export const useStore = create((set, get) => ({
   setBoxOpen: (isOpen) => set({ isBoxOpen: isOpen }),
   setCameraTarget: (face) => set({ cameraTarget: face }),
 
-  setBoxType: (boxType) => { set({ boxType }); get().calculatePrice() },
+  setBoxType: (boxType) => { set({ boxType, isDirty: true }); get().calculatePrice() },
   setBoxDimensions: (dims) => {
-    set(s => ({ boxDimensions: { ...s.boxDimensions, ...dims } }))
+    set(s => ({ boxDimensions: { ...s.boxDimensions, ...dims }, isDirty: true }))
     get().calculatePrice()
   },
-  setMaterial: (material) => { set({ material }); get().calculatePrice() },
-  setQuantity: (quantity) => { set({ quantity }); get().calculatePrice() },
+  setMaterial: (material) => { set({ material, isDirty: true }); get().calculatePrice() },
+  setQuantity: (quantity) => { set({ quantity, isDirty: true }); get().calculatePrice() },
   setLeftTab: (tab) => set({ leftTab: tab }),
   setSelectedElement: (id) => set({ selectedElementId: id }),
   isDraggingElement: false,
@@ -213,7 +218,7 @@ export const useStore = create((set, get) => ({
     const { designs, history, historyIndex } = get()
     const newHistory = history.slice(0, historyIndex + 1)
     newHistory.push({ designs: JSON.parse(JSON.stringify(designs)) })
-    set({ history: newHistory.slice(-50), historyIndex: newHistory.length - 1 })
+    set({ history: newHistory.slice(-50), historyIndex: newHistory.length - 1, isDirty: true })
   },
 
   undo: () => {

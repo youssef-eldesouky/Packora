@@ -51,7 +51,8 @@ export function CartProvider({ children }) {
         item.productId,
         item.quantity || 1,
         item.size || null,
-        item.material || null
+        item.material || null,
+        item.customBoxConfigId || null
       );
       syncCart(cart);
     } catch (err) {
