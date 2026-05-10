@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { DollarSign, ShoppingCart, Users, Package, MoreVertical, TrendingUp, TrendingDown } from 'lucide-react';
+import { DollarSign, ShoppingCart, Users, Package, MoreVertical, TrendingUp } from 'lucide-react';
 import { useAdmin } from '../../context/AdminContext';
 import { formatMoney } from '../../utils/adminFormat';
 import { guessProductIdFromLabel } from '../../utils/adminProductMatch';
@@ -13,8 +13,6 @@ function StatusBadge({ status }) {
 export default function AdminDashboard() {
   const { recentOrders, products, dashboardStats, topProductsFromOrders } = useAdmin();
   const recent = recentOrders || [];
-
-  const trends = [];
 
   const statCards = [
     {
@@ -112,11 +110,6 @@ export default function AdminDashboard() {
                   <div className="admin-rank-name">{p.name}</div>
                   <div className="admin-rank-sales">
                     {p.sales} sales
-                    {i % 2 === 1 ? (
-                      <TrendingDown size={14} className="admin-stat-trend down" />
-                    ) : (
-                      <TrendingUp size={14} className="admin-stat-trend up" />
-                    )}
                   </div>
                 </div>
                 <div className="admin-rank-rev">{formatMoney(p.revenue)}</div>
