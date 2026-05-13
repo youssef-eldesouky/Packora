@@ -5,16 +5,14 @@
 
 
 ## Table of Contents
-- [Features](#-features)
-- [Tech Stack](#-tech-stack)
-- [Project Architecture](#-project-architecture)
-- [Database Schema & Models](#-database-schema--models)
-- [Getting Started](#-getting-started)
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [Project Architecture](#project-architecture)
+- [Database Schema & Models](#database-schema--models)
+- [Getting Started](#getting-started)
   - [Prerequisites](#prerequisites)
   - [Backend Setup](#backend-setup)
   - [Frontend Setup](#frontend-setup)
-- [Contributing](#-contributing)
-- [License](#-license)
 
 
 
