@@ -10,7 +10,7 @@ import {
 import { useCart } from '../../context/CartContext';
 import ShippingAddress from './ShippingAddress';
 import Payment from './Payment';
-import ReviewOrder from './ReviewOrder';
+import PaymentResult from './PaymentResult';
 import Navbar from '../Navbar/Navbar';
 import './Checkout.css';
 import Footer from '../Footer/Footer';
@@ -100,7 +100,7 @@ export default function Checkout() {
         <div className="checkout-content">
           {checkoutStep === 'shipping' && <ShippingAddress />}
           {checkoutStep === 'payment'  && <Payment />}
-          {checkoutStep === 'review'   && <ReviewOrder />}
+          {checkoutStep === 'review'   && <PaymentResult />}
         </div>
       </main>
       <Footer />
