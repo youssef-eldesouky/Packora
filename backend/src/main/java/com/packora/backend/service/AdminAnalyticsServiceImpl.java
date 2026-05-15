@@ -43,13 +43,9 @@ public class AdminAnalyticsServiceImpl implements AdminAnalyticsService {
 
     @Override
     public DashboardStatsResponse getDashboardStats() {
-        List<Order> allOrders = orderRepository.findAll();
-        
-        long totalOrders = allOrders.size();
-        double totalRevenue = allOrders.stream()
-                .filter(o -> o.getStatus() != OrderStatus.CANCELLED)
-                .mapToDouble(Order::getTotalAmount)
-                .sum();
+        long totalOrders = orderRepository.countOrders();
+        Double sum = orderRepository.sumRevenue();
+        double totalRevenue = (sum != null) ? sum : 0.0;
         
         long activeCustomers = userRepository.count();
         long productCount = productRepository.count();
@@ -63,7 +59,7 @@ public class AdminAnalyticsServiceImpl implements AdminAnalyticsService {
         
         // Group by YearMonth
         Map<YearMonth, List<Order>> ordersByMonth = allOrders.stream()
-                .filter(o -> o.getStatus() != OrderStatus.CANCELLED)
+                .filter(o -> o.getStatus() != OrderStatus.CANCELLED && o.getOrderDate() != null)
                 .collect(Collectors.groupingBy(o -> YearMonth.from(o.getOrderDate())));
 
         // Determine the range of months to return (last N months up to current month)

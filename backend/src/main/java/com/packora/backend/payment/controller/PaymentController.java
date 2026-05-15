@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import org.springframework.beans.factory.annotation.Value;
 import java.util.Map;
 
 /**
@@ -33,6 +34,9 @@ public class PaymentController {
     private static final Logger log = LoggerFactory.getLogger(PaymentController.class);
 
     private final PaymobService paymobService;
+
+    @Value("${packora.frontend-url:http://localhost:3000}")
+    private String frontendUrl;
 
     public PaymentController(PaymobService paymobService) {
         this.paymobService = paymobService;
@@ -160,7 +164,7 @@ public class PaymentController {
         log.info("[PaymentController] GET redirect — success={}, txnId={}", success, transactionId);
 
         // Redirect back to checkout on step 3 (Review) with payment status
-        String frontendRedirect = "http://localhost:3000/Cart/checkout?step=review&success=" + success + "&txn=" + transactionId;
+        String frontendRedirect = frontendUrl + "/Cart/checkout?step=review&success=" + success + "&txn=" + transactionId;
 
         return ResponseEntity.status(302)
             .header("Location", frontendRedirect)

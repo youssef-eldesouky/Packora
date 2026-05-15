@@ -51,6 +51,7 @@ public class OrderServiceImpl implements OrderService {
     private final UserRepository     userRepository;
     private final ProductRepository  productRepository;
     private final ShipmentService    shipmentService;
+    private final CartService        cartService;
 
     /**
      * @Lazy on ShipmentService breaks the potential circular dependency:
@@ -60,11 +61,13 @@ public class OrderServiceImpl implements OrderService {
     public OrderServiceImpl(OrderRepository orderRepository,
                             UserRepository userRepository,
                             ProductRepository productRepository,
-                            @Lazy ShipmentService shipmentService) {
+                            @Lazy ShipmentService shipmentService,
+                            CartService cartService) {
         this.orderRepository   = orderRepository;
         this.userRepository    = userRepository;
         this.productRepository = productRepository;
         this.shipmentService   = shipmentService;
+        this.cartService       = cartService;
     }
 
     // ══════════════════════════════════════════════════════════════════════════
@@ -118,6 +121,14 @@ public class OrderServiceImpl implements OrderService {
             // can be manually created by an admin if something goes wrong here.
             log.error("[OrderService] Failed to auto-create shipment for order {}. Manual creation required. Error: {}",
                     saved.getId(), e.getMessage());
+        }
+
+        // Atomically clear the cart after the order is successfully placed.
+        try {
+            cartService.clearCart(userId);
+            log.info("[OrderService] Cart cleared for userId={}", userId);
+        } catch (Exception e) {
+            log.warn("[OrderService] Failed to clear cart for userId={}, you may need to clear it manually. Error: {}", userId, e.getMessage());
         }
 
         return toOrderResponse(saved);

@@ -73,7 +73,7 @@ public abstract class User implements UserDetails {
 
     @Transient
     public String getRole() {
-        DiscriminatorValue val = this.getClass().getAnnotation(DiscriminatorValue.class);
+        DiscriminatorValue val = org.hibernate.Hibernate.getClass(this).getAnnotation(DiscriminatorValue.class);
         return val != null ? val.value() : null;
     }
 

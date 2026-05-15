@@ -2,8 +2,11 @@ package com.packora.backend.service;
 
 import com.packora.backend.model.CustomBoxConfig;
 import com.packora.backend.model.User;
+import com.packora.backend.exception.ResourceNotFoundException;
 import com.packora.backend.repository.CustomBoxConfigRepository;
 import com.packora.backend.repository.UserRepository;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,7 +35,7 @@ public class CustomBoxConfigService {
     @Transactional
     public CustomBoxConfig saveConfig(Long userId, String configurationJson, boolean isSavedDraft) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User", userId));
 
         CustomBoxConfig config = CustomBoxConfig.builder()
                 .user(user)
@@ -46,10 +49,10 @@ public class CustomBoxConfigService {
     @Transactional
     public CustomBoxConfig updateConfig(Long configId, Long userId, String configurationJson, boolean isSavedDraft) {
         CustomBoxConfig config = configRepository.findById(configId)
-                .orElseThrow(() -> new RuntimeException("Configuration not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Configuration", configId));
 
         if (!config.getUser().getId().equals(userId)) {
-            throw new RuntimeException("Unauthorized to modify this configuration");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Unauthorized to modify this configuration");
         }
 
         config.setConfigurationJson(configurationJson);
@@ -59,10 +62,10 @@ public class CustomBoxConfigService {
 
     public CustomBoxConfig getConfig(Long configId, Long userId) {
         CustomBoxConfig config = configRepository.findById(configId)
-                .orElseThrow(() -> new RuntimeException("Configuration not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Configuration", configId));
 
         if (!config.getUser().getId().equals(userId)) {
-            throw new RuntimeException("Unauthorized to view this configuration");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Unauthorized to view this configuration");
         }
 
         return config;

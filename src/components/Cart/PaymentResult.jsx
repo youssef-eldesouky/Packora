@@ -5,14 +5,14 @@ import { useCart } from '../../context/CartContext';
 import './PaymentResult.css';
 
 /**
- * ReviewOrder — The final step of checkout (Step 3).
- * ⚠️  Despite the name "ReviewOrder", this component is actually the
+ * PaymentResult — The final step of checkout (Step 3).
+ * This component is actually the
  * **Payment Result Screen** — it shows success or failure after Paymob
  * redirects the user back to /Cart/checkout?step=review.
  * A future rename to `PaymentResultStep` or `OrderConfirmation` would
  * better reflect what this component does.
  */
-export default function ReviewOrder() {
+export default function PaymentResult() {
   const navigate = useNavigate();
   const [params] = useSearchParams();
   const { clearCart, setCheckoutStep } = useCart();

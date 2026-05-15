@@ -169,10 +169,8 @@ public class ShipmentServiceImpl implements ShipmentService {
         User partner = userRepository.findById(request.getPartnerId())
                 .orElseThrow(() -> new ResourceNotFoundException("User", request.getPartnerId()));
 
-        // Validate the user actually is a shipping partner using the discriminator value
-        // The discriminator column value is stored in the "role" column (see User entity)
-        String discriminatorValue = partner.getClass().getSimpleName();
-        if (!"PartnerShipping".equals(discriminatorValue)) {
+        // Validate the user actually is a shipping partner using their role
+        if (!"PARTNER_SHIPPING".equals(partner.getRole())) {
             throw new IllegalArgumentException(
                     "User " + request.getPartnerId() + " is not a shipping partner. " +
                     "Only users with the PARTNER_SHIPPING role can be assigned to shipments.");
