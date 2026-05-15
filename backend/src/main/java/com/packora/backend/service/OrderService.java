@@ -48,6 +48,7 @@ public interface OrderService {
     /**
      * Cancel an order.
      * Only orders in PENDING or PROCESSING state can be cancelled.
+     * The caller's userId must match the order's owner.
      */
-    OrderResponse cancelOrder(Long orderId);
+    OrderResponse cancelOrder(Long orderId, Long userId);
 }

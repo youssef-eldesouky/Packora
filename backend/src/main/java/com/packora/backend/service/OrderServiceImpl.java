@@ -203,8 +203,14 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public OrderResponse cancelOrder(Long orderId) {
+    public OrderResponse cancelOrder(Long orderId, Long userId) {
         Order order = findOrderOrThrow(orderId);
+
+        // Ownership check: only the order's owner can cancel it
+        if (!order.getUser().getId().equals(userId)) {
+            throw new org.springframework.security.access.AccessDeniedException(
+                    "You are not authorized to cancel this order.");
+        }
 
         if (!CANCELLABLE_STATUSES.contains(order.getStatus())) {
             throw new IllegalStateException(
@@ -213,7 +219,7 @@ public class OrderServiceImpl implements OrderService {
                     + ". Only PENDING or PROCESSING orders can be cancelled.");
         }
 
-        log.info("[OrderService] Cancelling order {}", orderId);
+        log.info("[OrderService] Cancelling order {} for userId={}", orderId, userId);
         order.setStatus(OrderStatus.CANCELLED);
         return toOrderResponse(orderRepository.save(order));
     }

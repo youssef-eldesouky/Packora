@@ -29,15 +29,6 @@ import java.util.List;
  * │ GET    /api/orders/{id}                                 │ Get single order by ID        │
  * │ PUT    /api/orders/{id}/status                          │ Update order status (Admin)   │
  * │ PUT    /api/orders/{id}/cancel                          │ Cancel an order               │
- * └─────────────────────────────────────────────────────────┴───────────────────────────────┘
- *
- * NOTE on authentication:
- * At this stage of the project, authentication via JWT has not been implemented.
- * The /me endpoint uses a ?userId= query param as a temporary stand-in.
- * Once Spring Security + JWT is wired up:
- *   1. Remove the userId query param from GET /me
- *   2. Extract principal from SecurityContextHolder in the service
- *   3. Add @PreAuthorize("hasRole('ADMIN')") to admin-only endpoints
  */
 @RestController
 @RequestMapping("/api/orders")
@@ -155,8 +146,10 @@ public class OrderController {
      * No request body needed — the action is implied by the endpoint.
      */
     @PutMapping("/{id}/cancel")
-    public ResponseEntity<OrderResponse> cancelOrder(@PathVariable Long id) {
-        log.info("[OrderController] PUT /api/orders/{}/cancel", id);
-        return ResponseEntity.ok(orderService.cancelOrder(id));
+    public ResponseEntity<OrderResponse> cancelOrder(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserDetailsImpl principal) {
+        log.info("[OrderController] PUT /api/orders/{}/cancel — userId={}", id, principal.getId());
+        return ResponseEntity.ok(orderService.cancelOrder(id, principal.getId()));
     }
 }
