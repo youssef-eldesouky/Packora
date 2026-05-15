@@ -1,15 +1,19 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { useAdminAuth } from './AdminAuthContext';
 
 import { userApi, productApi, orderApi, adminAnalyticsApi } from '../utils/api';
 
 const AdminContext = createContext(null);
 
 export function AdminProvider({ children }) {
+  const { isAdmin } = useAdminAuth();
+
   const [orders, setOrders] = useState([]);
   const [ordersLoading, setOrdersLoading] = useState(false);
   const [ordersError, setOrdersError] = useState(null);
 
   useEffect(() => {
+    if (!isAdmin) return;
     let cancelled = false;
     setOrdersLoading(true);
     setOrdersError(null);
@@ -29,7 +33,7 @@ export function AdminProvider({ children }) {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [isAdmin]);
 
   // ── Products: fetched from backend /api/products ──────────────
   const [products, setProducts] = useState([]);
@@ -37,6 +41,7 @@ export function AdminProvider({ children }) {
   const [productsError, setProductsError] = useState(null);
 
   useEffect(() => {
+    if (!isAdmin) return;
     let cancelled = false;
     setProductsLoading(true);
     setProductsError(null);
@@ -56,7 +61,7 @@ export function AdminProvider({ children }) {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [isAdmin]);
 
   // ── Customers: fetched from backend /api/users (ADMIN) ────────
   const [customers, setCustomers] = useState([]);
@@ -64,6 +69,7 @@ export function AdminProvider({ children }) {
   const [customersError, setCustomersError] = useState(null);
 
   useEffect(() => {
+    if (!isAdmin) return;
     let cancelled = false;
     setCustomersLoading(true);
     setCustomersError(null);
@@ -100,7 +106,7 @@ export function AdminProvider({ children }) {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [isAdmin]);
 
   // ── Product CRUD (hits real backend) ──────────────────────────
 
@@ -156,21 +162,26 @@ export function AdminProvider({ children }) {
   });
   const [topProductsFromOrders, setTopProductsFromOrders] = useState([]);
   const [recentOrders, setRecentOrders] = useState([]);
+  const [revenueChart, setRevenueChart] = useState([]);
   const [dashboardLoading, setDashboardLoading] = useState(false);
   const [dashboardError, setDashboardError] = useState(null);
 
   useEffect(() => {
+    if (!isAdmin) return;
     let cancelled = false;
     setDashboardLoading(true);
     setDashboardError(null);
 
-    adminAnalyticsApi
-      .getDashboard()
-      .then((data) => {
+    Promise.all([
+      adminAnalyticsApi.getDashboard(),
+      adminAnalyticsApi.getRevenueChart(6)
+    ])
+      .then(([dashboardData, chartData]) => {
         if (!cancelled) {
-          setDashboardStats(data.stats || {});
-          setTopProductsFromOrders(data.topProducts || []);
-          setRecentOrders(data.recentOrders || []);
+          setDashboardStats(dashboardData.stats || {});
+          setTopProductsFromOrders(dashboardData.topProducts || []);
+          setRecentOrders(dashboardData.recentOrders || []);
+          setRevenueChart(chartData || []);
         }
       })
       .catch((err) => {
@@ -183,7 +194,7 @@ export function AdminProvider({ children }) {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [isAdmin]);
 
   const value = useMemo(
     () => ({
@@ -203,6 +214,7 @@ export function AdminProvider({ children }) {
       dashboardStats,
       topProductsFromOrders,
       recentOrders,
+      revenueChart,
       dashboardLoading,
       dashboardError,
     }),
@@ -223,6 +235,7 @@ export function AdminProvider({ children }) {
       dashboardStats,
       topProductsFromOrders,
       recentOrders,
+      revenueChart,
       dashboardLoading,
       dashboardError,
     ]
