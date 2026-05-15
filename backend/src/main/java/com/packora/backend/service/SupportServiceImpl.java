@@ -2,8 +2,10 @@ package com.packora.backend.service;
 
 import com.packora.backend.dto.support.TicketCreateRequest;
 import com.packora.backend.dto.support.TicketResponse;
+import com.packora.backend.exception.ResourceNotFoundException;
 import com.packora.backend.model.Ticket;
 import com.packora.backend.model.User;
+import com.packora.backend.model.enums.TicketStatus;
 import com.packora.backend.repository.TicketRepository;
 import com.packora.backend.repository.UserRepository;
 import com.packora.backend.security.services.UserDetailsImpl;
@@ -40,7 +42,7 @@ public class SupportServiceImpl implements SupportService {
 
         if (isLoggedIn && authentication.getPrincipal() instanceof UserDetailsImpl userDetails) {
             User user = userRepository.findById(userDetails.getId())
-                    .orElseThrow(() -> new RuntimeException("User not found"));
+                    .orElseThrow(() -> new ResourceNotFoundException("User", userDetails.getId()));
             ticket.setUser(user);
             ticket.setContactName(user.getUsername());
             ticket.setContactEmail(user.getEmail());
@@ -60,13 +62,23 @@ public class SupportServiceImpl implements SupportService {
 
     @Override
     public TicketResponse getTicketById(Long id) {
-        Ticket ticket = ticketRepository.findById(id).orElseThrow(() -> new RuntimeException("Ticket not found"));
+        Ticket ticket = ticketRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Ticket", id));
         return mapToResponse(ticket);
     }
 
     @Override
     public List<TicketResponse> getMyTickets(Long userId) {
         return ticketRepository.findByUserId(userId).stream().map(this::mapToResponse).collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    public TicketResponse updateTicketStatus(Long ticketId, TicketStatus newStatus) {
+        Ticket ticket = ticketRepository.findById(ticketId)
+                .orElseThrow(() -> new ResourceNotFoundException("Ticket", ticketId));
+        ticket.setStatus(newStatus);
+        return mapToResponse(ticketRepository.save(ticket));
     }
 
     private TicketResponse mapToResponse(Ticket ticket) {
