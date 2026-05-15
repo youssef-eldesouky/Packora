@@ -9,6 +9,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import com.packora.backend.security.services.UserDetailsImpl;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -55,9 +57,15 @@ public class ShipmentController {
      * exists but has no shipment created yet.
      */
     @GetMapping("/order/{orderId}")
-    public ResponseEntity<ShipmentResponse> getShipmentByOrderId(@PathVariable Long orderId) {
+    public ResponseEntity<ShipmentResponse> getShipmentByOrderId(
+            @PathVariable Long orderId,
+            @AuthenticationPrincipal UserDetailsImpl principal) {
+        
+        boolean isAdmin = principal.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+                
         log.info("[ShipmentController] GET /api/shipments/order/{}", orderId);
-        return ResponseEntity.ok(shipmentService.getShipmentByOrderId(orderId));
+        return ResponseEntity.ok(shipmentService.getShipmentByOrderId(orderId, principal.getId(), isAdmin));
     }
 
     // ── GET /api/shipments/{id} ───────────────────────────────────────────────
@@ -69,9 +77,15 @@ public class ShipmentController {
      * Returns 404 if not found.
      */
     @GetMapping("/{id}")
-    public ResponseEntity<ShipmentResponse> getShipmentById(@PathVariable Long id) {
+    public ResponseEntity<ShipmentResponse> getShipmentById(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserDetailsImpl principal) {
+            
+        boolean isAdmin = principal.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+                
         log.info("[ShipmentController] GET /api/shipments/{}", id);
-        return ResponseEntity.ok(shipmentService.getShipmentById(id));
+        return ResponseEntity.ok(shipmentService.getShipmentById(id, principal.getId(), isAdmin));
     }
 
     // ── PUT /api/shipments/{id}/status ────────────────────────────────────────

@@ -91,7 +91,7 @@ public class ShipmentServiceImpl implements ShipmentService {
     // ══════════════════════════════════════════════════════════════════════════
 
     @Override
-    public ShipmentResponse getShipmentByOrderId(Long orderId) {
+    public ShipmentResponse getShipmentByOrderId(Long orderId, Long userId, boolean isAdmin) {
         // Validate order exists first so we give a meaningful error
         if (!orderRepository.existsById(orderId)) {
             throw new ResourceNotFoundException("Order", orderId);
@@ -100,12 +100,25 @@ public class ShipmentServiceImpl implements ShipmentService {
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Shipment for order " + orderId + " not found. " +
                         "The order may not have been processed yet."));
+
+        // Guard: only admins or the order owner can view this shipment
+        if (!isAdmin && !shipment.getOrder().getUser().getId().equals(userId)) {
+            throw new org.springframework.security.access.AccessDeniedException(
+                    "You are not authorized to view this shipment.");
+        }
         return toShipmentResponse(shipment);
     }
 
     @Override
-    public ShipmentResponse getShipmentById(Long shipmentId) {
-        return toShipmentResponse(findShipmentOrThrow(shipmentId));
+    public ShipmentResponse getShipmentById(Long shipmentId, Long userId, boolean isAdmin) {
+        Shipment shipment = findShipmentOrThrow(shipmentId);
+
+        // Guard: only admins or the order owner can view this shipment
+        if (!isAdmin && !shipment.getOrder().getUser().getId().equals(userId)) {
+            throw new org.springframework.security.access.AccessDeniedException(
+                    "You are not authorized to view this shipment.");
+        }
+        return toShipmentResponse(shipment);
     }
 
     // ══════════════════════════════════════════════════════════════════════════
@@ -360,7 +373,7 @@ public class ShipmentServiceImpl implements ShipmentService {
      * Example: Order 42 → TRK-0042
      */
     private String generateTrackingNumber(Long orderId) {
-        return "TRK-" + String.format("%04d", orderId % 10000);
+        return "TRK-" + String.format("%08d", orderId);
     }
 
     // ══════════════════════════════════════════════════════════════════════════

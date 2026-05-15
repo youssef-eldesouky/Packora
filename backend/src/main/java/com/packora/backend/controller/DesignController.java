@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -83,6 +84,7 @@ public class DesignController {
      *     -F "previewUrl=https://example.com/preview"
      */
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasAnyRole('ADMIN', 'PARTNER_PACKAGING')")
     public ResponseEntity<DesignResponse> createDesign(
             @RequestParam("partnerId") Long partnerId,
             @RequestPart(value = "logoFile", required = false) MultipartFile logoFile,
@@ -101,6 +103,7 @@ public class DesignController {
      * omitting a file part keeps the existing file.
      */
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasAnyRole('ADMIN', 'PARTNER_PACKAGING')")
     public ResponseEntity<DesignResponse> updateDesign(
             @PathVariable Long id,
             @RequestPart(value = "logoFile", required = false) MultipartFile logoFile,
@@ -118,6 +121,7 @@ public class DesignController {
      * Returns 204 No Content on success, 404 if not found.
      */
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'PARTNER_PACKAGING')")
     public ResponseEntity<Void> deleteDesign(@PathVariable Long id) {
         log.info("[DesignController] DELETE /api/designs/{}", id);
         designService.deleteDesign(id);

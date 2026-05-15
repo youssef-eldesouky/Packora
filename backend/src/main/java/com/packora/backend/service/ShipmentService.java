@@ -28,15 +28,17 @@ public interface ShipmentService {
      * Retrieve the shipment associated with a given order.
      * Throws {@link com.packora.backend.exception.ResourceNotFoundException}
      * if the order has no shipment yet.
+     * Throws AccessDeniedException if not an admin and doesn't own the order.
      *
      * Used by the frontend Track page.
      */
-    ShipmentResponse getShipmentByOrderId(Long orderId);
+    ShipmentResponse getShipmentByOrderId(Long orderId, Long userId, boolean isAdmin);
 
     /**
      * Retrieve a shipment directly by its shipment ID.
+     * Throws AccessDeniedException if not an admin and doesn't own the order.
      */
-    ShipmentResponse getShipmentById(Long shipmentId);
+    ShipmentResponse getShipmentById(Long shipmentId, Long userId, boolean isAdmin);
 
     /**
      * Update the shipment's status (Admin or shipping partner).

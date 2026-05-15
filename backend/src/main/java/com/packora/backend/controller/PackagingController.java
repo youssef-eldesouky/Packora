@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -82,6 +83,7 @@ public class PackagingController {
      * }
      */
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<PackagingResponse> createPackaging(
             @Valid @RequestBody PackagingRequest request) {
         log.info("[PackagingController] POST /api/packagings — type={}", request.getType());
@@ -96,6 +98,7 @@ public class PackagingController {
      * Returns 404 if the packaging does not exist.
      */
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<PackagingResponse> updatePackaging(
             @PathVariable Long id,
             @Valid @RequestBody PackagingRequest request) {
@@ -110,6 +113,7 @@ public class PackagingController {
      * Returns 204 No Content on success, 404 if not found.
      */
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deletePackaging(@PathVariable Long id) {
         log.info("[PackagingController] DELETE /api/packagings/{}", id);
         packagingService.deletePackaging(id);
