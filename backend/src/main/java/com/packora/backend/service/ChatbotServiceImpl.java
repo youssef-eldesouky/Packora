@@ -50,7 +50,7 @@ public class ChatbotServiceImpl implements ChatbotService {
             }
 
             Map<String, Object> systemInstruction = new HashMap<>();
-            systemInstruction.put("parts", Map.of("text", baseInstruction));
+            systemInstruction.put("parts", List.of(Map.of("text", baseInstruction)));
             payload.put("system_instruction", systemInstruction);
 
             // User Message
