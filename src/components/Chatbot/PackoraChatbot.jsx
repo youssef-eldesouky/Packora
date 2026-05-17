@@ -13,9 +13,11 @@ import './PackoraChatbot.css';
 import axios from 'axios';
 import ReactMarkdown from 'react-markdown';
 import { apiFetch } from '../../utils/api';
+import { useAuth } from '../../context/AuthContext';
 
 export default function PackoraChatbot() {
   const navigate = useNavigate();
+  const { isLoggedIn } = useAuth();
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [showBadge, setShowBadge] = useState(true);
   const [chatInput, setChatInput] = useState('');
@@ -88,9 +90,17 @@ export default function PackoraChatbot() {
       setShowBadge(false);
       addMessage('user', text);
       setChatInput('');
+
+      if (!isLoggedIn) {
+        setTimeout(() => {
+          addMessage('bot', 'Please [Log in](/login) first to use the chatbot.');
+        }, 500);
+        return;
+      }
+
       runBotReply(text);
     },
-    [addMessage, chatInput, runBotReply]
+    [addMessage, chatInput, runBotReply, isLoggedIn]
   );
 
   return (

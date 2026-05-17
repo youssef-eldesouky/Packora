@@ -27,7 +27,7 @@ public class ChatbotServiceImpl implements ChatbotService {
     @Value("${gemini.api-key}")
     private String geminiApiKey;
 
-    private static final String GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=";
+    private static final String GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=";
 
     @Override
     public ChatResponse askQuestion(ChatRequest request, boolean isLoggedIn, String username) {
@@ -38,19 +38,23 @@ public class ChatbotServiceImpl implements ChatbotService {
             Map<String, Object> payload = new HashMap<>();
 
             // System Instruction (Personality & Navigation instructions)
-            String baseInstruction = "You are an interactive, helpful customer support agent for Packora, an Egyptian packaging company. " +
-                "Help the user navigate the website by providing markdown links. Examples: [View Catalog](/catalog), " +
-                "[Go to Cart](/cart), [Checkout](/checkout), [Track Order](/track), [Dashboard](/admin). " +
-                "Answer FAQs concisely. Provide structured, interactive-feeling responses with bullet points if applicable. ";
+            String baseInstruction = "You are a concise customer support agent for Packora, an Egyptian packaging company. " +
+                "STRICT RULES: " +
+                "1. NEVER use emojis. " +
+                "2. Keep responses short and directly answer ONLY what the user asked. Do not add extra information they did not ask for. " +
+                "3. If the user says something casual like 'thanks' or 'ok', reply briefly (one sentence max) without adding navigation links or suggestions. " +
+                "4. Use plain text. Avoid markdown headers (no # or ##). Use simple bullet points only when listing multiple items. " +
+                "5. You may provide markdown links for navigation when relevant: [Catalog](/catalog), [Cart](/cart), [Checkout](/checkout), [Track Order](/track), [Dashboard](/admin). " +
+                "6. Do not repeat yourself or over-explain. ";
                 
             if (isLoggedIn) {
-                baseInstruction += "The user is currently logged in as '" + username + "'. You can address them by name and guide them to their [Dashboard](/admin) or [Cart](/cart).";
+                baseInstruction += "The user is logged in as '" + username + "'.";
             } else {
-                baseInstruction += "The user is a GUEST (NOT logged in). Answer their questions helpfully, but actively encourage them to [Log In](/login) or [Sign Up](/signup) to access features like custom quotes, purchasing, and order tracking. Provide those markdown links.";
+                baseInstruction += "The user is a guest. If they need account features, suggest [Log In](/login) or [Sign Up](/signup).";
             }
 
             Map<String, Object> systemInstruction = new HashMap<>();
-            systemInstruction.put("parts", Map.of("text", baseInstruction));
+            systemInstruction.put("parts", List.of(Map.of("text", baseInstruction)));
             payload.put("system_instruction", systemInstruction);
 
             // User Message
