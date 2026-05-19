@@ -88,6 +88,21 @@ public class OrderServiceImpl implements OrderService {
                 .map(cartItem -> buildOrderItem(cartItem))
                 .collect(Collectors.toList());
 
+        // Deduct stock for each item ordered
+        for (OrderItem item : orderItems) {
+            Product product = item.getProduct();
+            int currentStock = product.getStock() != null ? product.getStock() : 0;
+            int newStock = currentStock - item.getQuantity();
+            if (newStock < 0) {
+                throw new IllegalStateException("Not enough stock available for product '" + product.getName() + "'");
+            }
+            product.setStock(newStock);
+            if (newStock == 0) {
+                product.setInStock(false);
+            }
+            productRepository.save(product);
+        }
+
         double total = orderItems.stream()
                 .mapToDouble(item -> item.getUnitPrice() * item.getQuantity())
                 .sum();
@@ -143,9 +158,16 @@ public class OrderServiceImpl implements OrderService {
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Product", cartItem.getProductId()));
 
-        if (!product.getInStock()) {
+        if (product.getInStock() == null || !product.getInStock()) {
             throw new IllegalStateException(
                     "Product '" + product.getName() + "' (id=" + product.getId() + ") is currently out of stock.");
+        }
+
+        int availableStock = product.getStock() != null ? product.getStock() : 0;
+        if (availableStock < cartItem.getQuantity()) {
+            throw new IllegalStateException(
+                    "Not enough stock available for product '" + product.getName() + "' (id=" + product.getId() + "). " +
+                    "Available: " + availableStock + ", Requested: " + cartItem.getQuantity());
         }
 
         return OrderItem.builder()
