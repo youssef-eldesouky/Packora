@@ -311,24 +311,44 @@ public class PaymobService {
 
     /**
      * Syncs the Order's status based on the payment outcome.
-     * This keeps the order status consistent with payment reality without
-     * requiring a separate scheduled job.
+     * If the order belongs to a bulk session (bulkGroupId != null), all sibling
+     * orders in the same group are updated to the same status in one shot.
      */
     private void syncOrderStatus(Order order, boolean success,
                                   PaymobCallbackPayload.TransactionObj txn) {
         if (order == null) return;
 
+        OrderStatus newStatus = null;
         if (txn.isVoided() || txn.isRefunded()) {
-            order.setStatus(OrderStatus.CANCELLED);
+            newStatus = OrderStatus.CANCELLED;
         } else if (success) {
             // Payment confirmed — move order to PROCESSING so the team can fulfil it
-            order.setStatus(OrderStatus.PROCESSING);
+            newStatus = OrderStatus.PROCESSING;
         }
         // On failure we leave the order as PENDING so the user can retry payment
+        if (newStatus == null) {
+            orderRepository.save(order);
+            return;
+        }
 
-        orderRepository.save(order);
-        log.info("[Paymob] Order {} status synced → {}", order.getId(), order.getStatus());
+        // If this is a bulk order, update ALL orders in the same group
+        String bulkGroupId = order.getBulkGroupId();
+        if (bulkGroupId != null && !bulkGroupId.isBlank()) {
+            List<Order> siblingOrders = orderRepository.findByBulkGroupId(bulkGroupId);
+            final OrderStatus finalStatus = newStatus;
+            siblingOrders.forEach(o -> {
+                o.setStatus(finalStatus);
+                orderRepository.save(o);
+                log.info("[Paymob] Bulk order {} status synced → {} (bulkGroupId={})",
+                        o.getId(), finalStatus, bulkGroupId);
+            });
+        } else {
+            order.setStatus(newStatus);
+            orderRepository.save(order);
+            log.info("[Paymob] Order {} status synced → {}", order.getId(), newStatus);
+        }
     }
+
 
     // ── PRIVATE — HMAC-SHA512 Verification ─────────────────────────────────
 

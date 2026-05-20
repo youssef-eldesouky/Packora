@@ -43,40 +43,48 @@ export default function BulkOrder() {
   const handleConfirmOrder = async () => {
     setError(null);
     try {
-      // 1. Format Bulk Order Address
-      const addressString = [
-        bulkWarehouseData.warehouseName,
-        bulkWarehouseData.addressLine,
-        bulkWarehouseData.city,
-        bulkWarehouseData.postalCode,
-        bulkWarehouseData.contactNumber
-      ].filter(Boolean).join(', ') + ' (Bulk Excel)';
+      // Build the bulk order payload matching BulkOrderRequest
+      const payload = {
+        // Sender / warehouse info
+        warehouseName:  bulkWarehouseData.warehouseName  || '',
+        addressLine:    bulkWarehouseData.addressLine    || '',
+        city:           bulkWarehouseData.city           || '',
+        postalCode:     bulkWarehouseData.postalCode     || '',
+        contactNumber:  bulkWarehouseData.contactNumber  || '',
 
-      // 2. Map Cart Items
-      const items = cartItems.map((item) => ({
-        productId: item.isCustomBox ? 24 : parseInt(item.productId, 10),
-        quantity:  item.quantity,
-        unitPrice: item.price,
-        size:      item.size     || null,
-        material:  item.material || null,
-        customBoxConfigId: item.customBoxConfigId || null,
-      }));
+        // Cart products (distributed 1 per recipient by the backend)
+        items: cartItems.map((item) => ({
+          productId: item.isCustomBox ? 24 : parseInt(item.productId, 10),
+          quantity:  item.quantity,
+          unitPrice: item.price,
+          size:      item.size     || null,
+          material:  item.material || null,
+        })),
 
-      // 3. Create Order
-      const order = await orderApi.create({ shippingAddress: addressString, items });
-      const orderId     = order.rawId;
-      const totalAmount = order.rawAmount;
+        // Recipient rows from the Excel file
+        recipients: bulkExcelData.map((row) => ({
+          customerName: row['Customer Name'] || '',
+          phone:        row['Phone Number']  || '',
+          address:      row['Address Line']  || '',
+          city:         row['City']          || '',
+          notes:        row['Notes']         || '',
+        })),
+      };
 
-      setCurrentOrderId(orderId);
+      // 1. Create all bulk orders in one atomic backend call
+      const bulkResult = await orderApi.createBulk(payload);
+      // bulkResult = { primaryOrderId, totalAmount, bulkGroupId, recipientCount, orderIds }
 
-      // 4. Initiate Paymob Payment
+      setCurrentOrderId(bulkResult.primaryOrderId);
+
+      // 2. Initiate Paymob payment for the combined total using the primary order
       const billingData = {
         first_name:      'Bulk',
         last_name:       'Order',
         email:           'bulk@packora.com',
         phone_number:    bulkWarehouseData.contactNumber || 'NA',
-        street:          bulkWarehouseData.addressLine || 'NA',
-        city:            bulkWarehouseData.city   || 'NA',
+        street:          bulkWarehouseData.addressLine   || 'NA',
+        city:            bulkWarehouseData.city          || 'NA',
         country:         'EG',
         apartment:       'NA',
         floor:           'NA',
@@ -86,21 +94,24 @@ export default function BulkOrder() {
         state:           'NA',
       };
 
-      const paymentResp = await paymentApi.initiate(orderId, totalAmount, billingData);
-      
-      // 5. Store iframe URL and go to payment step
+      const paymentResp = await paymentApi.initiate(
+        bulkResult.primaryOrderId,
+        bulkResult.totalAmount,
+        billingData
+      );
+
+      // 3. Store iframe URL and navigate to payment step
       setIframeUrl(paymentResp.iframeUrl);
       setCheckoutStep('payment');
-      
-      // Navigate to standard checkout to show payment iframe
       navigate('/Cart/checkout');
-      
+
     } catch (err) {
-      console.error("Bulk Order creation failed:", err);
+      console.error('Bulk Order creation failed:', err);
       setError(err.message || 'Failed to initialize payment. Please try again.');
-      throw err; // So Step3Review knows to stop loading
+      throw err; // So Step3Review knows to stop its loading state
     }
   };
+
 
   if (isSuccess) {
     return (

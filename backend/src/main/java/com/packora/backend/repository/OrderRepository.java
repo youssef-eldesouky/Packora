@@ -19,9 +19,13 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     List<Order> findTop5ByOrderByOrderDateDesc();
 
+    /** Find all orders that share the same bulk session group ID. */
+    List<Order> findByBulkGroupId(String bulkGroupId);
+
     @Query("SELECT SUM(o.totalAmount) FROM Order o WHERE o.status != 'CANCELLED'")
     Double sumRevenue();
 
     @Query("SELECT COUNT(o) FROM Order o")
     long countOrders();
 }
+

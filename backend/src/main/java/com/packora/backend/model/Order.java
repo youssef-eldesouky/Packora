@@ -50,6 +50,14 @@ public class Order {
     @Column(columnDefinition = "TEXT")
     private String shippingAddress;
 
+    /**
+     * Shared identifier for all orders created in the same bulk upload session.
+     * Null for single (non-bulk) orders. Set to a UUID string when created via
+     * POST /api/orders/bulk so the payment callback can update all sibling orders.
+     */
+    @Column(name = "bulk_group_id")
+    private String bulkGroupId;
+
     // The user (BusinessOwner) who placed this order
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)

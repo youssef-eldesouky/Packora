@@ -212,6 +212,12 @@ export const orderApi = {
   /** POST /api/orders – place a new order */
   create: (data) => apiFetch('/api/orders', { method: 'POST', body: JSON.stringify(data) }).then(normalizeOrder),
 
+  /**
+   * POST /api/orders/bulk – place a bulk order (one order per recipient).
+   * Returns { primaryOrderId, totalAmount, bulkGroupId, recipientCount, orderIds }
+   */
+  createBulk: (data) => apiFetch('/api/orders/bulk', { method: 'POST', body: JSON.stringify(data) }),
+
   /** GET /api/orders/me – get orders for current user */
   getMyOrders: () => apiFetch('/api/orders/me').then(list => list.map(normalizeOrder)),
 
@@ -227,6 +233,7 @@ export const orderApi = {
   /** PUT /api/orders/:id/cancel – cancel an order */
   cancel: (id) => apiFetch(`/api/orders/${id}/cancel`, { method: 'PUT' }).then(normalizeOrder),
 };
+
 
 // ── Cart API ─────────────────────────────────────────────────────────
 
