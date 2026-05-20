@@ -62,6 +62,50 @@ public class UserController {
         return ResponseEntity.ok(new MessageResponse("Password updated successfully!"));
     }
 
+    // ── Saved Address Endpoints ────────────────────────────────────────────────
+
+    @GetMapping("/me/addresses")
+    public ResponseEntity<List<com.packora.backend.dto.user.SavedAddressResponse>> getMyAddresses(
+            @AuthenticationPrincipal UserDetailsImpl principal) {
+        log.info("[UserController] GET /api/users/me/addresses — userId={}", principal.getId());
+        return ResponseEntity.ok(userService.getSavedAddresses(principal.getId()));
+    }
+
+    @PostMapping("/me/addresses")
+    public ResponseEntity<com.packora.backend.dto.user.SavedAddressResponse> addMyAddress(
+            @AuthenticationPrincipal UserDetailsImpl principal,
+            @Valid @RequestBody com.packora.backend.dto.user.SavedAddressRequest request) {
+        log.info("[UserController] POST /api/users/me/addresses — userId={}", principal.getId());
+        return ResponseEntity.ok(userService.addAddress(principal.getId(), request));
+    }
+
+    @PutMapping("/me/addresses/{id}")
+    public ResponseEntity<com.packora.backend.dto.user.SavedAddressResponse> updateMyAddress(
+            @AuthenticationPrincipal UserDetailsImpl principal,
+            @PathVariable Long id,
+            @Valid @RequestBody com.packora.backend.dto.user.SavedAddressRequest request) {
+        log.info("[UserController] PUT /api/users/me/addresses/{} — userId={}", id, principal.getId());
+        return ResponseEntity.ok(userService.updateAddress(principal.getId(), id, request));
+    }
+
+    @DeleteMapping("/me/addresses/{id}")
+    public ResponseEntity<MessageResponse> deleteMyAddress(
+            @AuthenticationPrincipal UserDetailsImpl principal,
+            @PathVariable Long id) {
+        log.info("[UserController] DELETE /api/users/me/addresses/{} — userId={}", id, principal.getId());
+        userService.deleteAddress(principal.getId(), id);
+        return ResponseEntity.ok(new MessageResponse("Address deleted successfully!"));
+    }
+
+    @PutMapping("/me/addresses/{id}/primary")
+    public ResponseEntity<MessageResponse> setMyPrimaryAddress(
+            @AuthenticationPrincipal UserDetailsImpl principal,
+            @PathVariable Long id) {
+        log.info("[UserController] PUT /api/users/me/addresses/{}/primary — userId={}", id, principal.getId());
+        userService.setPrimaryAddress(principal.getId(), id);
+        return ResponseEntity.ok(new MessageResponse("Primary address set successfully!"));
+    }
+
     // ── Admin Endpoints ────────────────────────────────────────────────────────
 
     /**
