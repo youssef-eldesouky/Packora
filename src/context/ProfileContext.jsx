@@ -14,32 +14,21 @@ export function ProfileProvider({ children }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Local state persisted to localStorage
-  const [savedAddresses, setSavedAddresses] = useState(() => {
-    try { return JSON.parse(localStorage.getItem('packora_saved_addresses')) || []; } catch { return []; }
-  });
-  const [notificationPrefs, setNotificationPrefs] = useState(() => {
-    try {
-      const stored = JSON.parse(localStorage.getItem('packora_notification_prefs'));
-      return stored || { orderUpdates: true, shippingAlerts: true, promotions: false, newsletter: false };
-    } catch {
-      return { orderUpdates: true, shippingAlerts: true, promotions: false, newsletter: false };
-    }
+  // Address and notification preference states
+  const [savedAddresses, setSavedAddresses] = useState([]);
+  const [notificationPrefs, setNotificationPrefs] = useState({
+    orderUpdates: true,
+    shippingAlerts: true,
+    promotions: false,
+    newsletter: false,
   });
 
-  /* ── Sync local state to localStorage ─────────────────────────── */
-  useEffect(() => {
-    try { localStorage.setItem('packora_saved_addresses', JSON.stringify(savedAddresses)); } catch {}
-  }, [savedAddresses]);
-
-  useEffect(() => {
-    try { localStorage.setItem('packora_notification_prefs', JSON.stringify(notificationPrefs)); } catch {}
-  }, [notificationPrefs]);
-
-  /* ── Fetch profile on mount / login ───────────────────────────── */
+  /* ── Fetch profile, addresses, and notification preferences on mount / login ── */
   useEffect(() => {
     if (!isLoggedIn) {
       setAccountProfile(null);
+      setSavedAddresses([]);
+      setNotificationPrefs({ orderUpdates: true, shippingAlerts: true, promotions: false, newsletter: false });
       return;
     }
 
@@ -47,6 +36,7 @@ export function ProfileProvider({ children }) {
     setLoading(true);
     setError(null);
 
+    // 1. Fetch user profile
     userApi
       .getMe()
       .then((data) => {
@@ -67,6 +57,22 @@ export function ProfileProvider({ children }) {
       .finally(() => {
         if (!cancelled) setLoading(false);
       });
+
+    // 2. Fetch saved addresses
+    userApi
+      .getAddresses()
+      .then((addresses) => {
+        if (!cancelled) setSavedAddresses(addresses);
+      })
+      .catch((err) => console.error('Failed to load saved addresses', err));
+
+    // 3. Fetch notification preferences
+    userApi
+      .getNotificationPrefs()
+      .then((prefs) => {
+        if (!cancelled) setNotificationPrefs(prefs);
+      })
+      .catch((err) => console.error('Failed to load notification preferences', err));
 
     return () => {
       cancelled = true;
@@ -116,42 +122,84 @@ export function ProfileProvider({ children }) {
     };
   }, [accountProfile]);
 
-  /* ── Address helpers (local-only) ─────────────────────────────── */
-  const addAddress = (addr) => {
-    const id = `addr-${Date.now()}`;
-    const isPrimary = addr.isPrimary === true;
-    setSavedAddresses((prev) => {
-      let next = prev.map((a) => (isPrimary ? { ...a, isPrimary: false } : a));
-      next = [...next, { ...addr, id, isPrimary: !!isPrimary }];
-      return next;
-    });
-  };
-
-  const updateAddress = (id, updates) => {
-    setSavedAddresses((prev) => {
-      let next = prev.map((a) => {
-        if (a.id !== id) return a;
-        return { ...a, ...updates };
+  /* ── Address helpers (API-persisted) ──────────────────────────── */
+  const addAddress = async (addr) => {
+    setLoading(true);
+    try {
+      const newAddress = await userApi.addAddress(addr);
+      setSavedAddresses((prev) => {
+        let next = prev;
+        if (newAddress.isPrimary) {
+          next = prev.map((a) => ({ ...a, isPrimary: false }));
+        }
+        return [...next, newAddress];
       });
-      if (updates.isPrimary) {
-        next = next.map((a) => ({ ...a, isPrimary: a.id === id }));
-      }
-      return next;
-    });
+    } catch (err) {
+      console.error('Failed to add address', err);
+      setError(err.message || 'Failed to add address');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const deleteAddress = (id) => {
-    setSavedAddresses((prev) => {
-      const next = prev.filter((a) => a.id !== id);
-      if (next.length && !next.some((a) => a.isPrimary)) {
-        return next.map((a, i) => ({ ...a, isPrimary: i === 0 }));
-      }
-      return next;
-    });
+  const updateAddress = async (id, updates) => {
+    setLoading(true);
+    try {
+      const updated = await userApi.updateAddress(id, updates);
+      setSavedAddresses((prev) => {
+        let next = prev.map((a) => (a.id === id ? updated : a));
+        if (updated.isPrimary) {
+          next = next.map((a) => ({ ...a, isPrimary: a.id === id }));
+        }
+        return next;
+      });
+    } catch (err) {
+      console.error('Failed to update address', err);
+      setError(err.message || 'Failed to update address');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const setPrimaryAddress = (id) => {
-    setSavedAddresses((prev) => prev.map((a) => ({ ...a, isPrimary: a.id === id })));
+  const deleteAddress = async (id) => {
+    setLoading(true);
+    try {
+      await userApi.deleteAddress(id);
+      const fresh = await userApi.getAddresses();
+      setSavedAddresses(fresh);
+    } catch (err) {
+      console.error('Failed to delete address', err);
+      setError(err.message || 'Failed to delete address');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const setPrimaryAddress = async (id) => {
+    setLoading(true);
+    try {
+      await userApi.setPrimaryAddress(id);
+      setSavedAddresses((prev) => prev.map((a) => ({ ...a, isPrimary: a.id === id })));
+    } catch (err) {
+      console.error('Failed to set primary address', err);
+      setError(err.message || 'Failed to set primary address');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  /* ── Notification preferences helper (API-persisted) ─────────── */
+  const updateNotificationPrefs = async (prefs) => {
+    setLoading(true);
+    try {
+      const updated = await userApi.updateNotificationPrefs(prefs);
+      setNotificationPrefs(updated);
+    } catch (err) {
+      console.error('Failed to save notification preferences', err);
+      setError(err.message || 'Failed to save notification preferences');
+    } finally {
+      setLoading(false);
+    }
   };
 
   /* ── Context value ────────────────────────────────────────────── */
@@ -167,7 +215,7 @@ export function ProfileProvider({ children }) {
     deleteAddress,
     setPrimaryAddress,
     notificationPrefs,
-    setNotificationPrefs,
+    setNotificationPrefs: updateNotificationPrefs,
     stats,
   };
 
