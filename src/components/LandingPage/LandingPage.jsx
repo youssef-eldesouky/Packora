@@ -4,16 +4,17 @@ import "./LandingPage.css";
 import Navbar from "../Navbar/Navbar";
 import Footer from "../Footer/Footer";
 import { useAuth } from "../../context/AuthContext";
+import { Package , Leaf, Gift ,Truck ,Zap ,Palette ,Lock,LifeBuoy} from 'lucide-react';
 
 const FEATURE_SLIDE_COUNT = 6;
 
 const slides = [
-  { num: 1, icon: '📦', title: '3D Box Customizer', desc: 'Design your perfect packaging with our interactive 3D customizer. Change colors, add logos, and see your design in real-time.', img: '1.png' },
-  { num: 2, icon: '🍃', title: 'Eco Mailer Boxes', desc: 'Sustainable kraft mailers with 100% recycled materials. Fast, secure, and planet-friendly.', img: '2.png' },
-  { num: 3, icon: '🎁', title: 'Premium Packaging', desc: 'High-quality boxes, mailers, and custom solutions designed to protect your products and elevate your brand.', img: '3.png' },
-  { num: 4, icon: '🚛', title: 'Fast Shipping', desc: 'Quick turnaround times with reliable shipping options. Track your orders every step of the way.', img: '4.png' },
-  { num: 5, icon: '⚡️', title: 'Easy Ordering', desc: 'Simple online ordering process with flexible quantities and competitive pricing for all sizes.', img: '5.png' },
-  { num: 6, icon: '🎨', title: 'Custom Branding', desc: 'Upload your logo, choose your colors, and create packaging that perfectly represents your brand.', img: '6.png' },
+  { num: 1, icon: <Package size={32} color="#fff" strokeWidth={3}  />, title: '3D Box Customizer', desc: 'Design your perfect packaging with our interactive 3D customizer. Change colors, add logos, and see your design in real-time.', img: '1.png' },
+  { num: 2, icon: <Leaf size={32} color="#fff" strokeWidth={3}  />, title: 'Eco Mailer Boxes', desc: 'Sustainable kraft mailers with 100% recycled materials. Fast, secure, and planet-friendly.', img: '2.png' },
+  { num: 3, icon: <Gift size={32} color="#fff" strokeWidth={3}  />, title: 'Premium Packaging', desc: 'High-quality boxes, mailers, and custom solutions designed to protect your products and elevate your brand.', img: '3.png' },
+  { num: 4, icon: <Truck size={32} color="#fff" strokeWidth={3}  />, title: 'Fast Shipping', desc: 'Quick turnaround times with reliable shipping options. Track your orders every step of the way.', img: '4.png' },
+  { num: 5, icon: <Zap size={32} color="#fff" strokeWidth={3}  />, title: 'Easy Ordering', desc: 'Simple online ordering process with flexible quantities and competitive pricing for all sizes.', img: '5.png' },
+  { num: 6, icon: <Palette size={32} color="#fff" strokeWidth={3}  />, title: 'Custom Branding', desc: 'Upload your logo, choose your colors, and create packaging that perfectly represents your brand.', img: '6.png' },
 ];
 
 const LandingPage = () => {
@@ -114,9 +115,9 @@ const LandingPage = () => {
         </div>
       </div>
 
-      <div className="main-content py-20">
+      <div className="main-content py-5">
         {/* Stats */}
-        <section className="stats-section">
+        <section className="stats-section ">
           <div className="section-container">
             <div className="stats-grid">
               <div>
@@ -143,10 +144,10 @@ const LandingPage = () => {
         <section className="trust-section">
           <div className="section-container">
             <div className="trust-grid">
-              <div className="trust-badge">🔒 Secure checkout</div>
-              <div className="trust-badge">🚚 7-day delivery</div>
-              <div className="trust-badge">🌱 100% recyclable</div>
-              <div className="trust-badge">🛟 24/7 design support</div>
+              <div className="trust-badge"><Lock size={18} color="#5D536B" strokeWidth={3} /> Secure checkout</div>
+              <div className="trust-badge"><Truck size={18} color="#5D536B" strokeWidth={3} /> 7-day delivery</div>
+              <div className="trust-badge"><Leaf size={18} color="#5D536B" strokeWidth={3} /> 100% recyclable</div>
+              <div className="trust-badge"><LifeBuoy size={18} color="#5D536B" strokeWidth={3} /> 24/7 design support</div>
             </div>
           </div>
         </section>
