@@ -540,7 +540,7 @@ export default function Singlecard() {
           </div>
         </section>
       </main>
-      <Footer />
+      
     </div>
   );
 }
