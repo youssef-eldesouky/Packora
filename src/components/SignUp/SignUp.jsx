@@ -92,6 +92,8 @@ export default function SignUp() {
             alignItems: 'center',
             justifyContent: 'center',
             marginBottom: 24,
+             background: 'linear-gradient(135deg, #52796F, #5D536B)',
+            borderRadius: '9999px',
           }}
         >
           <Package size={32} color="var(--secondary-foreground)" />
@@ -303,7 +305,7 @@ export default function SignUp() {
             >
               Already have an account?{' '}
               <Link
-                to="/"
+                to="/login"
                 style={{
                   color: 'var(--secondary)',
                   textDecoration: 'none',

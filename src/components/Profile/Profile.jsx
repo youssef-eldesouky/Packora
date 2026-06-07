@@ -673,7 +673,7 @@ export default function Profile() {
           {activeTab === 'orders' && <OrderHistoryTab />}
         </div>
       </main>
-      <Footer />
+     
     </div>
   );
 }

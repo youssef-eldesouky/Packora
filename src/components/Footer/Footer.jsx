@@ -1,7 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import './Footer.css'
-import { Package } from 'lucide-react'
+import Logo from '../Logo/Logo';
 export default function Footer() {
   return (
     <div>
@@ -9,7 +9,7 @@ export default function Footer() {
   <div className="footer-container">
     
     <div className="footer-brand">
-      <div className="footer-logo-icon"><Package/></div>
+      <div className="footer-logo-icon"><Logo size={24} className="logo-icon"/></div>
       <h1 className="footer-logo-text">Packora</h1>
     </div>
 

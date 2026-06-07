@@ -1,0 +1,10 @@
+/* Logo component styling – can be extended for glass‑morphism or hover effects */
+.logo-icon { vertical-align: middle;
+width: 64px;
+    height: 64px;
+    background: linear-gradient(135deg, rgb(82, 121, 111), rgb(93, 83, 107));
+    border-radius: 9999px;
+    display: flex;
+    align-items: center;
+    justify-content: center; }
+    

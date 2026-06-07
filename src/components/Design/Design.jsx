@@ -6,10 +6,10 @@ import Footer from '../Footer/Footer'
 
 export default function Design() {
   return (
-    
+
     <div className="design-page-container w-full h-screen">
       <App3DBox />
-      <Footer/>
+      <Footer />
     </div>
   )
 }

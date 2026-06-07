@@ -23,24 +23,24 @@ import './Singlecard.css';
 import Footer from '../Footer/Footer';
 
 const SIZE_CHART = [
-  { label: 'Extra Small (XS)', dims: '15 × 10 × 5 cm',  vol: '0.75 L', best: 'Jewelry, accessories' },
-  { label: 'Small (S)',        dims: '20 × 15 × 10 cm', vol: '3 L',    best: 'Cosmetics, phone cases' },
-  { label: 'Medium (M)',       dims: '30 × 20 × 15 cm', vol: '9 L',    best: 'Shoes, books, clothing' },
-  { label: 'Large (L)',        dims: '40 × 30 × 20 cm', vol: '24 L',   best: 'Electronics, bulk items' },
-  { label: 'Extra Large (XL)', dims: '50 × 40 × 30 cm', vol: '60 L',   best: 'Large shipments' },
-  { label: 'Mailer S (MS)',    dims: '25 × 20 × 5 cm',  vol: '2.5 L',  best: 'Documents, flat items' },
-  { label: 'Mailer L (ML)',    dims: '35 × 25 × 8 cm',  vol: '7 L',    best: 'Clothing, soft goods' },
+  { label: 'Extra Small (XS)', dims: '15 × 10 × 5 cm', vol: '0.75 L', best: 'Jewelry, accessories' },
+  { label: 'Small (S)', dims: '20 × 15 × 10 cm', vol: '3 L', best: 'Cosmetics, phone cases' },
+  { label: 'Medium (M)', dims: '30 × 20 × 15 cm', vol: '9 L', best: 'Shoes, books, clothing' },
+  { label: 'Large (L)', dims: '40 × 30 × 20 cm', vol: '24 L', best: 'Electronics, bulk items' },
+  { label: 'Extra Large (XL)', dims: '50 × 40 × 30 cm', vol: '60 L', best: 'Large shipments' },
+  { label: 'Mailer S (MS)', dims: '25 × 20 × 5 cm', vol: '2.5 L', best: 'Documents, flat items' },
+  { label: 'Mailer L (ML)', dims: '35 × 25 × 8 cm', vol: '7 L', best: 'Clothing, soft goods' },
 ];
 
 const BAG_COLORS = [
-  { name: 'White',         hex: '#FFFFFF' },
-  { name: 'Brown Kraft',   hex: '#A0826D' },
-  { name: 'Black',         hex: '#1A1A1A' },
-  { name: 'Navy',          hex: '#1B2A4A' },
-  { name: 'Burgundy',      hex: '#6B1D2A' },
-  { name: 'Forest Green',  hex: '#2D5F3E' },
-  { name: 'Gold',          hex: '#C5A55A' },
-  { name: 'Custom',        hex: null },
+  { name: 'White', hex: '#FFFFFF' },
+  { name: 'Brown Kraft', hex: '#A0826D' },
+  { name: 'Black', hex: '#1A1A1A' },
+  { name: 'Navy', hex: '#1B2A4A' },
+  { name: 'Burgundy', hex: '#6B1D2A' },
+  { name: 'Forest Green', hex: '#2D5F3E' },
+  { name: 'Gold', hex: '#C5A55A' },
+  { name: 'Custom', hex: null },
 ];
 
 const BAG_CATEGORIES = ['Shopping Bags', 'Mailers', 'Pouches', 'Paper Bags'];
@@ -108,7 +108,7 @@ export default function Singlecard() {
           <Loader2 size={36} className="profile-spinner" />
           <p>Loading product…</p>
         </div>
-        <Footer />
+
       </div>
     );
   }
@@ -124,7 +124,7 @@ export default function Singlecard() {
             <Link to="/Catalog">Back to Catalog</Link>
           </div>
         </main>
-        <Footer />
+
       </div>
     );
   }
@@ -363,7 +363,7 @@ export default function Singlecard() {
                     {(() => {
                       const bagHex = bagColor === 'Custom' ? customHex
                         : BAG_COLORS.find(c => c.name === bagColor)?.hex || '#FFFFFF';
-                      const isDark = parseInt(bagHex.replace('#','').substring(0,2), 16) < 100;
+                      const isDark = parseInt(bagHex.replace('#', '').substring(0, 2), 16) < 100;
                       const handleColor = isDark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.25)';
                       const trimColor = isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.08)';
                       return (
@@ -540,7 +540,7 @@ export default function Singlecard() {
           </div>
         </section>
       </main>
-      <Footer/>
+      <Footer />
     </div>
   );
 }

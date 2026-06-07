@@ -63,7 +63,7 @@ export default function Cart() {
         <br/>
         <br/>
         <br/>
-        <Footer/>
+       
       </div>
     );
   }
@@ -223,7 +223,7 @@ export default function Cart() {
         </div>
       )}
 
-      <Footer/>
+      
     </div>
   );
 }

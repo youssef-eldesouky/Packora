@@ -705,7 +705,7 @@ export default function Support() {
             ))}
         </div>
       </main>
-     <Footer/>
+
     </div>
   );
 }

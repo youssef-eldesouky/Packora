@@ -114,8 +114,11 @@ public class CartServiceImpl implements CartService {
         }
 
         Cart cart = getOrCreateCart(userId);
-        CartItem cartItem = cartItemRepository.findById(itemId)
-                .orElseThrow(() -> new ResourceNotFoundException("CartItem not found with id: " + itemId));
+        CartItem cartItem = cartItemRepository.findById(itemId).orElse(null);
+        if (cartItem == null) {
+            log.warn("Attempted to update non-existent CartItem id={}", itemId);
+            return mapToResponse(cart);
+        }
 
         if (!cartItem.getCart().getId().equals(cart.getId())) {
             throw new IllegalArgumentException("Item does not belong to the user's cart");
@@ -131,16 +134,18 @@ public class CartServiceImpl implements CartService {
     @Transactional
     public CartResponse removeItemFromCart(Long userId, Long itemId) {
         Cart cart = getOrCreateCart(userId);
-        CartItem cartItem = cartItemRepository.findById(itemId)
-                .orElseThrow(() -> new ResourceNotFoundException("CartItem not found with id: " + itemId));
-
+        // Try to find the item; if it does not exist, just return the current cart state.
+        java.util.Optional<CartItem> optItem = cartItemRepository.findById(itemId);
+        if (optItem.isEmpty()) {
+            log.warn("Attempted to delete non‑existent CartItem id={}", itemId);
+            return mapToResponse(cart);
+        }
+        CartItem cartItem = optItem.get();
         if (!cartItem.getCart().getId().equals(cart.getId())) {
             throw new IllegalArgumentException("Item does not belong to the user's cart");
         }
-
         cart.removeCartItem(cartItem);
         cartRepository.save(cart);
-
         return mapToResponse(cart);
     }
 

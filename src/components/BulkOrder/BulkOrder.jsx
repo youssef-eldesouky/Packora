@@ -14,16 +14,16 @@ export default function BulkOrder() {
   const [currentStep, setCurrentStep] = useState(1);
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState(null);
-  const { 
-    cartItems, 
-    setIframeUrl, 
-    setCheckoutStep, 
-    setCurrentOrderId, 
-    clearCart, 
-    bulkExcelData, 
-    setBulkExcelData, 
-    bulkWarehouseData, 
-    setBulkWarehouseData 
+  const {
+    cartItems,
+    setIframeUrl,
+    setCheckoutStep,
+    setCurrentOrderId,
+    clearCart,
+    bulkExcelData,
+    setBulkExcelData,
+    bulkWarehouseData,
+    setBulkWarehouseData
   } = useCart();
   const navigate = useNavigate();
 
@@ -46,28 +46,28 @@ export default function BulkOrder() {
       // Build the bulk order payload matching BulkOrderRequest
       const payload = {
         // Sender / warehouse info
-        warehouseName:  bulkWarehouseData.warehouseName  || '',
-        addressLine:    bulkWarehouseData.addressLine    || '',
-        city:           bulkWarehouseData.city           || '',
-        postalCode:     bulkWarehouseData.postalCode     || '',
-        contactNumber:  bulkWarehouseData.contactNumber  || '',
+        warehouseName: bulkWarehouseData.warehouseName || '',
+        addressLine: bulkWarehouseData.addressLine || '',
+        city: bulkWarehouseData.city || '',
+        postalCode: bulkWarehouseData.postalCode || '',
+        contactNumber: bulkWarehouseData.contactNumber || '',
 
         // Cart products (distributed 1 per recipient by the backend)
         items: cartItems.map((item) => ({
           productId: item.isCustomBox ? 24 : parseInt(item.productId, 10),
-          quantity:  item.quantity,
+          quantity: item.quantity,
           unitPrice: item.price,
-          size:      item.size     || null,
-          material:  item.material || null,
+          size: item.size || null,
+          material: item.material || null,
         })),
 
         // Recipient rows from the Excel file
         recipients: bulkExcelData.map((row) => ({
           customerName: row['Customer Name'] || '',
-          phone:        row['Phone Number']  || '',
-          address:      row['Address Line']  || '',
-          city:         row['City']          || '',
-          notes:        row['Notes']         || '',
+          phone: row['Phone Number'] || '',
+          address: row['Address Line'] || '',
+          city: row['City'] || '',
+          notes: row['Notes'] || '',
         })),
       };
 
@@ -79,19 +79,19 @@ export default function BulkOrder() {
 
       // 2. Initiate Paymob payment for the combined total using the primary order
       const billingData = {
-        first_name:      'Bulk',
-        last_name:       'Order',
-        email:           'bulk@packora.com',
-        phone_number:    bulkWarehouseData.contactNumber || 'NA',
-        street:          bulkWarehouseData.addressLine   || 'NA',
-        city:            bulkWarehouseData.city          || 'NA',
-        country:         'EG',
-        apartment:       'NA',
-        floor:           'NA',
-        building:        'NA',
+        first_name: 'Bulk',
+        last_name: 'Order',
+        email: 'bulk@packora.com',
+        phone_number: bulkWarehouseData.contactNumber || 'NA',
+        street: bulkWarehouseData.addressLine || 'NA',
+        city: bulkWarehouseData.city || 'NA',
+        country: 'EG',
+        apartment: 'NA',
+        floor: 'NA',
+        building: 'NA',
         shipping_method: 'NA',
-        postal_code:     bulkWarehouseData.postalCode    || 'NA',
-        state:           'NA',
+        postal_code: bulkWarehouseData.postalCode || 'NA',
+        state: 'NA',
       };
 
       const paymentResp = await paymentApi.initiate(
@@ -124,22 +124,22 @@ export default function BulkOrder() {
             <p className="bulk-subtitle" style={{ marginBottom: '40px' }}>
               Your bulk order addresses have been successfully processed.
             </p>
-            <button 
-              className="btn-next" 
+            <button
+              className="btn-next"
               onClick={() => navigate('/HomePage')}
             >
               Return to Dashboard
             </button>
-            
-            <button 
-              className="btn-next" 
+
+            <button
+              className="btn-next"
               onClick={() => navigate('/Track')}
             >
               Track Your Order
             </button>
           </div>
         </main>
-        <Footer />
+
       </div>
     );
   }
@@ -147,7 +147,7 @@ export default function BulkOrder() {
   return (
     <div className="bulk-order-page">
       <Navbar />
-      
+
       <main className="bulk-main">
         <div className="bulk-header">
           <h1 className="bulk-title">Bulk Order Upload</h1>
@@ -172,20 +172,20 @@ export default function BulkOrder() {
 
         {/* Dynamic Step Content */}
         {currentStep === 1 && (
-          <Step1Warehouse 
-            data={bulkWarehouseData} 
-            onChange={setBulkWarehouseData} 
-            onNext={handleNextStep} 
+          <Step1Warehouse
+            data={bulkWarehouseData}
+            onChange={setBulkWarehouseData}
+            onNext={handleNextStep}
           />
         )}
-        
+
         {currentStep === 2 && (
-          <Step2Upload 
-            onUploadComplete={handleUploadComplete} 
-            onBack={handlePrevStep} 
+          <Step2Upload
+            onUploadComplete={handleUploadComplete}
+            onBack={handlePrevStep}
           />
         )}
-        
+
         {currentStep === 3 && (
           <>
             {error && (
@@ -193,9 +193,9 @@ export default function BulkOrder() {
                 {error}
               </div>
             )}
-            <Step3Review 
-              data={bulkExcelData} 
-              onBack={handlePrevStep} 
+            <Step3Review
+              data={bulkExcelData}
+              onBack={handlePrevStep}
               onConfirm={handleConfirmOrder}
             />
           </>

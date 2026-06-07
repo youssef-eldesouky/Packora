@@ -4,7 +4,7 @@ import { TypeAnimation } from "react-type-animation";
 import { motion } from "framer-motion";
 import "./LandingPage.css";
 import Navbar from "../Navbar/Navbar";
-import Footer from "../Footer/Footer";
+
 import { useAuth } from "../../context/AuthContext";
 import {
   Package, Box, Truck, Palette, ShoppingCart, Layers,
@@ -560,7 +560,7 @@ const LandingPage = () => {
         <div className="lp-cta__watermark">PACKORA</div>
       </section>
 
-      <Footer />
+      
     </div>
   );
 };

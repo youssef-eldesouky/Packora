@@ -110,7 +110,7 @@ export default function Checkout() {
           {effectiveStep === 'review'   && <PaymentResult />}
         </div>
       </main>
-      <Footer />
+      
     </div>
   );
 }

@@ -72,8 +72,8 @@ export default function LoginPage() {
           style={{
             width: 64,
             height: 64,
-            backgroundColor: 'var(--primary)',
-            borderRadius: 12,
+            background: 'linear-gradient(135deg, #52796F, #5D536B)',
+            borderRadius: '9999px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',

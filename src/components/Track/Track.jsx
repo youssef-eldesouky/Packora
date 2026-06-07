@@ -358,7 +358,7 @@ export default function Track() {
           </section>
         </div>
       </main>
-      <Footer/>
+  
     </div>
   );
 }

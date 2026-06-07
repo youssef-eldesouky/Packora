@@ -1,7 +1,8 @@
 import React from 'react';
+import Logo from '../Logo/Logo';
 import { Link, useLocation, /* useNavigate */ } from 'react-router-dom';
 import {
-  Package,
+
   LayoutGrid,
   Box,
   Truck,
@@ -58,7 +59,7 @@ export default function Navbar() {
     <header className="global-navbar">
       <Link to="/" className="global-navbar-logo">
         <div className="global-navbar-logo-icon">
-          <Package size={24} color="white" />
+           <Logo size={24} color="white" className="logo-icon" />
         </div>
         <span>Packora</span>
       </Link>

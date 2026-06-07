@@ -3,6 +3,8 @@ import { useStore } from '../../../store/useStore'
 import { useNavigate } from 'react-router-dom'
 import { useCart } from '../../../context/CartContext'
 import { customBoxConfigApi, productApi } from '../../../utils/api'
+import '../../../components/Design/3D-Box/Navbar.css'
+import { Package } from 'lucide-react'
 
 export default function Navbar() {
   const {
@@ -146,11 +148,8 @@ export default function Navbar() {
             <path d="M19 12H5M12 19l-7-7 7-7" />
           </svg>
         </button>
-        <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--deep-teal)] shadow-md">
-          <svg width="20" height="20" viewBox="0 0 18 18" fill="none">
-            <path d="M9 1L16 5V13L9 17L2 13V5L9 1Z" stroke="white" strokeWidth="1.5" strokeLinejoin="round" />
-            <path d="M9 1V17M2 5L9 9L16 5" stroke="white" strokeWidth="1.5" strokeLinejoin="round" />
-          </svg>
+        <div className="logo flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--deep-teal)] shadow-md">
+          <Package size={20} color='white' />
         </div>
         <div className="min-w-0">
           <div className="flex items-center gap-2">
