@@ -15,6 +15,7 @@ import ReactMarkdown from 'react-markdown';
 import { apiFetch } from '../../utils/api';
 import { useAuth } from '../../context/AuthContext';
 
+
 export default function PackoraChatbot() {
   const navigate = useNavigate();
   const { isLoggedIn } = useAuth();
@@ -62,6 +63,65 @@ export default function PackoraChatbot() {
     [timeStamp]
   );
 
+  const handleAutoNavigation = useCallback((reply) => {
+    if (!reply) return;
+    const textLower = reply.toLowerCase();
+    
+    let target = null;
+    
+    if (
+      textLower.includes('create a new box') || 
+      textLower.includes('create a box') || 
+      textLower.includes('create and customize') ||
+      textLower.includes('customize a box') ||
+      textLower.includes('customize a new box') ||
+      textLower.includes('creating and customizing') ||
+      textLower.includes('customize your box') ||
+      textLower.includes('customizing your box') ||
+      textLower.includes('design a box')
+    ) {
+      target = '/Design';
+    } else if (
+      textLower.includes('catalog') || 
+      textLower.includes('browse')
+    ) {
+      target = '/Catalog';
+    } else if (
+      textLower.includes('track') && 
+      (textLower.includes('order') || textLower.includes('shipment'))
+    ) {
+      target = '/Track';
+    } else if (
+      textLower.includes('cart') && 
+      (textLower.includes('checkout') || textLower.includes('view'))
+    ) {
+      target = '/Cart';
+    } else if (
+      textLower.includes('profile') || 
+      textLower.includes('account details')
+    ) {
+      target = '/Profile';
+    } else if (
+      textLower.includes('dashboard') || 
+      textLower.includes('homepage')
+    ) {
+      target = '/HomePage';
+    } else if (
+      textLower.includes('support') || 
+      textLower.includes('help desk') ||
+      textLower.includes('contact support')
+    ) {
+      target = '/Support';
+    }
+
+    if (target) {
+      setTimeout(() => {
+        navigate(target);
+        setIsChatOpen(false); // Close chatbot on transition for clean UX
+      }, 1000);
+    }
+  }, [navigate]);
+
   const runBotReply = useCallback(
     async (text) => {
       setIsTyping(true);
@@ -73,6 +133,7 @@ export default function PackoraChatbot() {
         });
         
         addMessage('bot', data.reply);
+        handleAutoNavigation(data.reply);
       } catch (error) {
         console.error("Chatbot API Error:", error);
         addMessage('bot', 'Sorry, I am having trouble connecting to my servers right now.');
@@ -80,7 +141,7 @@ export default function PackoraChatbot() {
         setIsTyping(false);
       }
     },
-    [addMessage]
+    [addMessage, handleAutoNavigation]
   );
 
   const handleSend = useCallback(
