@@ -21,6 +21,11 @@ public interface OrderService {
     OrderResponse placeOrder(PlaceOrderRequest request, Long userId);
 
     /**
+     * Confirms an order as Cash on Delivery (COD).
+     */
+    OrderResponse confirmCodOrder(Long orderId, Long userId);
+
+    /**
      * Retrieve a single order by its primary key.
      * Throws {@link com.packora.backend.exception.ResourceNotFoundException} if missing.
      */

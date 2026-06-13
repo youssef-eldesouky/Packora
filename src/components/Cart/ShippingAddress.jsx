@@ -60,34 +60,9 @@ export default function ShippingAddress() {
 
       const order = await orderApi.create({ shippingAddress: addressString, items });
       const orderId = order.rawId;
-      const totalAmount = order.rawAmount;
 
       setCurrentOrderId(orderId);
-
-      // 2. Initiate Paymob Payment
-      const [firstName = 'NA', ...rest] = (form.fullName || 'NA').split(' ');
-      const lastName = rest.join(' ') || 'NA';
-
-      const billingData = {
-        first_name: firstName,
-        last_name: lastName,
-        email: form.email || 'na@na.com',
-        phone_number: form.phone || 'NA',
-        street: form.street || 'NA',
-        city: form.city || 'NA',
-        country: 'EG',
-        apartment: 'NA',
-        floor: 'NA',
-        building: 'NA',
-        shipping_method: 'NA',
-        postal_code: form.zip || 'NA',
-        state: form.state || 'NA',
-      };
-
-      const paymentResp = await paymentApi.initiate(orderId, totalAmount, billingData);
-
-      // 3. Store iframe URL and go to payment step
-      setIframeUrl(paymentResp.iframeUrl);
+      setIframeUrl(null); // Clear any old iframe URL
       setCheckoutStep('payment');
 
     } catch (err) {

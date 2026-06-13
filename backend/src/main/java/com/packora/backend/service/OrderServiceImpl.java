@@ -7,9 +7,14 @@ import com.packora.backend.model.OrderItem;
 import com.packora.backend.model.Product;
 import com.packora.backend.model.User;
 import com.packora.backend.model.enums.OrderStatus;
+import com.packora.backend.model.enums.PaymentMethod;
+import com.packora.backend.model.enums.PaymentStatus;
+import com.packora.backend.model.Payment;
 import com.packora.backend.repository.OrderRepository;
 import com.packora.backend.repository.ProductRepository;
 import com.packora.backend.repository.UserRepository;
+import com.packora.backend.repository.PaymentRepository;
+import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Lazy;
@@ -52,6 +57,7 @@ public class OrderServiceImpl implements OrderService {
     private final ProductRepository  productRepository;
     private final ShipmentService    shipmentService;
     private final CartService        cartService;
+    private final PaymentRepository  paymentRepository;
 
     /**
      * @Lazy on ShipmentService breaks the potential circular dependency:
@@ -62,12 +68,14 @@ public class OrderServiceImpl implements OrderService {
                             UserRepository userRepository,
                             ProductRepository productRepository,
                             @Lazy ShipmentService shipmentService,
-                            CartService cartService) {
+                            CartService cartService,
+                            PaymentRepository paymentRepository) {
         this.orderRepository   = orderRepository;
         this.userRepository    = userRepository;
         this.productRepository = productRepository;
         this.shipmentService   = shipmentService;
         this.cartService       = cartService;
+        this.paymentRepository = paymentRepository;
     }
 
     // ══════════════════════════════════════════════════════════════════════════
@@ -231,6 +239,19 @@ public class OrderServiceImpl implements OrderService {
                 orderId, order.getStatus(), newStatus);
 
         order.setStatus(newStatus);
+
+        // If order becomes DELIVERED and payment method is COD, mark COD payments as COMPLETED
+        if (newStatus == OrderStatus.DELIVERED && order.getPaymentMethod() == PaymentMethod.COD) {
+            List<Payment> payments = paymentRepository.findByOrderId(orderId);
+            for (Payment payment : payments) {
+                if ("COD".equals(payment.getMethod()) && payment.getStatus() == PaymentStatus.PENDING) {
+                    payment.setStatus(PaymentStatus.COMPLETED);
+                    paymentRepository.save(payment);
+                    log.info("[OrderService] COD payment for order {} marked as COMPLETED", orderId);
+                }
+            }
+        }
+
         return toOrderResponse(orderRepository.save(order));
     }
 
@@ -254,7 +275,72 @@ public class OrderServiceImpl implements OrderService {
 
         log.info("[OrderService] Cancelling order {} for userId={}", orderId, userId);
         order.setStatus(OrderStatus.CANCELLED);
+
+        // If order is cancelled, set any associated pending Payment status to FAILED
+        List<Payment> payments = paymentRepository.findByOrderId(orderId);
+        for (Payment payment : payments) {
+            if (payment.getStatus() == PaymentStatus.PENDING) {
+                payment.setStatus(PaymentStatus.FAILED);
+                paymentRepository.save(payment);
+                log.info("[OrderService] Pending payment {} for cancelled order {} marked as FAILED", payment.getId(), orderId);
+            }
+        }
+
         return toOrderResponse(orderRepository.save(order));
+    }
+
+    @Override
+    @Transactional
+    public OrderResponse confirmCodOrder(Long orderId, Long userId) {
+        Order order = findOrderOrThrow(orderId);
+
+        // Ownership check
+        if (!order.getUser().getId().equals(userId)) {
+            throw new org.springframework.security.access.AccessDeniedException("You are not authorized to confirm this order.");
+        }
+
+        if (order.getStatus() != OrderStatus.PENDING) {
+            throw new IllegalStateException("Order is not in PENDING status.");
+        }
+
+        String bulkGroupId = order.getBulkGroupId();
+        if (bulkGroupId != null && !bulkGroupId.isBlank()) {
+            List<Order> siblingOrders = orderRepository.findByBulkGroupId(bulkGroupId);
+            Order primarySaved = null;
+            for (Order o : siblingOrders) {
+                o.setStatus(OrderStatus.PROCESSING);
+                o.setPaymentMethod(PaymentMethod.COD);
+
+                // Create COD payment
+                Payment payment = new Payment();
+                payment.setOrder(o);
+                payment.setAmount(o.getTotalAmount());
+                payment.setMethod("COD");
+                payment.setStatus(PaymentStatus.PENDING);
+                payment.setTransactionId("COD_" + o.getId() + "_" + UUID.randomUUID().toString().substring(0, 8));
+                paymentRepository.save(payment);
+
+                Order saved = orderRepository.save(o);
+                if (o.getId().equals(orderId)) {
+                    primarySaved = saved;
+                }
+            }
+            return toOrderResponse(primarySaved != null ? primarySaved : siblingOrders.get(0));
+        } else {
+            order.setStatus(OrderStatus.PROCESSING);
+            order.setPaymentMethod(PaymentMethod.COD);
+
+            // Create COD payment
+            Payment payment = new Payment();
+            payment.setOrder(order);
+            payment.setAmount(order.getTotalAmount());
+            payment.setMethod("COD");
+            payment.setStatus(PaymentStatus.PENDING);
+            payment.setTransactionId("COD_" + order.getId() + "_" + UUID.randomUUID().toString().substring(0, 8));
+            paymentRepository.save(payment);
+
+            return toOrderResponse(orderRepository.save(order));
+        }
     }
 
     // ══════════════════════════════════════════════════════════════════════════
@@ -281,6 +367,7 @@ public class OrderServiceImpl implements OrderService {
         return OrderResponse.builder()
                 .id(order.getId())
                 .status(order.getStatus().name().toLowerCase())
+                .paymentMethod(order.getPaymentMethod() != null ? order.getPaymentMethod().name() : null)
                 .totalAmount(order.getTotalAmount())
                 .orderDate(order.getOrderDate())
                 .updatedAt(order.getUpdatedAt())

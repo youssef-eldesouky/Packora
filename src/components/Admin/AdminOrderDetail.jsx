@@ -134,6 +134,16 @@ export default function AdminOrderDetail() {
         </p>
       </div>
 
+      {/* ── Payment Method ─────────────────────────────────────── */}
+      <div className="admin-card" style={{ marginBottom: '1rem' }}>
+        <h2 className="admin-page-title" style={{ fontSize: '1rem', marginBottom: '0.75rem' }}>
+          Payment Method
+        </h2>
+        <p style={{ margin: 0, fontWeight: 600 }}>
+          {order.paymentMethod === 'COD' ? 'Cash on Delivery' : 'Credit / Debit Card'}
+        </p>
+      </div>
+
       {/* ── Customer ───────────────────────────────────────────── */}
       <div className="admin-card" style={{ marginBottom: '1rem' }}>
         <h2 className="admin-page-title" style={{ fontSize: '1rem', marginBottom: '0.75rem' }}>

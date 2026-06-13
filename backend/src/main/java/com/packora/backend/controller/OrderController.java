@@ -68,6 +68,18 @@ public class OrderController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    /**
+     * Confirm an order as Cash on Delivery.
+     */
+    @PostMapping("/{id}/confirm-cod")
+    public ResponseEntity<OrderResponse> confirmCodOrder(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserDetailsImpl principal) {
+        log.info("[OrderController] POST /api/orders/{}/confirm-cod — userId={}", id, principal.getId());
+        OrderResponse response = orderService.confirmCodOrder(id, principal.getId());
+        return ResponseEntity.ok(response);
+    }
+
     // ── GET /api/orders/me ────────────────────────────────────────────────────
 
     /**

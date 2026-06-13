@@ -275,6 +275,9 @@ export const orderApi = {
 
   /** PUT /api/orders/:id/cancel – cancel an order */
   cancel: (id) => apiFetch(`/api/orders/${id}/cancel`, { method: 'PUT' }).then(normalizeOrder),
+
+  /** POST /api/orders/:id/confirm-cod – confirm COD order */
+  confirmCod: (id) => apiFetch(`/api/orders/${id}/confirm-cod`, { method: 'POST' }).then(normalizeOrder),
 };
 
 

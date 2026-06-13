@@ -240,6 +240,12 @@ export default function Track() {
                     <span className="track-detail-label">Order Date</span>
                     <span className="track-detail-value">{selectedOrder.date}</span>
                   </p>
+                  <p className="track-detail-row">
+                    <span className="track-detail-label">Payment Method</span>
+                    <span className="track-detail-value">
+                      {selectedOrder.paymentMethod === 'COD' ? 'Cash on Delivery' : 'Credit / Debit Card'}
+                    </span>
+                  </p>
                   
                   {shipmentLoading ? (
                     <div style={{ textAlign: 'center', padding: '2rem 0', color: 'var(--muted)' }}>

@@ -2,6 +2,7 @@ package com.packora.backend.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.packora.backend.model.enums.OrderStatus;
+import com.packora.backend.model.enums.PaymentMethod;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -38,6 +39,10 @@ public class Order {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private OrderStatus status = OrderStatus.PENDING;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "payment_method", nullable = false)
+    private PaymentMethod paymentMethod = PaymentMethod.CARD;
 
     @Column(nullable = false)
     private Double totalAmount;

@@ -27,6 +27,7 @@ public class OrderResponse {
     // Status as a string so the frontend can compare directly against
     // the mock-data status values ("pending", "processing", etc.)
     private String status;
+    private String paymentMethod;
 
     private Double totalAmount;
 
