@@ -156,7 +156,7 @@ export default function SignUp() {
               />
             </div>
 
-            {/* Business Name */}
+            {/* Organization Name */}
             <div className="signup-field" style={{ marginBottom: 20 }}>
               <label
                 htmlFor="businessName"
@@ -171,7 +171,7 @@ export default function SignUp() {
                 }}
               >
                 <Building2 size={18} color="var(--foreground)" />
-                Business Name
+                Organization Name
               </label>
               <input
                 id="businessName"

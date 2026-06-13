@@ -65,7 +65,7 @@ const slides = [
 const features = [
   { icon: Layers, title: "Multi-Role Architecture", subtitle: "Role-Based Access", desc: "Distinct dashboards for Admins, Business users, and Designers — each with tailored tools.", accent: "var(--deep-teal)" },
   { icon: Box, title: "Custom Catalogue", subtitle: "Packaging Library", desc: "Browse, filter, and order from an extensive catalogue of packaging solutions.", accent: "var(--vintage-grape)" },
-  { icon: Cpu, title: "AI Integration", subtitle: "Smart Chatbot", desc: "Gemini-powered chatbot for instant packaging advice, sizing help, and order support.", accent: "var(--lavender-grey)" },
+  { icon: Cpu, title: "AI Integration", subtitle: "Smart Chatbot", desc: "AI-powered chatbot for instant packaging advice, sizing help, and order support.", accent: "var(--lavender-grey)" },
   { icon: Truck, title: "Shipping Solutions", subtitle: "Logistics Network", desc: "Integrated shipping with real-time tracking and partner carrier management.", accent: "var(--almond-silk)" },
 ];
 
