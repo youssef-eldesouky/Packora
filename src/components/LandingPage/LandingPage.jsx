@@ -379,12 +379,7 @@ const LandingPage = () => {
                     <h3 className="slide-card-title">{slide.title}</h3>
                     <p className="slide-card-desc">{slide.desc}</p>
                   </div>
-                  <div className="lp-features__card-body">
-                    <h3 className="lp-features__title">{f.title}</h3>
-                    <span className="lp-features__subtitle">{f.subtitle}</span>
-                    <p className="lp-features__desc">{f.desc}</p>
-                  </div>
-                  <div className="lp-features__accent-line" />
+
                 </div>
               );
             })}
