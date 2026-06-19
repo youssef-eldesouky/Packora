@@ -1,0 +1,718 @@
+==========================================================================================
+                   PACKORA — FULL QA REPORT
+         Full-Stack E-Commerce Packaging Platform
+               Backend + Frontend + Bug Report
+==========================================================================================
+  Generated On  : Tuesday, June 16, 2026 at 2:46:41 PM
+  Report Type   : Comprehensive QA Report (Tests + Bugs)
+  Backend Stack : Spring Boot 4.0.3 / Java 17 / JUnit 5 / H2
+  Frontend Stack: React 19 / Jest 29 / React Testing Library
+  Total Tests   : 108  |  Passed: 108  |  Failed: 0  |  Pass Rate: 100.0%
+  Total Bugs    : 10  |  Fixed: 5  |  Open: 5
+==========================================================================================
+
+------------------------------------------------------------------------------------------
+TABLE OF CONTENTS
+------------------------------------------------------------------------------------------
+
+  SECTION 1  ....  Executive Summary
+  SECTION 2  ....  Backend Test Results  (60 tests)
+               2a.  BackendApplicationTests   (1 test)
+               2b.  ProductRepositoryTest     (18 tests)
+               2c.  UserRepositoryTest        (18 tests)
+               2d.  OrderRepositoryTest       (14 tests)
+               2e.  TicketRepositoryTest      (9 tests)
+  SECTION 3  ....  Frontend Test Results (48 tests)
+               3a.  adminFormat.test.js       (8 tests)
+               3b.  api.test.js               (6 tests)
+               3c.  AuthContext.test.js       (7 tests)
+               3d.  LoginPage.test.jsx        (12 tests)
+               3e.  Navbar.test.jsx           (5 tests)
+               3f.  RequireAuth.test.jsx      (2 tests)
+               3g.  PaymentSuccess.test.jsx   (8 tests)
+  SECTION 4  ....  Bug Report (10 bugs)
+               4a.  Critical Bugs    (2 — Fixed)
+               4b.  High Bugs        (3 — Fixed)
+               4c.  Medium Bugs      (3 — Open)
+               4d.  Low Bugs         (2 — Open)
+  SECTION 5  ....  Component Coverage Summary
+  SECTION 6  ....  Recommendations
+
+==========================================================================================
+SECTION 1 — EXECUTIVE SUMMARY
+==========================================================================================
+
+  PROJECT    : Packora — Full-Stack E-Commerce Packaging Platform
+  OBJECTIVE  : Comprehensive automated testing of backend repository layer
+               and frontend React components, with full bug documentation.
+
+  ┌─────────────────────────────────────────────┐
+  │           OVERALL TEST RESULTS              │
+  ├──────────────────────┬──────────────────────┤
+  │  Total Tests         │  108                 │
+  │  Passed              │  108                 │
+  │  Failed              │  0                   │
+  │  Pass Rate           │  100.0%              │
+  ├──────────────────────┼──────────────────────┤
+  │  Backend Tests       │  60                  │
+  │  Frontend Tests      │  48                  │
+  ├──────────────────────┼──────────────────────┤
+  │  Unit Tests          │  21                  │
+  │  Component Tests     │  27                  │
+  │  Database Tests      │  59                  │
+  │  Integration Tests   │  1                   │
+  └──────────────────────┴──────────────────────┘
+
+  ┌─────────────────────────────────────────────┐
+  │              BUG SUMMARY                    │
+  ├──────────────────────┬──────────────────────┤
+  │  Total Bugs Found    │  10                  │
+  │  Fixed               │  5                   │
+  │  Open (To Do)        │  5                   │
+  ├──────────────────────┼──────────────────────┤
+  │  Critical            │  2 (all fixed)       │
+  │  High                │  3 (all fixed)       │
+  │  Medium              │  3 (open)            │
+  │  Low                 │  2 (open)            │
+  └──────────────────────┴──────────────────────┘
+
+  CONCLUSION:
+  All 108 automated tests pass at 100%. The 5 blocking bugs discovered
+  during test authoring (2 Critical, 3 High) have been fully resolved.
+  5 non-blocking issues remain open as recommendations for future sprints.
+
+==========================================================================================
+SECTION 2 — BACKEND TEST RESULTS  [60 / 60 PASSED]
+==========================================================================================
+
+  --------------------------------------------------------------------------------------
+  Suite: BackendApplicationTests   [1 tests]
+  --------------------------------------------------------------------------------------
+  ID      Status  Type        Duration  Test Name
+  --------------------------------------------------------------------------------------
+  BE-001  [PASS]  Integration 1.625s    contextLoads
+                                        Verifies the Spring Boot application context loads
+with all beans
+
+  --------------------------------------------------------------------------------------
+  Suite: ProductRepositoryTest   [18 tests]
+  --------------------------------------------------------------------------------------
+  ID      Status  Type        Duration  Test Name
+  --------------------------------------------------------------------------------------
+  BE-002  [PASS]  Database    12ms      saveProduct_shouldPersistAndGenerateId
+                                        DB-001: Save a new product and verify it is
+persisted
+  BE-003  [PASS]  Database    8ms       saveProduct_shouldPersistSizesAndMaterials
+                                        DB-002: Save product with sizes and materials
+(ElementCollection)
+  BE-004  [PASS]  Database    6ms       findById_shouldReturnProduct
+                                        DB-003: Find product by ID
+  BE-005  [PASS]  Database    4ms       findById_shouldReturnEmptyForNonExistent
+                                        DB-004: Find product by ID returns empty for
+non-existent ID
+  BE-006  [PASS]  Database    7ms       findByName_shouldReturnMatchingProduct
+                                        DB-005: Find product by exact name
+  BE-007  [PASS]  Database    9ms       findByCategory_shouldReturnAllInCategory
+                                        DB-006: Find products by category
+  BE-008  [PASS]  Database    5ms       findByCategory_shouldReturnEmptyForUnknown
+                                        DB-007: Find products by unknown category returns
+empty
+  BE-009  [PASS]  Database    8ms       findByInStockTrue_shouldReturnOnlyInStockProducts
+                                        DB-008: Find only in-stock products
+  BE-010  [PASS]  Database    8ms       findByCategoryAndInStockTrue_shouldFilterByCategoryAndStock
+                                        DB-009: Find in-stock products by category
+  BE-011  [PASS]  Database    11ms      findByNameContainingIgnoreCase_shouldSearchCaseInsensitive
+                                        DB-010: Search products by name keyword
+(case-insensitive)
+  BE-012  [PASS]  Database    5ms       findByNameContainingIgnoreCase_shouldReturnEmptyForNoMatch
+                                        DB-011: Search with no matching keyword returns
+empty list
+  BE-013  [PASS]  Database    9ms       findAll_shouldReturnAllProducts
+                                        DB-012: Find all products
+  BE-014  [PASS]  Database    8ms       updateProduct_shouldPersistPriceChange
+                                        DB-013: Update product price
+  BE-015  [PASS]  Database    7ms       updateProduct_shouldPersistStockChange
+                                        DB-014: Update product stock status
+  BE-016  [PASS]  Database    7ms       deleteById_shouldRemoveProduct
+                                        DB-015: Delete product by ID
+  BE-017  [PASS]  Database    8ms       deleteAll_shouldClearTable
+                                        DB-016: Delete all products
+  BE-018  [PASS]  Database    6ms       count_shouldReturnCorrectCount
+                                        DB-017: Product count returns correct number
+  BE-019  [PASS]  Database    7ms       save_shouldAutoGenerateCreatedAt
+                                        DB-018: CreatedAt timestamp is auto-generated
+
+  --------------------------------------------------------------------------------------
+  Suite: UserRepositoryTest   [18 tests]
+  --------------------------------------------------------------------------------------
+  ID      Status  Type        Duration  Test Name
+  --------------------------------------------------------------------------------------
+  BE-020  [PASS]  Database    9ms       saveBusinessOwner_shouldPersistWithAllFields
+                                        DB-019: Save a BusinessOwner and verify
+persistence
+  BE-021  [PASS]  Database    7ms       saveAdmin_shouldPersistWithDiscriminator
+                                        DB-020: Save an Admin user (STI discrimination)
+  BE-022  [PASS]  Database    6ms       findByEmail_shouldReturnUser
+                                        DB-021: Find user by email
+  BE-023  [PASS]  Database    4ms       findByEmail_shouldReturnEmptyForNonExistent
+                                        DB-022: Find user by email returns empty for
+non-existent
+  BE-024  [PASS]  Database    6ms       findByUsername_shouldReturnUser
+                                        DB-023: Find user by username
+  BE-025  [PASS]  Database    4ms       findByUsername_shouldReturnEmptyForNonExistent
+                                        DB-024: Find user by username returns empty for
+non-existent
+  BE-026  [PASS]  Database    6ms       existsByEmail_shouldReturnTrueWhenExists
+                                        DB-025: existsByEmail returns true for existing
+email
+  BE-027  [PASS]  Database    3ms       existsByEmail_shouldReturnFalseWhenNotExists
+                                        DB-026: existsByEmail returns false for
+non-existing email
+  BE-028  [PASS]  Database    5ms       existsByUsername_shouldReturnTrueWhenExists
+                                        DB-027: existsByUsername returns true for existing
+username
+  BE-029  [PASS]  Database    3ms       existsByUsername_shouldReturnFalseWhenNotExists
+                                        DB-028: existsByUsername returns false for
+non-existing username
+  BE-030  [PASS]  Database    8ms       updateUser_shouldPersistPhoneChange
+                                        DB-029: Update user phone number
+  BE-031  [PASS]  Database    8ms       updateUser_shouldPersistCompanyNameChange
+                                        DB-030: Update user company name
+  BE-032  [PASS]  Database    7ms       deleteById_shouldRemoveUser
+                                        DB-031: Delete user by ID
+  BE-033  [PASS]  Database    9ms       singleTableInheritance_shouldStoreAllSubtypesInOneTable
+                                        DB-032: Both Admin and BusinessOwner stored in
+same table
+  BE-034  [PASS]  Database    6ms       businessOwner_shouldHaveCorrectRole
+                                        DB-033: BusinessOwner role is BUSINESS_OWNER via
+discriminator
+  BE-035  [PASS]  Database    6ms       save_shouldAutoGenerateCreatedAt
+                                        DB-034: CreatedAt timestamp is auto-generated on
+save
+  BE-036  [PASS]  Database    12ms      save_shouldRejectDuplicateEmail
+                                        DB-035: Cannot save two users with same email
+  BE-037  [PASS]  Database    11ms      save_shouldRejectDuplicateUsername
+                                        DB-036: Cannot save two users with same username
+
+  --------------------------------------------------------------------------------------
+  Suite: OrderRepositoryTest   [14 tests]
+  --------------------------------------------------------------------------------------
+  ID      Status  Type        Duration  Test Name
+  --------------------------------------------------------------------------------------
+  BE-038  [PASS]  Database    8ms       saveOrder_shouldPersistWithAllFields
+                                        DB-037: Save a new order and verify persistence
+  BE-039  [PASS]  Database    7ms       saveOrder_shouldDefaultToPending
+                                        DB-038: Order defaults to PENDING status
+  BE-040  [PASS]  Database    5ms       findById_shouldReturnOrder
+                                        DB-039: Find order by ID
+  BE-041  [PASS]  Database    9ms       findByUserId_shouldReturnUserOrders
+                                        DB-040: Find orders by user ID
+  BE-042  [PASS]  Database    8ms       findByStatus_shouldReturnMatchingOrders
+                                        DB-041: Find orders by status
+  BE-043  [PASS]  Database    9ms       findByUserIdOrderByOrderDateDesc_shouldReturnSorted
+                                        DB-042: Find user orders ordered by date
+descending
+  BE-044  [PASS]  Database    12ms      findTop5ByOrderByOrderDateDesc_shouldReturnMaxFive
+                                        DB-043: Find top 5 recent orders
+  BE-045  [PASS]  Database    9ms       findByBulkGroupId_shouldReturnGroupedOrders
+                                        DB-044: Find orders by bulk group ID
+  BE-046  [PASS]  Database    6ms       countOrders_shouldReturnCorrectCount
+                                        DB-045: Count all orders
+  BE-047  [PASS]  Database    8ms       sumRevenue_shouldExcludeCancelled
+                                        DB-046: Sum revenue excludes cancelled orders
+  BE-048  [PASS]  Database    7ms       updateStatus_shouldPersistChange
+                                        DB-047: Update order status to SHIPPED
+  BE-049  [PASS]  Database    7ms       cancelOrder_shouldSetStatusToCancelled
+                                        DB-048: Cancel order by updating status
+  BE-050  [PASS]  Database    6ms       deleteById_shouldRemoveOrder
+                                        DB-049: Delete order by ID
+  BE-051  [PASS]  Database    6ms       save_shouldAutoGenerateOrderDate
+                                        DB-050: OrderDate timestamp is auto-generated
+
+  --------------------------------------------------------------------------------------
+  Suite: TicketRepositoryTest   [9 tests]
+  --------------------------------------------------------------------------------------
+  ID      Status  Type        Duration  Test Name
+  --------------------------------------------------------------------------------------
+  BE-052  [PASS]  Database    7ms       saveGuestTicket_shouldPersistWithAllFields
+                                        DB-051: Save a guest support ticket and verify
+persistence
+  BE-053  [PASS]  Database    9ms       saveUserTicket_shouldPersistWithUserAndStaffAssociations
+                                        DB-052: Save a user support ticket with
+associations
+  BE-054  [PASS]  Database    5ms       findById_shouldReturnTicket
+                                        DB-053: Find ticket by ID
+  BE-055  [PASS]  Database    10ms      findByUserId_shouldReturnAssociatedTickets
+                                        DB-054: Find tickets by user ID
+  BE-056  [PASS]  Database    7ms       findByAssignedStaffId_shouldReturnStaffTickets
+                                        DB-055: Find tickets by assigned staff ID
+  BE-057  [PASS]  Database    8ms       findByStatus_shouldFilterTickets
+                                        DB-056: Find tickets by status
+  BE-058  [PASS]  Database    8ms       updateTicket_shouldPersistStatusAndStaffChanges
+                                        DB-057: Update ticket status and assigned staff
+  BE-059  [PASS]  Database    5ms       deleteById_shouldRemoveTicket
+                                        DB-058: Delete ticket by ID
+  BE-060  [PASS]  Database    6ms       save_shouldAutoGenerateTimestamps
+                                        DB-059: Ticket timestamps are auto-generated
+
+==========================================================================================
+SECTION 3 — FRONTEND TEST RESULTS  [48 / 48 PASSED]
+==========================================================================================
+
+  --------------------------------------------------------------------------------------
+  Suite: adminFormat.test.js   [8 tests]
+  --------------------------------------------------------------------------------------
+  ID      Status  Type        Duration  Test Name
+  --------------------------------------------------------------------------------------
+  FE-001  [PASS]  Unit        1ms       parseAmount - returns number as-is when given a number
+                                        Tests parseAmount returns numeric input unchanged
+  FE-002  [PASS]  Unit        1ms       parseAmount - strips currency symbols and returns a number
+                                        Tests parseAmount extracts numeric value from
+currency strings
+  FE-003  [PASS]  Unit        1ms       parseAmount - returns 0 for null or undefined
+                                        Tests parseAmount returns 0 for falsy input
+  FE-004  [PASS]  Unit        1ms       parseAmount - returns 0 for non-numeric strings
+                                        Tests parseAmount returns 0 for alphabetic strings
+  FE-005  [PASS]  Unit        17ms      formatMoney - formats integer amounts in EGP without decimals
+                                        Tests formatMoney produces "EGP 1,000" format
+  FE-006  [PASS]  Unit        1ms       formatMoney - formats zero correctly
+                                        Tests formatMoney handles zero value
+  FE-007  [PASS]  Unit        1ms       formatMoneyDecimal - formats amounts with 2 decimal places
+                                        Tests formatMoneyDecimal produces 2-decimal output
+  FE-008  [PASS]  Unit        1ms       formatMoneyDecimal - formats zero with decimals
+                                        Tests formatMoneyDecimal handles zero with "0.00"
+
+  --------------------------------------------------------------------------------------
+  Suite: api.test.js   [6 tests]
+  --------------------------------------------------------------------------------------
+  ID      Status  Type        Duration  Test Name
+  --------------------------------------------------------------------------------------
+  FE-009  [PASS]  Unit        1ms       getStoredToken - returns null when localStorage is empty
+                                        Tests JWT token retrieval returns null when no
+auth stored
+  FE-010  [PASS]  Unit        1ms       getStoredToken - returns the token when valid auth stored
+                                        Tests JWT token retrieval from valid localStorage
+data
+  FE-011  [PASS]  Unit        1ms       getStoredToken - returns null when data has no token field
+                                        Tests JWT retrieval handles missing token key
+  FE-012  [PASS]  Unit        1ms       getStoredToken - returns null when stored data is malformed
+                                        Tests JWT retrieval handles corrupted localStorage
+data
+  FE-013  [PASS]  Unit        1ms       API_BASE - is a non-empty string
+                                        Validates API_BASE constant type
+  FE-014  [PASS]  Unit        1ms       API_BASE - defaults to localhost when no env var set
+                                        Tests API_BASE falls back to http://localhost:8080
+
+  --------------------------------------------------------------------------------------
+  Suite: AuthContext.test.js   [7 tests]
+  --------------------------------------------------------------------------------------
+  ID      Status  Type        Duration  Test Name
+  --------------------------------------------------------------------------------------
+  FE-015  [PASS]  Unit        1ms       emailToDisplayName - converts dot-separated email
+                                        Tests john.doe@mail.com => "John Doe"
+  FE-016  [PASS]  Unit        1ms       emailToDisplayName - converts underscore-separated email
+                                        Tests jane_smith@example.com => "Jane Smith"
+  FE-017  [PASS]  Unit        1ms       emailToDisplayName - converts hyphen-separated email
+                                        Tests ali-hassan@packora.com => "Ali Hassan"
+  FE-018  [PASS]  Unit        1ms       emailToDisplayName - handles single word prefix
+                                        Tests admin@packora.com => "Admin"
+  FE-019  [PASS]  Unit        1ms       emailToDisplayName - returns "User" for empty string
+                                        Tests fallback for empty input
+  FE-020  [PASS]  Unit        1ms       emailToDisplayName - returns "User" for null
+                                        Tests null safety
+  FE-021  [PASS]  Unit        1ms       emailToDisplayName - handles email with numbers
+                                        Tests user123@mail.com => "User123"
+
+  --------------------------------------------------------------------------------------
+  Suite: LoginPage.test.jsx   [12 tests]
+  --------------------------------------------------------------------------------------
+  ID      Status  Type        Duration  Test Name
+  --------------------------------------------------------------------------------------
+  FE-022  [PASS]  Component   36ms      renders the page title "Welcome Back"
+                                        Verifies main heading renders
+  FE-023  [PASS]  Component   6ms       renders subtitle text
+                                        Verifies subtitle renders
+  FE-024  [PASS]  Component   10ms      renders email and password input fields
+                                        Verifies form inputs exist with labels
+  FE-025  [PASS]  Component   32ms      renders the Sign In button
+                                        Verifies submit button renders
+  FE-026  [PASS]  Component   5ms       renders "Forgot password?" link
+                                        Verifies password recovery link
+  FE-027  [PASS]  Component   4ms       renders "Create one now" sign-up link
+                                        Verifies sign-up navigation link
+  FE-028  [PASS]  Component   7ms       renders Remember me checkbox
+                                        Verifies remember-me checkbox renders
+  FE-029  [PASS]  Component   47ms      email input accepts typed text
+                                        Simulates user typing in email field
+  FE-030  [PASS]  Component   28ms      password input accepts typed text
+                                        Simulates user typing in password field
+  FE-031  [PASS]  Component   62ms      shows "Signing in..." when form is submitted
+                                        Verifies loading state on form submission
+  FE-032  [PASS]  Component   63ms      shows error message on failed login
+                                        Tests server error message display
+  FE-033  [PASS]  Component   97ms      shows connection error when fetch throws
+                                        Tests network failure error display
+
+  --------------------------------------------------------------------------------------
+  Suite: Navbar.test.jsx   [5 tests]
+  --------------------------------------------------------------------------------------
+  ID      Status  Type        Duration  Test Name
+  --------------------------------------------------------------------------------------
+  FE-034  [PASS]  Component   26ms      renders the Packora brand name
+                                        Verifies brand text "Packora" renders
+  FE-035  [PASS]  Component   4ms       renders all main nav links
+                                        Verifies all 7 navigation links render
+  FE-036  [PASS]  Component   3ms       shows Login link when user is not logged in
+                                        Verifies Login link visibility for guests
+  FE-037  [PASS]  Component   3ms       does NOT show Logout button when not logged in
+                                        Verifies Logout is hidden for guests
+  FE-038  [PASS]  Component   3ms       does NOT show Profile link when not logged in
+                                        Verifies Profile link is hidden for guests
+
+  --------------------------------------------------------------------------------------
+  Suite: RequireAuth.test.jsx   [2 tests]
+  --------------------------------------------------------------------------------------
+  ID      Status  Type        Duration  Test Name
+  --------------------------------------------------------------------------------------
+  FE-039  [PASS]  Component   23ms      renders children when user is logged in
+                                        Verifies protected content is rendered for
+authenticated users
+  FE-040  [PASS]  Component   3ms       redirects to /login when user is NOT logged in
+                                        Verifies redirect to login for unauthenticated
+users
+
+  --------------------------------------------------------------------------------------
+  Suite: PaymentSuccess.test.jsx   [8 tests]
+  --------------------------------------------------------------------------------------
+  ID      Status  Type        Duration  Test Name
+  --------------------------------------------------------------------------------------
+  FE-041  [PASS]  Component   15ms      renders "Payment Successful!" heading
+                                        Verifies success heading renders
+  FE-042  [PASS]  Component   5ms       renders success message body text
+                                        Verifies success description text
+  FE-043  [PASS]  Component   4ms       shows "View My Orders" button
+                                        Verifies order navigation button
+  FE-044  [PASS]  Component   4ms       shows "Continue Shopping" button
+                                        Verifies catalog navigation button
+  FE-045  [PASS]  Component   5ms       displays transaction ID when txn param is provided
+                                        Verifies transaction reference display
+  FE-046  [PASS]  Component   3ms       does NOT show transaction reference when absent
+                                        Verifies txn reference hidden when not in URL
+  FE-047  [PASS]  Component   20ms      navigates to Track page when "View My Orders" clicked
+                                        Tests navigation to /Track on button click
+  FE-048  [PASS]  Component   10ms      navigates to Catalog page when "Continue Shopping" clicked
+                                        Tests navigation to /Catalog on button click
+
+==========================================================================================
+SECTION 4 — BUG REPORT  [10 BUGS FOUND]
+==========================================================================================
+
+  ──────────────────────────────────────────────────────────────────────────────────────
+  CRITICAL BUGS  (2)
+  ──────────────────────────────────────────────────────────────────────────────────────
+
+  BUG-001  |  CRITICAL  |  P1  |  FIXED  |  Backend
+  TITLE     : H2 v2.4.240 Throws Check Constraint Violation on Simple Inserts
+  COMPONENT : Database / H2
+  AFFECTS   : BE-002 -> BE-060 (All Repository Tests)
+  FOUND BY  : Automated Test Run (ProductRepositoryTest)
+
+  ROOT CAUSE:
+     H2 2.4.240 introduced stricter check-constraint validation conflicting with the
+     Packora JPA schema. Simple INSERT statements raised SQLState 23514, blocking all
+     @DataJpaTest tests.
+
+  STEPS TO REPRODUCE:
+     1. Upgrade H2 to 2.4.240 in pom.xml
+     2. Run ./mvnw test on any Repository test
+     3. Observe: HibernateJdbcException -> Check constraint "ORDERS_STATUS_CHECK" invalid
+
+  FIX APPLIED:
+     Pinned H2 to 2.3.232 in backend/pom.xml: <h2.version>2.3.232</h2.version>
+
+  FIXED IN  : backend/pom.xml
+
+  NOTES     :
+     Spring Boot 4 auto-resolves to H2 2.4.x; explicit version override is required.
+  ······················································································
+
+  BUG-002  |  CRITICAL  |  P1  |  FIXED  |  Frontend
+  TITLE     : Frontend Tests Fail: TextEncoder/TextDecoder Not Defined in Jest Environment
+  COMPONENT : Test Environment / Jest
+  AFFECTS   : FE-022 -> FE-048 (All Component Tests)
+  FOUND BY  : Automated Test Run (LoginPage.test.jsx)
+
+  ROOT CAUSE:
+     React Router v7 requires TextEncoder/TextDecoder Web APIs. Jest's jsdom does not
+     include them, causing ReferenceError at import time for any component using routing.
+
+  STEPS TO REPRODUCE:
+     1. Create any test using <MemoryRouter> wrapper
+     2. Run npm test
+     3. Observe: ReferenceError: TextEncoder is not defined
+
+  FIX APPLIED:
+     Added polyfills to src/setupTests.js:
+     const { TextEncoder, TextDecoder } = require('util');
+     Object.assign(global, { TextEncoder, TextDecoder });
+
+  FIXED IN  : src/setupTests.js
+
+  NOTES     :
+     Polyfill must be placed before any React Router import in setupTests.js. Order
+     matters.
+  ······················································································
+
+  ──────────────────────────────────────────────────────────────────────────────────────
+  HIGH BUGS  (3)
+  ──────────────────────────────────────────────────────────────────────────────────────
+
+  BUG-003  |  HIGH  |  P2  |  FIXED  |  Backend
+  TITLE     : Spring Boot 4 @DataJpaTest: application-test.properties Not Auto-Loaded
+  COMPONENT : Test Configuration / Spring Boot
+  AFFECTS   : BE-002 -> BE-060 (All Repository Tests)
+  FOUND BY  : Automated Test Run (UserRepositoryTest)
+
+  ROOT CAUSE:
+     Spring Boot 4 changed auto-detection path for test properties. Without explicit
+     profile, tests attempted a full datasource connection instead of H2 in-memory.
+
+  STEPS TO REPRODUCE:
+     1. Create a @DataJpaTest class without @ActiveProfiles
+     2. Run the test
+     3. Observe: DataSource connection refused (attempts production DB)
+
+  FIX APPLIED:
+     Created src/test/resources/application-test.properties with H2 in-memory config.
+     Added @ActiveProfiles("test") to all @DataJpaTest classes.
+
+  FIXED IN  : backend/src/test/resources/application-test.properties
+
+  NOTES     :
+     All @DataJpaTest classes must declare @ActiveProfiles("test") in Spring Boot 4.
+  ······················································································
+
+  BUG-004  |  HIGH  |  P2  |  FIXED  |  Backend
+  TITLE     : Single Table Inheritance: SupportStaff Subtype Missing from Hibernate Scan
+  COMPONENT : Repository / User / JPA
+  AFFECTS   : BE-052, BE-053 (TicketRepositoryTest)
+  FOUND BY  : Automated Test Run (TicketRepositoryTest)
+
+  ROOT CAUSE:
+     SupportStaff, a required User subtype for Ticket tests, was not in the entity
+     hierarchy, causing MappingException when @DataJpaTest built the schema.
+
+  STEPS TO REPRODUCE:
+     1. Write TicketRepositoryTest with a SupportStaff user
+     2. Run the test
+     3. Observe: MappingException: Unknown entity class
+
+  FIX APPLIED:
+     Verified SupportStaff extends User with @DiscriminatorValue("SUPPORT_STAFF"). Added to @DataJpaTest entity scan.
+
+  FIXED IN  : backend/src/test/java/com/packora/backend/repository/TicketRepositoryTest.java
+
+  NOTES     :
+     STI subtypes must be on the classpath and visible to Hibernate for slice tests.
+  ······················································································
+
+  BUG-005  |  HIGH  |  P2  |  FIXED  |  Tooling
+  TITLE     : generate-test-report.js: Nested Template Literal Syntax Error Prevents HTML Generation
+  COMPONENT : Reporting Script
+  AFFECTS   : N/A (HTML report generation blocked)
+  FOUND BY  : Manual script execution
+
+  ROOT CAUSE:
+     Unescaped backtick characters inside a template literal string caused Node.js to
+     throw SyntaxError: Invalid or unexpected token.
+
+  STEPS TO REPRODUCE:
+     1. Run node generate-test-report.js
+     2. Observe: SyntaxError at the HTML content block
+
+  FIX APPLIED:
+     Refactored HTML generation to use string concatenation via for-loops (backendRowsHtml, frontendRowsHtml) instead of nested template literals.
+
+  FIXED IN  : generate-test-report.js
+
+  NOTES     :
+     Use string concatenation for large HTML blocks to avoid nested template literal
+     issues.
+  ······················································································
+
+  ──────────────────────────────────────────────────────────────────────────────────────
+  MEDIUM BUGS  (3)
+  ──────────────────────────────────────────────────────────────────────────────────────
+
+  BUG-006  |  MEDIUM  |  P3  |  OPEN  |  Frontend
+  TITLE     : LoginPage: No Inline Validation — Empty Form Can Be Submitted
+  COMPONENT : LoginPage
+  AFFECTS   : FE-022 -> FE-033 (LoginPage.test.jsx)
+  FOUND BY  : Manual Code Review during test authoring
+
+  ROOT CAUSE:
+     The LoginPage component does not validate that email/password fields are non-empty
+     before submitting. A user can click Sign In with empty fields, triggering a network
+     request.
+
+  STEPS TO REPRODUCE:
+     1. Open the Login page
+     2. Leave email and password empty
+     3. Click "Sign In"
+     4. Observe: API call is made with empty credentials (no client-side error)
+
+  RECOMMENDATION:
+     RECOMMENDATION: Add required attributes to both inputs and/or add JS validation in submit handler to check for empty fields before calling the API.
+
+  NOTES     :
+     Backend returns 401 on empty credentials, but UX should prevent the request entirely.
+  ······················································································
+
+  BUG-008  |  MEDIUM  |  P3  |  OPEN  |  Frontend
+  TITLE     : API Token Retrieval: No Handling of localStorage SecurityError in Private Browsing
+  COMPONENT : Utils / api
+  AFFECTS   : FE-009 -> FE-014 (api.test.js)
+  FOUND BY  : Code Review during api.test.js authoring
+
+  ROOT CAUSE:
+     getStoredToken() catches malformed JSON but not SecurityError thrown when
+     localStorage is inaccessible (private/incognito mode with strict settings).
+
+  STEPS TO REPRODUCE:
+     1. Open app in a browser with localStorage disabled
+     2. Observe: Uncaught DOMException: SecurityError
+
+  RECOMMENDATION:
+     RECOMMENDATION: Wrap localStorage.getItem() in an additional try-catch for SecurityError.
+
+  NOTES     :
+     Low probability but worth hardening for production.
+  ······················································································
+
+  BUG-009  |  MEDIUM  |  P3  |  OPEN  |  Backend
+  TITLE     : Order Repository: sumRevenue Query Returns NULL Instead of 0 When No Orders Exist
+  COMPONENT : Repository / Order
+  AFFECTS   : BE-047 (OrderRepositoryTest - sumRevenue_shouldExcludeCancelled)
+  FOUND BY  : Test analysis during OrderRepositoryTest authoring
+
+  ROOT CAUSE:
+     The @Query uses SUM() which returns NULL when result set is empty (SQL standard).
+     Calling service layer does not null-check, risking NullPointerException.
+
+  STEPS TO REPRODUCE:
+     1. Clear all orders from the DB
+     2. Call the revenue sum endpoint
+     3. Observe: NullPointerException in service layer (or null returned to API)
+
+  RECOMMENDATION:
+     RECOMMENDATION: Use COALESCE(SUM(o.totalAmount), 0) in the JPQL query, or null-check the return value in the service layer.
+
+  NOTES     :
+     Test currently passes because it always seeds at least one valid order before
+     asserting.
+  ······················································································
+
+  ──────────────────────────────────────────────────────────────────────────────────────
+  LOW BUGS  (2)
+  ──────────────────────────────────────────────────────────────────────────────────────
+
+  BUG-007  |  LOW  |  P4  |  OPEN  |  Frontend
+  TITLE     : Navbar: No Active Link Highlighting for Current Route
+  COMPONENT : Navbar
+  AFFECTS   : FE-034 -> FE-038 (Navbar.test.jsx)
+  FOUND BY  : Manual Code Review during test authoring
+
+  ROOT CAUSE:
+     The Navbar renders all navigation links with identical styling regardless of the
+     active route. No visual indicator shows which page the user is currently on.
+
+  STEPS TO REPRODUCE:
+     1. Navigate to any page (e.g. Catalog)
+     2. Observe: All nav links look identical — no active state
+
+  RECOMMENDATION:
+     RECOMMENDATION: Use React Router's <NavLink> with an active class or style callback to highlight the current route.
+
+  NOTES     :
+     Minor UX issue. No functional impact.
+  ······················································································
+
+  BUG-010  |  LOW  |  P4  |  OPEN  |  Frontend
+  TITLE     : PaymentSuccess: Transaction ID Exposed in Plain URL Parameter Without Encoding
+  COMPONENT : PaymentSuccess
+  AFFECTS   : FE-045, FE-046 (PaymentSuccess.test.jsx)
+  FOUND BY  : Code Review during PaymentSuccess.test.jsx authoring
+
+  ROOT CAUSE:
+     PaymentSuccess reads the txn URL parameter and renders it unencoded. Special
+     characters in transaction IDs can break URL parsing and expose data in browser
+     history.
+
+  STEPS TO REPRODUCE:
+     1. Complete payment with a txn ID containing & or # characters
+     2. Observe: URL parameter is truncated/misread
+
+  RECOMMENDATION:
+     RECOMMENDATION: Encode txn parameter with encodeURIComponent() when building the URL and decode with decodeURIComponent() on read.
+
+  NOTES     :
+     Low severity in practice as transaction IDs are typically alphanumeric.
+  ······················································································
+
+==========================================================================================
+SECTION 5 — COMPONENT COVERAGE SUMMARY
+==========================================================================================
+
+  Component                          Tests   Passed  Result
+  ----------------------------------------------------------------------
+  Spring Boot Application            1       1       ALL PASS
+  Repository / Product               18      18      ALL PASS
+  Repository / User                  18      18      ALL PASS
+  Repository / Order                 14      14      ALL PASS
+  Repository / Ticket                9       9       ALL PASS
+  Utils / adminFormat                8       8       ALL PASS
+  Utils / api                        6       6       ALL PASS
+  Context / AuthContext              7       7       ALL PASS
+  LoginPage                          12      12      ALL PASS
+  Navbar                             5       5       ALL PASS
+  RequireAuth Guard                  2       2       ALL PASS
+  PaymentSuccess                     8       8       ALL PASS
+
+  Total Components Tested: 12
+
+==========================================================================================
+SECTION 6 — RECOMMENDATIONS
+==========================================================================================
+
+  The following open issues are recommended for the next sprint:
+
+  1. [BUG-006] LoginPage — Add Client-Side Form Validation (Medium / P3)
+     Add required attributes or JS validation before API submission.
+
+  2. [BUG-007] Navbar — Add Active-Link Highlighting (Low / P4)
+     Use React Router's <NavLink> active class to indicate current page.
+
+  3. [BUG-008] api.js — Handle localStorage SecurityError (Medium / P3)
+     Wrap localStorage.getItem() in a try-catch for SecurityError to support
+     private/incognito browsing mode.
+
+  4. [BUG-009] OrderRepository — Use COALESCE in Revenue SUM Query (Medium / P3)
+     Replace SUM(o.totalAmount) with COALESCE(SUM(o.totalAmount), 0) to
+     prevent NullPointerException when no non-cancelled orders exist.
+
+  5. [BUG-010] PaymentSuccess — URL-Encode Transaction ID Parameter (Low / P4)
+     Use encodeURIComponent/decodeURIComponent for txn URL parameter to
+     prevent issues with special characters in transaction IDs.
+
+  ADDITIONAL RECOMMENDATIONS:
+  - Add end-to-end (E2E) tests using Cypress or Playwright for critical flows.
+  - Add integration tests for REST controllers (MockMvc / @WebMvcTest).
+  - Configure JaCoCo code coverage to target >= 80% backend branch coverage.
+  - Set up CI/CD pipeline to run all tests automatically on each pull request.
+
+==========================================================================================
+  END OF REPORT
+  Packora QA Report  |  Generated: Tuesday, June 16, 2026 at 2:46:41 PM
+  To regenerate: node generate-text-report.js
+  Related files: test-reports/Packora_Test_Report.html  |  test-reports/Packora_Bug_Report.html
+==========================================================================================

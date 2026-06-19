@@ -203,7 +203,7 @@ export default function BulkOrder() {
 
       </main>
 
-      <Footer />
+      
     </div>
   );
 }

@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Packora — Bug Report</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #080b14; --surface: #10151f; --card: #141b28; --card-hover: #182031;
+      --border: #1e2a3d; --border-light: #243347; --text: #e2e8f0; --muted: #8892a4;
+      --primary: #3b82f6; --critical: #ef4444; --high: #f97316; --medium: #eab308;
+      --low: #6b7280; --fixed: #22c55e; --open: #f97316;
+    }
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.65; }
+    ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { background: var(--bg); } ::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 3px; }
+    .hero { background: linear-gradient(135deg,#0f1827,#0a1220,#080b14); border-bottom: 1px solid var(--border); padding: 3rem 2rem 2.5rem; text-align: center; position: relative; overflow: hidden; }
+    .hero::before { content:''; position:absolute; top:-80px; left:50%; transform:translateX(-50%); width:600px; height:400px; background:radial-gradient(ellipse,rgba(239,68,68,.08),transparent 70%); pointer-events:none; }
+    .hero-label { display:inline-flex; align-items:center; gap:.5rem; background:rgba(239,68,68,.1); border:1px solid rgba(239,68,68,.3); color:var(--critical); font-size:.78rem; font-weight:600; padding:.35rem 1rem; border-radius:20px; letter-spacing:.8px; text-transform:uppercase; margin-bottom:1.2rem; }
+    .hero h1 { font-size:clamp(1.8rem,4vw,2.8rem); font-weight:800; letter-spacing:-.5px; margin-bottom:.6rem; }
+    .hero h1 .brand { color:var(--primary); }
+    .hero p { color:var(--muted); font-size:1rem; max-width:600px; margin:0 auto .5rem; }
+    .hero .meta { color:#4a5568; font-size:.8rem; margin-top:.8rem; font-family:'JetBrains Mono',monospace; }
+    .container { max-width:1100px; margin:0 auto; padding:2.5rem 1.5rem; }
+    .summary-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:1rem; margin-bottom:2.5rem; }
+    .summary-card { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:1.4rem 1rem; text-align:center; transition:transform .2s,border-color .2s; }
+    .summary-card:hover { transform:translateY(-2px); border-color:var(--border-light); }
+    .summary-card .num { font-size:2.4rem; font-weight:800; line-height:1; margin-bottom:.4rem; }
+    .summary-card .lbl { font-size:.72rem; text-transform:uppercase; letter-spacing:.6px; color:var(--muted); font-weight:600; }
+    .c-total .num{color:#818cf8} .c-critical .num{color:var(--critical)} .c-high .num{color:var(--high)} .c-medium .num{color:var(--medium)} .c-low .num{color:var(--low)} .c-fixed .num{color:var(--fixed)} .c-open .num{color:var(--open)}
+    .section-heading { display:flex; align-items:center; gap:.8rem; margin-bottom:1.5rem; padding-bottom:.75rem; border-bottom:1px solid var(--border); }
+    .section-heading h2 { font-size:1.2rem; font-weight:700; }
+    .count-pill { background:var(--border-light); color:var(--muted); font-size:.7rem; font-weight:700; padding:3px 10px; border-radius:20px; }
+    .bugs-list { display:flex; flex-direction:column; gap:1.2rem; margin-bottom:3rem; }
+    .bug-card { background:var(--card); border:1px solid var(--border); border-radius:14px; overflow:hidden; transition:border-color .25s,box-shadow .25s; }
+    .bug-card:hover { border-color:var(--border-light); box-shadow:0 4px 24px rgba(0,0,0,.4); }
+    .bug-header { padding:1.2rem 1.5rem; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:flex-start; gap:1rem; flex-wrap:wrap; }
+    .bug-title-row { display:flex; align-items:center; gap:.8rem; flex:1; min-width:0; }
+    .bug-id { font-family:'JetBrains Mono',monospace; font-size:.75rem; font-weight:700; color:var(--primary); background:rgba(59,130,246,.1); padding:.25rem .6rem; border-radius:6px; border:1px solid rgba(59,130,246,.25); white-space:nowrap; }
+    .bug-title { font-size:.97rem; font-weight:600; line-height:1.4; }
+    .bug-badges { display:flex; gap:.5rem; flex-wrap:wrap; align-items:center; }
+    .badge { font-size:.7rem; font-weight:700; padding:.25rem .65rem; border-radius:8px; text-transform:uppercase; letter-spacing:.4px; white-space:nowrap; }
+    .priority-badge { background:rgba(129,140,248,.1); color:#818cf8; border:1px solid rgba(129,140,248,.3); }
+    .bug-meta { display:flex; flex-wrap:wrap; gap:.4rem 1.5rem; padding:.75rem 1.5rem; background:rgba(0,0,0,.2); border-bottom:1px solid var(--border); font-size:.8rem; color:var(--muted); }
+    .bug-meta b { color:var(--text); }
+    .bug-body { padding:1.2rem 1.5rem; display:flex; flex-direction:column; gap:1rem; }
+    .bug-section-label { font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:var(--muted); margin-bottom:.4rem; }
+    .bug-section-content { font-size:.87rem; color:#c8d3e0; line-height:1.65; }
+    .steps .step { padding:.15rem 0; font-family:'JetBrains Mono',monospace; font-size:.82rem; color:#9fb3c8; }
+    .fix-applied { background:rgba(34,197,94,.05); border:1px solid rgba(34,197,94,.2); border-radius:10px; padding:.9rem 1rem; }
+    .fix-applied .bug-section-label { color:var(--fixed); }
+    .fix-recommended { background:rgba(249,115,22,.05); border:1px solid rgba(249,115,22,.2); border-radius:10px; padding:.9rem 1rem; }
+    .fix-recommended .bug-section-label { color:var(--open); }
+    .fixed-in { margin-top:.6rem; font-family:'JetBrains Mono',monospace; font-size:.78rem; color:var(--fixed); opacity:.8; }
+    .notes-section { background:rgba(129,140,248,.04); border:1px solid rgba(129,140,248,.15); border-radius:10px; padding:.9rem 1rem; }
+    .notes-section .bug-section-label { color:#818cf8; }
+    .toc { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:1.5rem; margin-bottom:2.5rem; }
+    .toc h3 { font-size:.9rem; font-weight:700; margin-bottom:1rem; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; }
+    .toc-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:.5rem; }
+    .toc-item { display:flex; align-items:center; gap:.6rem; padding:.5rem .75rem; border-radius:8px; transition:background .15s; text-decoration:none; color:var(--text); font-size:.83rem; }
+    .toc-item:hover { background:rgba(255,255,255,.04); }
+    .toc-id { font-family:'JetBrains Mono',monospace; font-size:.7rem; color:var(--primary); width:64px; flex-shrink:0; }
+    .toc-sev-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+    .footer { text-align:center; color:var(--muted); font-size:.78rem; padding:2rem; border-top:1px solid var(--border); margin-top:3rem; }
+    .footer code { font-family:'JetBrains Mono',monospace; background:var(--card); padding:2px 6px; border-radius:4px; color:#818cf8; }
+  </style>
+</head>
+<body>
+  <div class="hero">
+    <div class="hero-label">🐛 Bug Report</div>
+    <h1>📦 <span class="brand">Packora</span> — Bug Report</h1>
+    <p>Full-Stack Quality Assurance — Bugs Discovered &amp; Fixed During Automated Testing</p>
+    <p>Backend (Spring Boot 4) + Frontend (React 19) — 108 Tests Executed</p>
+    <div class="meta">Generated: Tuesday, June 16, 2026 at 2:41:32 PM &nbsp;|&nbsp; Total Bugs: 10 &nbsp;|&nbsp; Fixed: 5 &nbsp;|&nbsp; Open: 5</div>
+  </div>
+
+  <div class="container">
+    <div class="summary-grid">
+      <div class="summary-card c-total"><div class="num">10</div><div class="lbl">Total Bugs</div></div>
+      <div class="summary-card c-critical"><div class="num">2</div><div class="lbl">Critical</div></div>
+      <div class="summary-card c-high"><div class="num">3</div><div class="lbl">High</div></div>
+      <div class="summary-card c-medium"><div class="num">3</div><div class="lbl">Medium</div></div>
+      <div class="summary-card c-low"><div class="num">2</div><div class="lbl">Low</div></div>
+      <div class="summary-card c-fixed"><div class="num">5</div><div class="lbl">Fixed</div></div>
+      <div class="summary-card c-open"><div class="num">5</div><div class="lbl">Open</div></div>
+    </div>
+
+    <div class="toc">
+      <h3>📋 Quick Navigation</h3>
+      <div class="toc-grid">
+        <a class="toc-item" href="#bug-001"><span class="toc-id">BUG-001</span><span class="toc-sev-dot" style="background:#ef4444"></span><span>H2 Database v2.4.240 Throws Check Constraint Vio…</span></a>
+        <a class="toc-item" href="#bug-002"><span class="toc-id">BUG-002</span><span class="toc-sev-dot" style="background:#ef4444"></span><span>Frontend Tests Fail: TextEncoder / TextDecoder N…</span></a>
+        <a class="toc-item" href="#bug-003"><span class="toc-id">BUG-003</span><span class="toc-sev-dot" style="background:#f97316"></span><span>Spring Boot 4 @DataJpaTest: application-test.pro…</span></a>
+        <a class="toc-item" href="#bug-004"><span class="toc-id">BUG-004</span><span class="toc-sev-dot" style="background:#f97316"></span><span>Single Table Inheritance (STI) Schema Missing Di…</span></a>
+        <a class="toc-item" href="#bug-005"><span class="toc-id">BUG-005</span><span class="toc-sev-dot" style="background:#f97316"></span><span>generate-test-report.js: Nested Template Literal…</span></a>
+        <a class="toc-item" href="#bug-006"><span class="toc-id">BUG-006</span><span class="toc-sev-dot" style="background:#eab308"></span><span>LoginPage: No Inline Validation — Empty Form Can…</span></a>
+        <a class="toc-item" href="#bug-007"><span class="toc-id">BUG-007</span><span class="toc-sev-dot" style="background:#6b7280"></span><span>Navbar: No Active Link Highlighting for Current …</span></a>
+        <a class="toc-item" href="#bug-008"><span class="toc-id">BUG-008</span><span class="toc-sev-dot" style="background:#eab308"></span><span>API Token Retrieval: No Handling of localStorage…</span></a>
+        <a class="toc-item" href="#bug-009"><span class="toc-id">BUG-009</span><span class="toc-sev-dot" style="background:#eab308"></span><span>Order Repository: sumRevenue Query Returns Null …</span></a>
+        <a class="toc-item" href="#bug-010"><span class="toc-id">BUG-010</span><span class="toc-sev-dot" style="background:#6b7280"></span><span>PaymentSuccess: Transaction ID Exposed in Plain …</span></a>
+      </div>
+    </div>
+
+    <div class="section-heading">
+      <h2>🐛 All Bug Findings</h2>
+      <span class="count-pill">5 Fixed &nbsp;·&nbsp; 5 Open</span>
+    </div>
+    <div class="bugs-list">
+      
+    <div class="bug-card" id="bug-001">
+      <div class="bug-header">
+        <div class="bug-title-row">
+          <span class="bug-id">BUG-001</span>
+          <h3 class="bug-title">H2 Database v2.4.240 Throws Check Constraint Violation on Simple Inserts</h3>
+        </div>
+        <div class="bug-badges">
+          <span class="badge" style="background:rgba(239,68,68,0.15);color:#ef4444;border:1px solid #ef444440">Critical</span>
+          <span class="badge" style="background:rgba(34,197,94,0.12);color:#22c55e;border:1px solid #22c55e40">✅ Fixed</span>
+          <span class="badge" style="background:rgba(96,165,250,0.1);color:#60a5fa;border:1px solid #60a5fa40">Backend</span>
+          <span class="badge priority-badge">P1</span>
+        </div>
+      </div>
+      <div class="bug-meta">
+        <span>🧩 <b>Component:</b> Database / H2</span>
+        <span>🧪 <b>Affected Tests:</b> All Repository Tests (BE-002 → BE-060)</span>
+        <span>🔍 <b>Discovered By:</b> Automated Test Run (ProductRepositoryTest)</span>
+        <span>🌐 <b>Environment:</b> Spring Boot 4.0.3 / Java 17 / H2 in-memory</span>
+      </div>
+      <div class="bug-body">
+        <div class="bug-section">
+          <div class="bug-section-label">Root Cause</div>
+          <div class="bug-section-content">H2 version 2.4.240 introduced stricter check-constraint validation that conflicts with the Packora JPA schema. Simple INSERT statements (e.g., saving a Product or User) raised SQLState 23514 (check constraint violated), blocking all @DataJpaTest tests from running.</div>
+        </div>
+        <div class="bug-section">
+          <div class="bug-section-label">Steps to Reproduce</div>
+          <div class="bug-section-content steps"><div class="step">1. Upgrade H2 to 2.4.240 in pom.xml.</div><div class="step">2. Run `./mvnw test` on any Repository test.</div><div class="step">3. Observe: HibernateJdbcException → Check constraint "ORDERS_STATUS_CHECK" invalid.</div></div>
+        </div>
+        <div class="bug-section fix-applied">
+          <div class="bug-section-label">✅ Fix Applied</div>
+          <div class="bug-section-content">Version-pinned H2 to 2.3.232 in backend/pom.xml:<br/><h2.version>2.3.232</h2.version></div>
+          <div class="fixed-in">📁 backend/pom.xml</div>
+        </div>
+        <div class="bug-section notes-section"><div class="bug-section-label">📝 Notes</div><div class="bug-section-content">This is a known incompatibility. Spring Boot 4 auto-resolves to H2 2.4.x; explicit version override is required.</div></div>
+      </div>
+    </div>
+    <div class="bug-card" id="bug-002">
+      <div class="bug-header">
+        <div class="bug-title-row">
+          <span class="bug-id">BUG-002</span>
+          <h3 class="bug-title">Frontend Tests Fail: TextEncoder / TextDecoder Not Defined in Jest Environment</h3>
+        </div>
+        <div class="bug-badges">
+          <span class="badge" style="background:rgba(239,68,68,0.15);color:#ef4444;border:1px solid #ef444440">Critical</span>
+          <span class="badge" style="background:rgba(34,197,94,0.12);color:#22c55e;border:1px solid #22c55e40">✅ Fixed</span>
+          <span class="badge" style="background:rgba(96,165,250,0.1);color:#fbbf24;border:1px solid #fbbf2440">Frontend</span>
+          <span class="badge priority-badge">P1</span>
+        </div>
+      </div>
+      <div class="bug-meta">
+        <span>🧩 <b>Component:</b> Test Environment / Jest</span>
+        <span>🧪 <b>Affected Tests:</b> All Component Tests (FE-022 → FE-048)</span>
+        <span>🔍 <b>Discovered By:</b> Automated Test Run (LoginPage.test.jsx)</span>
+        <span>🌐 <b>Environment:</b> React 19 / Jest 29 / jsdom / React Router v7</span>
+      </div>
+      <div class="bug-body">
+        <div class="bug-section">
+          <div class="bug-section-label">Root Cause</div>
+          <div class="bug-section-content">React Router v7 (used internally by React 19 test wrappers) requires the Web-standard TextEncoder and TextDecoder APIs. Jest's default jsdom environment does not include these, causing a ReferenceError at import time for any component that uses routing.</div>
+        </div>
+        <div class="bug-section">
+          <div class="bug-section-label">Steps to Reproduce</div>
+          <div class="bug-section-content steps"><div class="step">1. Create a test for LoginPage.test.jsx or any component wrapped in <MemoryRouter>.</div><div class="step">2. Run `npm test`.</div><div class="step">3. Observe: ReferenceError: TextEncoder is not defined.</div></div>
+        </div>
+        <div class="bug-section fix-applied">
+          <div class="bug-section-label">✅ Fix Applied</div>
+          <div class="bug-section-content">Added polyfills to src/setupTests.js:<br/>const { TextEncoder, TextDecoder } = require('util');<br/>Object.assign(global, { TextEncoder, TextDecoder });</div>
+          <div class="fixed-in">📁 src/setupTests.js</div>
+        </div>
+        <div class="bug-section notes-section"><div class="bug-section-label">📝 Notes</div><div class="bug-section-content">Polyfill must be placed before any React Router import in setupTests.js. Order matters.</div></div>
+      </div>
+    </div>
+    <div class="bug-card" id="bug-003">
+      <div class="bug-header">
+        <div class="bug-title-row">
+          <span class="bug-id">BUG-003</span>
+          <h3 class="bug-title">Spring Boot 4 @DataJpaTest: application-test.properties Not Auto-Loaded</h3>
+        </div>
+        <div class="bug-badges">
+          <span class="badge" style="background:rgba(249,115,22,0.15);color:#f97316;border:1px solid #f9731640">High</span>
+          <span class="badge" style="background:rgba(34,197,94,0.12);color:#22c55e;border:1px solid #22c55e40">✅ Fixed</span>
+          <span class="badge" style="background:rgba(96,165,250,0.1);color:#60a5fa;border:1px solid #60a5fa40">Backend</span>
+          <span class="badge priority-badge">P2</span>
+        </div>
+      </div>
+      <div class="bug-meta">
+        <span>🧩 <b>Component:</b> Test Configuration / Spring Boot</span>
+        <span>🧪 <b>Affected Tests:</b> All Repository Tests (BE-002 → BE-060)</span>
+        <span>🔍 <b>Discovered By:</b> Automated Test Run (UserRepositoryTest)</span>
+        <span>🌐 <b>Environment:</b> Spring Boot 4.0.3 / JUnit 5</span>
+      </div>
+      <div class="bug-body">
+        <div class="bug-section">
+          <div class="bug-section-label">Root Cause</div>
+          <div class="bug-section-content">Spring Boot 4 changed the auto-detection path for test properties. The file at src/test/resources/application.properties was not picked up for @DataJpaTest slice tests, causing tests to attempt a full datasource connection instead of using H2 in-memory.</div>
+        </div>
+        <div class="bug-section">
+          <div class="bug-section-label">Steps to Reproduce</div>
+          <div class="bug-section-content steps"><div class="step">1. Create a @DataJpaTest class without @ActiveProfiles annotation.</div><div class="step">2. Run the test without application-test.properties in the correct location.</div><div class="step">3. Observe: DataSource connection refused (attempts to connect to production DB).</div></div>
+        </div>
+        <div class="bug-section fix-applied">
+          <div class="bug-section-label">✅ Fix Applied</div>
+          <div class="bug-section-content">Created src/test/resources/application-test.properties with:<br/>spring.datasource.url=jdbc:h2:mem:testdb<br/>spring.datasource.driver-class-name=org.h2.Driver<br/>spring.jpa.hibernate.ddl-auto=create-drop<br/>Added @ActiveProfiles("test") to all @DataJpaTest classes.</div>
+          <div class="fixed-in">📁 backend/src/test/resources/application-test.properties</div>
+        </div>
+        <div class="bug-section notes-section"><div class="bug-section-label">📝 Notes</div><div class="bug-section-content">All @DataJpaTest classes must declare @ActiveProfiles("test") explicitly in Spring Boot 4.</div></div>
+      </div>
+    </div>
+    <div class="bug-card" id="bug-004">
+      <div class="bug-header">
+        <div class="bug-title-row">
+          <span class="bug-id">BUG-004</span>
+          <h3 class="bug-title">Single Table Inheritance (STI) Schema Missing Discriminator for SupportStaff Subtype</h3>
+        </div>
+        <div class="bug-badges">
+          <span class="badge" style="background:rgba(249,115,22,0.15);color:#f97316;border:1px solid #f9731640">High</span>
+          <span class="badge" style="background:rgba(34,197,94,0.12);color:#22c55e;border:1px solid #22c55e40">✅ Fixed</span>
+          <span class="badge" style="background:rgba(96,165,250,0.1);color:#60a5fa;border:1px solid #60a5fa40">Backend</span>
+          <span class="badge priority-badge">P2</span>
+        </div>
+      </div>
+      <div class="bug-meta">
+        <span>🧩 <b>Component:</b> Repository / User / JPA</span>
+        <span>🧪 <b>Affected Tests:</b> BE-052, BE-053 (TicketRepositoryTest)</span>
+        <span>🔍 <b>Discovered By:</b> Automated Test Run (TicketRepositoryTest)</span>
+        <span>🌐 <b>Environment:</b> Spring Boot 4.0.3 / Hibernate 6 / JPA</span>
+      </div>
+      <div class="bug-body">
+        <div class="bug-section">
+          <div class="bug-section-label">Root Cause</div>
+          <div class="bug-section-content">The User entity uses Single Table Inheritance (@Inheritance(strategy = SINGLE_TABLE)). SupportStaff, a subtype required for Ticket association tests, was not included in the entity inheritance hierarchy, causing a MappingException when @DataJpaTest tried to build the schema.</div>
+        </div>
+        <div class="bug-section">
+          <div class="bug-section-label">Steps to Reproduce</div>
+          <div class="bug-section-content steps"><div class="step">1. Write TicketRepositoryTest with a SupportStaff user.</div><div class="step">2. Run the test.</div><div class="step">3. Observe: org.hibernate.MappingException: Unknown entity class.</div></div>
+        </div>
+        <div class="bug-section fix-applied">
+          <div class="bug-section-label">✅ Fix Applied</div>
+          <div class="bug-section-content">Verified SupportStaff extends User with @DiscriminatorValue("SUPPORT_STAFF"). Added SupportStaff to the @DataJpaTest entity scan.</div>
+          <div class="fixed-in">📁 backend/src/test/java/com/packora/backend/repository/TicketRepositoryTest.java</div>
+        </div>
+        <div class="bug-section notes-section"><div class="bug-section-label">📝 Notes</div><div class="bug-section-content">STI subtypes must be on the classpath and visible to Hibernate for slice tests to work.</div></div>
+      </div>
+    </div>
+    <div class="bug-card" id="bug-005">
+      <div class="bug-header">
+        <div class="bug-title-row">
+          <span class="bug-id">BUG-005</span>
+          <h3 class="bug-title">generate-test-report.js: Nested Template Literal Syntax Error Prevents HTML Generation</h3>
+        </div>
+        <div class="bug-badges">
+          <span class="badge" style="background:rgba(249,115,22,0.15);color:#f97316;border:1px solid #f9731640">High</span>
+          <span class="badge" style="background:rgba(34,197,94,0.12);color:#22c55e;border:1px solid #22c55e40">✅ Fixed</span>
+          <span class="badge" style="background:rgba(96,165,250,0.1);color:#a78bfa;border:1px solid #a78bfa40">Tooling</span>
+          <span class="badge priority-badge">P2</span>
+        </div>
+      </div>
+      <div class="bug-meta">
+        <span>🧩 <b>Component:</b> Reporting Script</span>
+        <span>🧪 <b>Affected Tests:</b> All Tests (HTML Report Generation)</span>
+        <span>🔍 <b>Discovered By:</b> Manual script execution</span>
+        <span>🌐 <b>Environment:</b> Node.js / JavaScript</span>
+      </div>
+      <div class="bug-body">
+        <div class="bug-section">
+          <div class="bug-section-label">Root Cause</div>
+          <div class="bug-section-content">The HTML report block inside generate-test-report.js used unescaped backtick characters (`) within a template literal string. Node.js interpreted these as closing the outer template literal, causing a SyntaxError: Invalid or unexpected token at runtime.</div>
+        </div>
+        <div class="bug-section">
+          <div class="bug-section-label">Steps to Reproduce</div>
+          <div class="bug-section-content steps"><div class="step">1. Run `node generate-test-report.js`.</div><div class="step">2. Observe: SyntaxError at the HTML content block.</div></div>
+        </div>
+        <div class="bug-section fix-applied">
+          <div class="bug-section-label">✅ Fix Applied</div>
+          <div class="bug-section-content">Refactored HTML generation to use string concatenation via a for-loop (backendRowsHtml, frontendRowsHtml) instead of nested template literals. The outer template literal now contains only safe single-quoted and double-quoted HTML.</div>
+          <div class="fixed-in">📁 generate-test-report.js</div>
+        </div>
+        <div class="bug-section notes-section"><div class="bug-section-label">📝 Notes</div><div class="bug-section-content">Nested template literals in JS are valid but require careful escaping. Using string concatenation for large HTML blocks is safer.</div></div>
+      </div>
+    </div>
+    <div class="bug-card" id="bug-006">
+      <div class="bug-header">
+        <div class="bug-title-row">
+          <span class="bug-id">BUG-006</span>
+          <h3 class="bug-title">LoginPage: No Inline Validation — Empty Form Can Be Submitted</h3>
+        </div>
+        <div class="bug-badges">
+          <span class="badge" style="background:rgba(234,179,8,0.15);color:#eab308;border:1px solid #eab30840">Medium</span>
+          <span class="badge" style="background:rgba(249,115,22,0.12);color:#f97316;border:1px solid #f9731640">⚠️ Open</span>
+          <span class="badge" style="background:rgba(96,165,250,0.1);color:#fbbf24;border:1px solid #fbbf2440">Frontend</span>
+          <span class="badge priority-badge">P3</span>
+        </div>
+      </div>
+      <div class="bug-meta">
+        <span>🧩 <b>Component:</b> LoginPage</span>
+        <span>🧪 <b>Affected Tests:</b> FE-022 → FE-033 (LoginPage.test.jsx)</span>
+        <span>🔍 <b>Discovered By:</b> Manual Code Review during test authoring</span>
+        <span>🌐 <b>Environment:</b> React 19 / Browser</span>
+      </div>
+      <div class="bug-body">
+        <div class="bug-section">
+          <div class="bug-section-label">Root Cause</div>
+          <div class="bug-section-content">The LoginPage component does not validate that the email/password fields are non-empty before submitting the form. A user can click "Sign In" with empty fields, triggering a network request with blank credentials.</div>
+        </div>
+        <div class="bug-section">
+          <div class="bug-section-label">Steps to Reproduce</div>
+          <div class="bug-section-content steps"><div class="step">1. Open the Login page.</div><div class="step">2. Leave email and password empty.</div><div class="step">3. Click "Sign In".</div><div class="step">4. Observe: API call is made with empty body (no client-side validation error shown).</div></div>
+        </div>
+        <div class="bug-section fix-recommended">
+          <div class="bug-section-label">💡 Recommendation</div>
+          <div class="bug-section-content">Recommended: Add required attribute to both inputs and/or add JS validation in the submit handler to check for empty fields before calling the API.</div>
+          
+        </div>
+        <div class="bug-section notes-section"><div class="bug-section-label">📝 Notes</div><div class="bug-section-content">Backend does return 401 on empty credentials, but UX should prevent the request entirely.</div></div>
+      </div>
+    </div>
+    <div class="bug-card" id="bug-007">
+      <div class="bug-header">
+        <div class="bug-title-row">
+          <span class="bug-id">BUG-007</span>
+          <h3 class="bug-title">Navbar: No Active Link Highlighting for Current Route</h3>
+        </div>
+        <div class="bug-badges">
+          <span class="badge" style="background:rgba(107,114,128,0.15);color:#6b7280;border:1px solid #6b728040">Low</span>
+          <span class="badge" style="background:rgba(249,115,22,0.12);color:#f97316;border:1px solid #f9731640">⚠️ Open</span>
+          <span class="badge" style="background:rgba(96,165,250,0.1);color:#fbbf24;border:1px solid #fbbf2440">Frontend</span>
+          <span class="badge priority-badge">P4</span>
+        </div>
+      </div>
+      <div class="bug-meta">
+        <span>🧩 <b>Component:</b> Navbar</span>
+        <span>🧪 <b>Affected Tests:</b> FE-034 → FE-038 (Navbar.test.jsx)</span>
+        <span>🔍 <b>Discovered By:</b> Manual Code Review during test authoring</span>
+        <span>🌐 <b>Environment:</b> React 19 / React Router v7</span>
+      </div>
+      <div class="bug-body">
+        <div class="bug-section">
+          <div class="bug-section-label">Root Cause</div>
+          <div class="bug-section-content">The Navbar renders all navigation links with the same styling regardless of the active route. There is no visual indicator (e.g., active class, underline, color) to show which page the user is currently on.</div>
+        </div>
+        <div class="bug-section">
+          <div class="bug-section-label">Steps to Reproduce</div>
+          <div class="bug-section-content steps"><div class="step">1. Navigate to the Catalog page.</div><div class="step">2. Observe: All nav links appear identical — no active state shown.</div></div>
+        </div>
+        <div class="bug-section fix-recommended">
+          <div class="bug-section-label">💡 Recommendation</div>
+          <div class="bug-section-content">Recommended: Use React Router's <NavLink> with an active class or style callback to highlight the current route link.</div>
+          
+        </div>
+        <div class="bug-section notes-section"><div class="bug-section-label">📝 Notes</div><div class="bug-section-content">Minor UX issue. No functional impact.</div></div>
+      </div>
+    </div>
+    <div class="bug-card" id="bug-008">
+      <div class="bug-header">
+        <div class="bug-title-row">
+          <span class="bug-id">BUG-008</span>
+          <h3 class="bug-title">API Token Retrieval: No Handling of localStorage SecurityError (Private Browsing)</h3>
+        </div>
+        <div class="bug-badges">
+          <span class="badge" style="background:rgba(234,179,8,0.15);color:#eab308;border:1px solid #eab30840">Medium</span>
+          <span class="badge" style="background:rgba(249,115,22,0.12);color:#f97316;border:1px solid #f9731640">⚠️ Open</span>
+          <span class="badge" style="background:rgba(96,165,250,0.1);color:#fbbf24;border:1px solid #fbbf2440">Frontend</span>
+          <span class="badge priority-badge">P3</span>
+        </div>
+      </div>
+      <div class="bug-meta">
+        <span>🧩 <b>Component:</b> Utils / api</span>
+        <span>🧪 <b>Affected Tests:</b> FE-009 → FE-014 (api.test.js)</span>
+        <span>🔍 <b>Discovered By:</b> Code Review during api.test.js authoring</span>
+        <span>🌐 <b>Environment:</b> Browser (Private/Strict mode)</span>
+      </div>
+      <div class="bug-body">
+        <div class="bug-section">
+          <div class="bug-section-label">Root Cause</div>
+          <div class="bug-section-content">The getStoredToken() function in api.js catches malformed JSON but does not handle the case where localStorage is completely inaccessible (e.g., in private/incognito mode with strict settings, or when storage is disabled by browser policy). This throws an uncaught SecurityError.</div>
+        </div>
+        <div class="bug-section">
+          <div class="bug-section-label">Steps to Reproduce</div>
+          <div class="bug-section-content steps"><div class="step">1. Open app in a browser with localStorage disabled (about:config → dom.storage.enabled=false in Firefox).</div><div class="step">2. Observe: Uncaught DOMException: SecurityError.</div></div>
+        </div>
+        <div class="bug-section fix-recommended">
+          <div class="bug-section-label">💡 Recommendation</div>
+          <div class="bug-section-content">Recommended: Wrap the localStorage.getItem() call in an additional try-catch for SecurityError.</div>
+          
+        </div>
+        <div class="bug-section notes-section"><div class="bug-section-label">📝 Notes</div><div class="bug-section-content">Low probability but worth hardening for production.</div></div>
+      </div>
+    </div>
+    <div class="bug-card" id="bug-009">
+      <div class="bug-header">
+        <div class="bug-title-row">
+          <span class="bug-id">BUG-009</span>
+          <h3 class="bug-title">Order Repository: sumRevenue Query Returns Null Instead of 0 When No Orders Exist</h3>
+        </div>
+        <div class="bug-badges">
+          <span class="badge" style="background:rgba(234,179,8,0.15);color:#eab308;border:1px solid #eab30840">Medium</span>
+          <span class="badge" style="background:rgba(249,115,22,0.12);color:#f97316;border:1px solid #f9731640">⚠️ Open</span>
+          <span class="badge" style="background:rgba(96,165,250,0.1);color:#60a5fa;border:1px solid #60a5fa40">Backend</span>
+          <span class="badge priority-badge">P3</span>
+        </div>
+      </div>
+      <div class="bug-meta">
+        <span>🧩 <b>Component:</b> Repository / Order</span>
+        <span>🧪 <b>Affected Tests:</b> BE-047 (OrderRepositoryTest — sumRevenue_shouldExcludeCancelled)</span>
+        <span>🔍 <b>Discovered By:</b> Test analysis during OrderRepositoryTest authoring</span>
+        <span>🌐 <b>Environment:</b> Spring Boot 4 / JPA</span>
+      </div>
+      <div class="bug-body">
+        <div class="bug-section">
+          <div class="bug-section-label">Root Cause</div>
+          <div class="bug-section-content">The @Query for summing revenue uses SUM() which returns NULL when the result set is empty (SQL standard behavior). The calling service layer does not null-check this, which can lead to a NullPointerException when there are no non-cancelled orders.</div>
+        </div>
+        <div class="bug-section">
+          <div class="bug-section-label">Steps to Reproduce</div>
+          <div class="bug-section-content steps"><div class="step">1. Clear all orders from the DB.</div><div class="step">2. Call the revenue sum endpoint.</div><div class="step">3. Observe: NullPointerException in service layer (or null returned to API consumer).</div></div>
+        </div>
+        <div class="bug-section fix-recommended">
+          <div class="bug-section-label">💡 Recommendation</div>
+          <div class="bug-section-content">Recommended: Use COALESCE(SUM(o.totalAmount), 0) in the JPQL query, or null-check the return value in the service layer.</div>
+          
+        </div>
+        <div class="bug-section notes-section"><div class="bug-section-label">📝 Notes</div><div class="bug-section-content">Test currently passes because test always seeds at least one valid order before asserting.</div></div>
+      </div>
+    </div>
+    <div class="bug-card" id="bug-010">
+      <div class="bug-header">
+        <div class="bug-title-row">
+          <span class="bug-id">BUG-010</span>
+          <h3 class="bug-title">PaymentSuccess: Transaction ID Exposed in Plain URL Parameter (No Encoding)</h3>
+        </div>
+        <div class="bug-badges">
+          <span class="badge" style="background:rgba(107,114,128,0.15);color:#6b7280;border:1px solid #6b728040">Low</span>
+          <span class="badge" style="background:rgba(249,115,22,0.12);color:#f97316;border:1px solid #f9731640">⚠️ Open</span>
+          <span class="badge" style="background:rgba(96,165,250,0.1);color:#fbbf24;border:1px solid #fbbf2440">Frontend</span>
+          <span class="badge priority-badge">P4</span>
+        </div>
+      </div>
+      <div class="bug-meta">
+        <span>🧩 <b>Component:</b> PaymentSuccess</span>
+        <span>🧪 <b>Affected Tests:</b> FE-045, FE-046 (PaymentSuccess.test.jsx)</span>
+        <span>🔍 <b>Discovered By:</b> Code Review during PaymentSuccess.test.jsx authoring</span>
+        <span>🌐 <b>Environment:</b> React 19 / Browser</span>
+      </div>
+      <div class="bug-body">
+        <div class="bug-section">
+          <div class="bug-section-label">Root Cause</div>
+          <div class="bug-section-content">The PaymentSuccess component reads the transaction ID directly from the URL search parameter (?txn=...) and renders it unencoded. If the transaction ID contains special characters, it can break URL parsing. Additionally, raw transaction IDs in URLs are visible in browser history and server logs.</div>
+        </div>
+        <div class="bug-section">
+          <div class="bug-section-label">Steps to Reproduce</div>
+          <div class="bug-section-content steps"><div class="step">1. Complete a payment with a transaction ID containing & or # characters.</div><div class="step">2. Observe: URL parameter is truncated/misread.</div></div>
+        </div>
+        <div class="bug-section fix-recommended">
+          <div class="bug-section-label">💡 Recommendation</div>
+          <div class="bug-section-content">Recommended: Encode the txn parameter with encodeURIComponent() when building the URL, and decode with decodeURIComponent() on read.</div>
+          
+        </div>
+        <div class="bug-section notes-section"><div class="bug-section-label">📝 Notes</div><div class="bug-section-content">Security-adjacent but low severity in practice as transaction IDs are typically alphanumeric.</div></div>
+      </div>
+    </div>
+    </div>
+
+    <div class="footer">
+      <p>Packora Bug Report — Generated by <code>node generate-bug-report.js</code></p>
+      <p style="margin-top:.4rem">Full test results: <code>test-reports/Packora_Test_Report.html</code> &nbsp;|&nbsp; Excel: <code>test-reports/Packora_Bug_Report.xlsx</code></p>
+    </div>
+  </div>
+</body>
+</html>
