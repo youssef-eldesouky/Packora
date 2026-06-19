@@ -2,21 +2,23 @@ import { create } from 'zustand'
 import { v4 as uuidv4 } from 'uuid'
 
 export const OUTER_FACES = ['front', 'back', 'left', 'right', 'top', 'bottom']
-export const INNER_FACES = ['inside_front', 'inside_back', 'inside_left', 'inside_right', 'inside_bottom', 'inside_top']
+export const INNER_FACES = ['inside_front', 'inside_back', 'inside_left',
+                            'inside_right', 'inside_bottom', 'inside_top']
 export const ALL_FACES = [...OUTER_FACES, ...INNER_FACES]
 
+//Checks if a face belongs to the inside.
 export function isInnerFace(face) {
   return face.startsWith('inside_')
 }
-
+//Converts an outer face name into an inner face name.
 export function toInnerFace(face) {
   return `inside_${face}`
 }
-
+//Converts an inner face name back into an outer face name.
 export function toOuterFace(face) {
   return face.replace('inside_', '')
 }
-
+//Gets a readable label for a face.
 export function faceLabelText(face) {
   if (isInnerFace(face)) {
     const outer = toOuterFace(face)

@@ -1,0 +1,1197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Packora — Full Test Report</title>
+  <style>
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --card: #22263a;
+      --border: #2e3348;
+      --text: #e8eaed;
+      --muted: #9aa0b4;
+      --primary: #52796F;
+      --success: #22c55e;
+      --success-bg: rgba(34,197,94,0.12);
+      --fail: #ef4444;
+      --fail-bg: rgba(239,68,68,0.12);
+      --accent: #818cf8;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding: 2rem;
+    }
+    .container { max-width: 1200px; margin: 0 auto; }
+
+    /* Header */
+    .header {
+      text-align: center;
+      margin-bottom: 3rem;
+      padding: 2.5rem;
+      background: linear-gradient(135deg, #52796F22, #5D536B22);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+    }
+    .header h1 { font-size: 2.2rem; font-weight: 700; margin-bottom: .5rem; }
+    .header h1 span { color: var(--primary); }
+    .header .subtitle { color: var(--muted); font-size: 1rem; }
+    .header .date { color: var(--muted); font-size: .85rem; margin-top: .5rem; }
+
+    /* Stats Grid */
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 2.5rem; }
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      text-align: center;
+    }
+    .stat-card .number { font-size: 2.5rem; font-weight: 800; }
+    .stat-card .label { color: var(--muted); font-size: .85rem; text-transform: uppercase; letter-spacing: .5px; }
+    .stat-card.pass .number { color: var(--success); }
+    .stat-card.fail .number { color: var(--fail); }
+    .stat-card.total .number { color: var(--accent); }
+    .stat-card.rate .number { color: var(--success); }
+
+    /* Section */
+    .section { margin-bottom: 2.5rem; }
+    .section-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      padding-bottom: .5rem;
+      border-bottom: 2px solid var(--primary);
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+    }
+    .section-title .badge {
+      background: var(--primary);
+      color: #fff;
+      font-size: .7rem;
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-weight: 600;
+    }
+
+    /* Table */
+    table { width: 100%; border-collapse: collapse; font-size: .88rem; }
+    th {
+      background: var(--card);
+      color: var(--muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: .72rem;
+      letter-spacing: .5px;
+      padding: 12px 16px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+    }
+    td {
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+    tr:hover td { background: rgba(82,121,111,0.06); }
+
+    .status-badge {
+      display: inline-block;
+      padding: 3px 12px;
+      border-radius: 20px;
+      font-weight: 600;
+      font-size: .78rem;
+      text-transform: uppercase;
+    }
+    .status-pass { background: var(--success-bg); color: var(--success); }
+    .status-fail { background: var(--fail-bg); color: var(--fail); }
+    .layer-badge {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 6px;
+      font-size: .75rem;
+      font-weight: 600;
+    }
+    .layer-backend { background: #3b82f620; color: #60a5fa; }
+    .layer-frontend { background: #f59e0b20; color: #fbbf24; }
+    .type-badge {
+      font-size: .75rem;
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: .8rem;
+      padding: 2rem 0 1rem;
+      border-top: 1px solid var(--border);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <!-- Header -->
+    <div class="header">
+      <h1>📦 <span>Packora</span> — Full Test Report</h1>
+      <p class="subtitle">Backend (Spring Boot 4) + Frontend (React 19) — Automated Test Results</p>
+      <p class="date">Generated: Tuesday, June 16, 2026 at 1:28:32 PM</p>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats">
+      <div class="stat-card total">
+        <div class="number">108</div>
+        <div class="label">Total Tests</div>
+      </div>
+      <div class="stat-card pass">
+        <div class="number">108</div>
+        <div class="label">Passed</div>
+      </div>
+      <div class="stat-card fail">
+        <div class="number">0</div>
+        <div class="label">Failed</div>
+      </div>
+      <div class="stat-card rate">
+        <div class="number">100.0%</div>
+        <div class="label">Pass Rate</div>
+      </div>
+    </div>
+
+    <!-- Backend Tests -->
+    <div class="section">
+      <h2 class="section-title">
+        🔷 Backend Tests (Spring Boot 4 + JUnit 5)
+        <span class="badge">60 tests</span>
+      </h2>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Test Suite</th>
+            <th>Test Name</th>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Status</th>
+            <th>Duration</th>
+          </tr>
+        </thead>
+        <tbody>
+          
+          <tr>
+            <td>BE-001</td>
+            <td>BackendApplicationTests</td>
+            <td>contextLoads</td>
+            <td><span class="type-badge">Integration</span></td>
+            <td>Verifies the Spring Boot application context loads successfully with all beans</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>1.625s</td>
+          </tr>
+          <tr>
+            <td>BE-002</td>
+            <td>ProductRepositoryTest</td>
+            <td>saveProduct_shouldPersistAndGenerateId</td>
+            <td><span class="type-badge">Database</span></td>
+            <td>DB-001: Save a new product and verify it's persisted</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>12ms</td>
+          </tr>
+          <tr>
+            <td>BE-003</td>
+            <td>ProductRepositoryTest</td>
+            <td>saveProduct_shouldPersistSizesAndMaterials</td>
+            <td><span class="type-badge">Database</span></td>
+            <td>DB-002: Save product with sizes and materials (ElementCollection)</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>8ms</td>
+          </tr>
+          <tr>
+            <td>BE-004</td>
+            <td>ProductRepositoryTest</td>
+            <td>findById_shouldReturnProduct</td>
+            <td><span class="type-badge">Database</span></td>
+            <td>DB-003: Find product by ID</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>6ms</td>
+          </tr>
+          <tr>
+            <td>BE-005</td>
+            <td>ProductRepositoryTest</td>
+            <td>findById_shouldReturnEmptyForNonExistent</td>
+            <td><span class="type-badge">Database</span></td>
+            <td>DB-004: Find product by ID returns empty for non-existent ID</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>4ms</td>
+          </tr>
+          <tr>
+            <td>BE-006</td>
+            <td>ProductRepositoryTest</td>
+            <td>findByName_shouldReturnMatchingProduct</td>
+            <td><span class="type-badge">Database</span></td>
+            <td>DB-005: Find product by exact name</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>7ms</td>
+          </tr>
+          <tr>
+            <td>BE-007</td>
+            <td>ProductRepositoryTest</td>
+            <td>findByCategory_shouldReturnAllInCategory</td>
+            <td><span class="type-badge">Database</span></td>
+            <td>DB-006: Find products by category</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>9ms</td>
+          </tr>
+          <tr>
+            <td>BE-008</td>
+            <td>ProductRepositoryTest</td>
+            <td>findByCategory_shouldReturnEmptyForUnknown</td>
+            <td><span class="type-badge">Database</span></td>
+            <td>DB-007: Find products by category returns empty for unknown category</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>5ms</td>
+          </tr>
+          <tr>
+            <td>BE-009</td>
+            <td>ProductRepositoryTest</td>
+            <td>findByInStockTrue_shouldReturnOnlyInStockProducts</td>
+            <td><span class="type-badge">Database</span></td>
+            <td>DB-008: Find only in-stock products</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>8ms</td>
+          </tr>
+          <tr>
+            <td>BE-010</td>
+            <td>ProductRepositoryTest</td>
+            <td>findByCategoryAndInStockTrue_shouldFilterByCategoryAndStock</td>
+            <td><span class="type-badge">Database</span></td>
+            <td>DB-009: Find in-stock products by category</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>8ms</td>
+          </tr>
+          <tr>
+            <td>BE-011</td>
+            <td>ProductRepositoryTest</td>
+            <td>findByNameContainingIgnoreCase_shouldSearchCaseInsensitive</td>
+            <td><span class="type-badge">Database</span></td>
+            <td>DB-010: Search products by name keyword (case-insensitive)</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>11ms</td>
+          </tr>
+          <tr>
+            <td>BE-012</td>
+            <td>ProductRepositoryTest</td>
+            <td>findByNameContainingIgnoreCase_shouldReturnEmptyForNoMatch</td>
+            <td><span class="type-badge">Database</span></td>
+            <td>DB-011: Search with no matching keyword returns empty list</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>5ms</td>
+          </tr>
+          <tr>
+            <td>BE-013</td>
+            <td>ProductRepositoryTest</td>
+            <td>findAll_shouldReturnAllProducts</td>
+            <td><span class="type-badge">Database</span></td>
+            <td>DB-012: Find all products</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>9ms</td>
+          </tr>
+          <tr>
+            <td>BE-014</td>
+            <td>ProductRepositoryTest</td>
+            <td>updateProduct_shouldPersistPriceChange</td>
+            <td><span class="type-badge">Database</span></td>
+            <td>DB-013: Update product price</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>8ms</td>
+          </tr>
+          <tr>
+            <td>BE-015</td>
+            <td>ProductRepositoryTest</td>
+            <td>updateProduct_shouldPersistStockChange</td>
+            <td><span class="type-badge">Database</span></td>
+            <td>DB-014: Update product stock status</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>7ms</td>
+          </tr>
+          <tr>
+            <td>BE-016</td>
+            <td>ProductRepositoryTest</td>
+            <td>deleteById_shouldRemoveProduct</td>
+            <td><span class="type-badge">Database</span></td>
+            <td>DB-015: Delete product by ID</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>7ms</td>
+          </tr>
+          <tr>
+            <td>BE-017</td>
+            <td>ProductRepositoryTest</td>
+            <td>deleteAll_shouldClearTable</td>
+            <td><span class="type-badge">Database</span></td>
+            <td>DB-016: Delete all products</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>8ms</td>
+          </tr>
+          <tr>
+            <td>BE-018</td>
+            <td>ProductRepositoryTest</td>
+            <td>count_shouldReturnCorrectCount</td>
+            <td><span class="type-badge">Database</span></td>
+            <td>DB-017: Product count returns correct number</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>6ms</td>
+          </tr>
+          <tr>
+            <td>BE-019</td>
+            <td>ProductRepositoryTest</td>
+            <td>save_shouldAutoGenerateCreatedAt</td>
+            <td><span class="type-badge">Database</span></td>
+            <td>DB-018: CreatedAt timestamp is auto-generated</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>7ms</td>
+          </tr>
+          <tr>
+            <td>BE-020</td>
+            <td>UserRepositoryTest</td>
+            <td>saveBusinessOwner_shouldPersistWithAllFields</td>
+            <td><span class="type-badge">Database</span></td>
+            <td>DB-019: Save a BusinessOwner and verify persistence</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>9ms</td>
+          </tr>
+          <tr>
+            <td>BE-021</td>
+            <td>UserRepositoryTest</td>
+            <td>saveAdmin_shouldPersistWithDiscriminator</td>
+            <td><span class="type-badge">Database</span></td>
+            <td>DB-020: Save an Admin user (STI discrimination)</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>7ms</td>
+          </tr>
+          <tr>
+            <td>BE-022</td>
+            <td>UserRepositoryTest</td>
+            <td>findByEmail_shouldReturnUser</td>
+            <td><span class="type-badge">Database</span></td>
+            <td>DB-021: Find user by email</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>6ms</td>
+          </tr>
+          <tr>
+            <td>BE-023</td>
+            <td>UserRepositoryTest</td>
+            <td>findByEmail_shouldReturnEmptyForNonExistent</td>
+            <td><span class="type-badge">Database</span></td>
+            <td>DB-022: Find user by email returns empty for non-existent</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>4ms</td>
+          </tr>
+          <tr>
+            <td>BE-024</td>
+            <td>UserRepositoryTest</td>
+            <td>findByUsername_shouldReturnUser</td>
+            <td><span class="type-badge">Database</span></td>
+            <td>DB-023: Find user by username</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>6ms</td>
+          </tr>
+          <tr>
+            <td>BE-025</td>
+            <td>UserRepositoryTest</td>
+            <td>findByUsername_shouldReturnEmptyForNonExistent</td>
+            <td><span class="type-badge">Database</span></td>
+            <td>DB-024: Find user by username returns empty for non-existent</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>4ms</td>
+          </tr>
+          <tr>
+            <td>BE-026</td>
+            <td>UserRepositoryTest</td>
+            <td>existsByEmail_shouldReturnTrueWhenExists</td>
+            <td><span class="type-badge">Database</span></td>
+            <td>DB-025: existsByEmail returns true for existing email</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>6ms</td>
+          </tr>
+          <tr>
+            <td>BE-027</td>
+            <td>UserRepositoryTest</td>
+            <td>existsByEmail_shouldReturnFalseWhenNotExists</td>
+            <td><span class="type-badge">Database</span></td>
+            <td>DB-026: existsByEmail returns false for non-existing email</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>3ms</td>
+          </tr>
+          <tr>
+            <td>BE-028</td>
+            <td>UserRepositoryTest</td>
+            <td>existsByUsername_shouldReturnTrueWhenExists</td>
+            <td><span class="type-badge">Database</span></td>
+            <td>DB-027: existsByUsername returns true for existing username</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>5ms</td>
+          </tr>
+          <tr>
+            <td>BE-029</td>
+            <td>UserRepositoryTest</td>
+            <td>existsByUsername_shouldReturnFalseWhenNotExists</td>
+            <td><span class="type-badge">Database</span></td>
+            <td>DB-028: existsByUsername returns false for non-existing username</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>3ms</td>
+          </tr>
+          <tr>
+            <td>BE-030</td>
+            <td>UserRepositoryTest</td>
+            <td>updateUser_shouldPersistPhoneChange</td>
+            <td><span class="type-badge">Database</span></td>
+            <td>DB-029: Update user phone number</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>8ms</td>
+          </tr>
+          <tr>
+            <td>BE-031</td>
+            <td>UserRepositoryTest</td>
+            <td>updateUser_shouldPersistCompanyNameChange</td>
+            <td><span class="type-badge">Database</span></td>
+            <td>DB-030: Update user company name</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>8ms</td>
+          </tr>
+          <tr>
+            <td>BE-032</td>
+            <td>UserRepositoryTest</td>
+            <td>deleteById_shouldRemoveUser</td>
+            <td><span class="type-badge">Database</span></td>
+            <td>DB-031: Delete user by ID</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>7ms</td>
+          </tr>
+          <tr>
+            <td>BE-033</td>
+            <td>UserRepositoryTest</td>
+            <td>singleTableInheritance_shouldStoreAllSubtypesInOneTable</td>
+            <td><span class="type-badge">Database</span></td>
+            <td>DB-032: Both Admin and BusinessOwner stored in same table</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>9ms</td>
+          </tr>
+          <tr>
+            <td>BE-034</td>
+            <td>UserRepositoryTest</td>
+            <td>businessOwner_shouldHaveCorrectRole</td>
+            <td><span class="type-badge">Database</span></td>
+            <td>DB-033: BusinessOwner role is BUSINESS_OWNER via discriminator</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>6ms</td>
+          </tr>
+          <tr>
+            <td>BE-035</td>
+            <td>UserRepositoryTest</td>
+            <td>save_shouldAutoGenerateCreatedAt</td>
+            <td><span class="type-badge">Database</span></td>
+            <td>DB-034: CreatedAt timestamp is auto-generated on save</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>6ms</td>
+          </tr>
+          <tr>
+            <td>BE-036</td>
+            <td>UserRepositoryTest</td>
+            <td>save_shouldRejectDuplicateEmail</td>
+            <td><span class="type-badge">Database</span></td>
+            <td>DB-035: Cannot save two users with same email</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>12ms</td>
+          </tr>
+          <tr>
+            <td>BE-037</td>
+            <td>UserRepositoryTest</td>
+            <td>save_shouldRejectDuplicateUsername</td>
+            <td><span class="type-badge">Database</span></td>
+            <td>DB-036: Cannot save two users with same username</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>11ms</td>
+          </tr>
+          <tr>
+            <td>BE-038</td>
+            <td>OrderRepositoryTest</td>
+            <td>saveOrder_shouldPersistWithAllFields</td>
+            <td><span class="type-badge">Database</span></td>
+            <td>DB-037: Save a new order and verify persistence</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>8ms</td>
+          </tr>
+          <tr>
+            <td>BE-039</td>
+            <td>OrderRepositoryTest</td>
+            <td>saveOrder_shouldDefaultToPending</td>
+            <td><span class="type-badge">Database</span></td>
+            <td>DB-038: Order defaults to PENDING status</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>7ms</td>
+          </tr>
+          <tr>
+            <td>BE-040</td>
+            <td>OrderRepositoryTest</td>
+            <td>findById_shouldReturnOrder</td>
+            <td><span class="type-badge">Database</span></td>
+            <td>DB-039: Find order by ID</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>5ms</td>
+          </tr>
+          <tr>
+            <td>BE-041</td>
+            <td>OrderRepositoryTest</td>
+            <td>findByUserId_shouldReturnUserOrders</td>
+            <td><span class="type-badge">Database</span></td>
+            <td>DB-040: Find orders by user ID</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>9ms</td>
+          </tr>
+          <tr>
+            <td>BE-042</td>
+            <td>OrderRepositoryTest</td>
+            <td>findByStatus_shouldReturnMatchingOrders</td>
+            <td><span class="type-badge">Database</span></td>
+            <td>DB-041: Find orders by status</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>8ms</td>
+          </tr>
+          <tr>
+            <td>BE-043</td>
+            <td>OrderRepositoryTest</td>
+            <td>findByUserIdOrderByOrderDateDesc_shouldReturnSorted</td>
+            <td><span class="type-badge">Database</span></td>
+            <td>DB-042: Find user orders ordered by date descending</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>9ms</td>
+          </tr>
+          <tr>
+            <td>BE-044</td>
+            <td>OrderRepositoryTest</td>
+            <td>findTop5ByOrderByOrderDateDesc_shouldReturnMaxFive</td>
+            <td><span class="type-badge">Database</span></td>
+            <td>DB-043: Find top 5 recent orders</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>12ms</td>
+          </tr>
+          <tr>
+            <td>BE-045</td>
+            <td>OrderRepositoryTest</td>
+            <td>findByBulkGroupId_shouldReturnGroupedOrders</td>
+            <td><span class="type-badge">Database</span></td>
+            <td>DB-044: Find orders by bulk group ID</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>9ms</td>
+          </tr>
+          <tr>
+            <td>BE-046</td>
+            <td>OrderRepositoryTest</td>
+            <td>countOrders_shouldReturnCorrectCount</td>
+            <td><span class="type-badge">Database</span></td>
+            <td>DB-045: Count all orders</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>6ms</td>
+          </tr>
+          <tr>
+            <td>BE-047</td>
+            <td>OrderRepositoryTest</td>
+            <td>sumRevenue_shouldExcludeCancelled</td>
+            <td><span class="type-badge">Database</span></td>
+            <td>DB-046: Sum revenue excludes cancelled orders</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>8ms</td>
+          </tr>
+          <tr>
+            <td>BE-048</td>
+            <td>OrderRepositoryTest</td>
+            <td>updateStatus_shouldPersistChange</td>
+            <td><span class="type-badge">Database</span></td>
+            <td>DB-047: Update order status to SHIPPED</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>7ms</td>
+          </tr>
+          <tr>
+            <td>BE-049</td>
+            <td>OrderRepositoryTest</td>
+            <td>cancelOrder_shouldSetStatusToCancelled</td>
+            <td><span class="type-badge">Database</span></td>
+            <td>DB-048: Cancel order by updating status</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>7ms</td>
+          </tr>
+          <tr>
+            <td>BE-050</td>
+            <td>OrderRepositoryTest</td>
+            <td>deleteById_shouldRemoveOrder</td>
+            <td><span class="type-badge">Database</span></td>
+            <td>DB-049: Delete order by ID</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>6ms</td>
+          </tr>
+          <tr>
+            <td>BE-051</td>
+            <td>OrderRepositoryTest</td>
+            <td>save_shouldAutoGenerateOrderDate</td>
+            <td><span class="type-badge">Database</span></td>
+            <td>DB-050: OrderDate timestamp is auto-generated</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>6ms</td>
+          </tr>
+          <tr>
+            <td>BE-052</td>
+            <td>TicketRepositoryTest</td>
+            <td>saveGuestTicket_shouldPersistWithAllFields</td>
+            <td><span class="type-badge">Database</span></td>
+            <td>DB-051: Save a guest contact/support ticket and verify persistence</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>7ms</td>
+          </tr>
+          <tr>
+            <td>BE-053</td>
+            <td>TicketRepositoryTest</td>
+            <td>saveUserTicket_shouldPersistWithUserAndStaffAssociations</td>
+            <td><span class="type-badge">Database</span></td>
+            <td>DB-052: Save a registered user support ticket with associations</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>9ms</td>
+          </tr>
+          <tr>
+            <td>BE-054</td>
+            <td>TicketRepositoryTest</td>
+            <td>findById_shouldReturnTicket</td>
+            <td><span class="type-badge">Database</span></td>
+            <td>DB-053: Find ticket by ID</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>5ms</td>
+          </tr>
+          <tr>
+            <td>BE-055</td>
+            <td>TicketRepositoryTest</td>
+            <td>findByUserId_shouldReturnAssociatedTickets</td>
+            <td><span class="type-badge">Database</span></td>
+            <td>DB-054: Find tickets by user ID</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>10ms</td>
+          </tr>
+          <tr>
+            <td>BE-056</td>
+            <td>TicketRepositoryTest</td>
+            <td>findByAssignedStaffId_shouldReturnStaffTickets</td>
+            <td><span class="type-badge">Database</span></td>
+            <td>DB-055: Find tickets by assigned staff ID</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>7ms</td>
+          </tr>
+          <tr>
+            <td>BE-057</td>
+            <td>TicketRepositoryTest</td>
+            <td>findByStatus_shouldFilterTickets</td>
+            <td><span class="type-badge">Database</span></td>
+            <td>DB-056: Find tickets by status</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>8ms</td>
+          </tr>
+          <tr>
+            <td>BE-058</td>
+            <td>TicketRepositoryTest</td>
+            <td>updateTicket_shouldPersistStatusAndStaffChanges</td>
+            <td><span class="type-badge">Database</span></td>
+            <td>DB-057: Update ticket status and assigned staff</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>8ms</td>
+          </tr>
+          <tr>
+            <td>BE-059</td>
+            <td>TicketRepositoryTest</td>
+            <td>deleteById_shouldRemoveTicket</td>
+            <td><span class="type-badge">Database</span></td>
+            <td>DB-058: Delete ticket by ID</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>5ms</td>
+          </tr>
+          <tr>
+            <td>BE-060</td>
+            <td>TicketRepositoryTest</td>
+            <td>save_shouldAutoGenerateTimestamps</td>
+            <td><span class="type-badge">Database</span></td>
+            <td>DB-059: Ticket timestamps are auto-generated</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>6ms</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Frontend Tests -->
+    <div class="section">
+      <h2 class="section-title">
+        🔶 Frontend Tests (React 19 + Jest + Testing Library)
+        <span class="badge">48 tests</span>
+      </h2>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Test Suite</th>
+            <th>Test Name</th>
+            <th>Type</th>
+            <th>Component</th>
+            <th>Status</th>
+            <th>Duration</th>
+          </tr>
+        </thead>
+        <tbody>
+          
+          <tr>
+            <td>FE-001</td>
+            <td>adminFormat.test.js</td>
+            <td>parseAmount - returns number as-is when given a number</td>
+            <td><span class="type-badge">Unit</span></td>
+            <td>Utils / adminFormat</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>1ms</td>
+          </tr>
+          <tr>
+            <td>FE-002</td>
+            <td>adminFormat.test.js</td>
+            <td>parseAmount - strips currency symbols and returns a number</td>
+            <td><span class="type-badge">Unit</span></td>
+            <td>Utils / adminFormat</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>1ms</td>
+          </tr>
+          <tr>
+            <td>FE-003</td>
+            <td>adminFormat.test.js</td>
+            <td>parseAmount - returns 0 for null or undefined</td>
+            <td><span class="type-badge">Unit</span></td>
+            <td>Utils / adminFormat</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>1ms</td>
+          </tr>
+          <tr>
+            <td>FE-004</td>
+            <td>adminFormat.test.js</td>
+            <td>parseAmount - returns 0 for non-numeric strings</td>
+            <td><span class="type-badge">Unit</span></td>
+            <td>Utils / adminFormat</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>1ms</td>
+          </tr>
+          <tr>
+            <td>FE-005</td>
+            <td>adminFormat.test.js</td>
+            <td>formatMoney - formats integer amounts in EGP without decimals</td>
+            <td><span class="type-badge">Unit</span></td>
+            <td>Utils / adminFormat</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>17ms</td>
+          </tr>
+          <tr>
+            <td>FE-006</td>
+            <td>adminFormat.test.js</td>
+            <td>formatMoney - formats zero correctly</td>
+            <td><span class="type-badge">Unit</span></td>
+            <td>Utils / adminFormat</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>1ms</td>
+          </tr>
+          <tr>
+            <td>FE-007</td>
+            <td>adminFormat.test.js</td>
+            <td>formatMoneyDecimal - formats amounts with 2 decimal places</td>
+            <td><span class="type-badge">Unit</span></td>
+            <td>Utils / adminFormat</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>1ms</td>
+          </tr>
+          <tr>
+            <td>FE-008</td>
+            <td>adminFormat.test.js</td>
+            <td>formatMoneyDecimal - formats zero with decimals</td>
+            <td><span class="type-badge">Unit</span></td>
+            <td>Utils / adminFormat</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>1ms</td>
+          </tr>
+          <tr>
+            <td>FE-009</td>
+            <td>api.test.js</td>
+            <td>getStoredToken - returns null when localStorage is empty</td>
+            <td><span class="type-badge">Unit</span></td>
+            <td>Utils / api</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>1ms</td>
+          </tr>
+          <tr>
+            <td>FE-010</td>
+            <td>api.test.js</td>
+            <td>getStoredToken - returns the token when valid auth data is stored</td>
+            <td><span class="type-badge">Unit</span></td>
+            <td>Utils / api</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>1ms</td>
+          </tr>
+          <tr>
+            <td>FE-011</td>
+            <td>api.test.js</td>
+            <td>getStoredToken - returns null when stored data has no token field</td>
+            <td><span class="type-badge">Unit</span></td>
+            <td>Utils / api</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>1ms</td>
+          </tr>
+          <tr>
+            <td>FE-012</td>
+            <td>api.test.js</td>
+            <td>getStoredToken - returns null when stored data is malformed JSON</td>
+            <td><span class="type-badge">Unit</span></td>
+            <td>Utils / api</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>1ms</td>
+          </tr>
+          <tr>
+            <td>FE-013</td>
+            <td>api.test.js</td>
+            <td>API_BASE - is a non-empty string</td>
+            <td><span class="type-badge">Unit</span></td>
+            <td>Utils / api</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>1ms</td>
+          </tr>
+          <tr>
+            <td>FE-014</td>
+            <td>api.test.js</td>
+            <td>API_BASE - defaults to localhost when no env var set</td>
+            <td><span class="type-badge">Unit</span></td>
+            <td>Utils / api</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>1ms</td>
+          </tr>
+          <tr>
+            <td>FE-015</td>
+            <td>AuthContext.test.js</td>
+            <td>emailToDisplayName - converts dot-separated email to title case</td>
+            <td><span class="type-badge">Unit</span></td>
+            <td>Context / AuthContext</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>1ms</td>
+          </tr>
+          <tr>
+            <td>FE-016</td>
+            <td>AuthContext.test.js</td>
+            <td>emailToDisplayName - converts underscore-separated email</td>
+            <td><span class="type-badge">Unit</span></td>
+            <td>Context / AuthContext</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>1ms</td>
+          </tr>
+          <tr>
+            <td>FE-017</td>
+            <td>AuthContext.test.js</td>
+            <td>emailToDisplayName - converts hyphen-separated email</td>
+            <td><span class="type-badge">Unit</span></td>
+            <td>Context / AuthContext</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>1ms</td>
+          </tr>
+          <tr>
+            <td>FE-018</td>
+            <td>AuthContext.test.js</td>
+            <td>emailToDisplayName - handles single word prefix</td>
+            <td><span class="type-badge">Unit</span></td>
+            <td>Context / AuthContext</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>1ms</td>
+          </tr>
+          <tr>
+            <td>FE-019</td>
+            <td>AuthContext.test.js</td>
+            <td>emailToDisplayName - returns "User" for empty string</td>
+            <td><span class="type-badge">Unit</span></td>
+            <td>Context / AuthContext</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>1ms</td>
+          </tr>
+          <tr>
+            <td>FE-020</td>
+            <td>AuthContext.test.js</td>
+            <td>emailToDisplayName - returns "User" for null</td>
+            <td><span class="type-badge">Unit</span></td>
+            <td>Context / AuthContext</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>1ms</td>
+          </tr>
+          <tr>
+            <td>FE-021</td>
+            <td>AuthContext.test.js</td>
+            <td>emailToDisplayName - handles email with numbers</td>
+            <td><span class="type-badge">Unit</span></td>
+            <td>Context / AuthContext</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>1ms</td>
+          </tr>
+          <tr>
+            <td>FE-022</td>
+            <td>LoginPage.test.jsx</td>
+            <td>renders the page title "Welcome Back"</td>
+            <td><span class="type-badge">Component</span></td>
+            <td>LoginPage</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>36ms</td>
+          </tr>
+          <tr>
+            <td>FE-023</td>
+            <td>LoginPage.test.jsx</td>
+            <td>renders subtitle text</td>
+            <td><span class="type-badge">Component</span></td>
+            <td>LoginPage</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>6ms</td>
+          </tr>
+          <tr>
+            <td>FE-024</td>
+            <td>LoginPage.test.jsx</td>
+            <td>renders email and password input fields</td>
+            <td><span class="type-badge">Component</span></td>
+            <td>LoginPage</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>10ms</td>
+          </tr>
+          <tr>
+            <td>FE-025</td>
+            <td>LoginPage.test.jsx</td>
+            <td>renders the Sign In button</td>
+            <td><span class="type-badge">Component</span></td>
+            <td>LoginPage</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>32ms</td>
+          </tr>
+          <tr>
+            <td>FE-026</td>
+            <td>LoginPage.test.jsx</td>
+            <td>renders "Forgot password?" link</td>
+            <td><span class="type-badge">Component</span></td>
+            <td>LoginPage</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>5ms</td>
+          </tr>
+          <tr>
+            <td>FE-027</td>
+            <td>LoginPage.test.jsx</td>
+            <td>renders "Create one now" sign-up link</td>
+            <td><span class="type-badge">Component</span></td>
+            <td>LoginPage</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>4ms</td>
+          </tr>
+          <tr>
+            <td>FE-028</td>
+            <td>LoginPage.test.jsx</td>
+            <td>renders Remember me checkbox</td>
+            <td><span class="type-badge">Component</span></td>
+            <td>LoginPage</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>7ms</td>
+          </tr>
+          <tr>
+            <td>FE-029</td>
+            <td>LoginPage.test.jsx</td>
+            <td>email input accepts typed text</td>
+            <td><span class="type-badge">Component</span></td>
+            <td>LoginPage</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>47ms</td>
+          </tr>
+          <tr>
+            <td>FE-030</td>
+            <td>LoginPage.test.jsx</td>
+            <td>password input accepts typed text</td>
+            <td><span class="type-badge">Component</span></td>
+            <td>LoginPage</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>28ms</td>
+          </tr>
+          <tr>
+            <td>FE-031</td>
+            <td>LoginPage.test.jsx</td>
+            <td>shows "Signing in..." when form is submitted</td>
+            <td><span class="type-badge">Component</span></td>
+            <td>LoginPage</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>62ms</td>
+          </tr>
+          <tr>
+            <td>FE-032</td>
+            <td>LoginPage.test.jsx</td>
+            <td>shows error message on failed login</td>
+            <td><span class="type-badge">Component</span></td>
+            <td>LoginPage</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>63ms</td>
+          </tr>
+          <tr>
+            <td>FE-033</td>
+            <td>LoginPage.test.jsx</td>
+            <td>shows connection error when fetch throws</td>
+            <td><span class="type-badge">Component</span></td>
+            <td>LoginPage</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>97ms</td>
+          </tr>
+          <tr>
+            <td>FE-034</td>
+            <td>Navbar.test.jsx</td>
+            <td>renders the Packora brand name</td>
+            <td><span class="type-badge">Component</span></td>
+            <td>Navbar</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>26ms</td>
+          </tr>
+          <tr>
+            <td>FE-035</td>
+            <td>Navbar.test.jsx</td>
+            <td>renders all main nav links</td>
+            <td><span class="type-badge">Component</span></td>
+            <td>Navbar</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>4ms</td>
+          </tr>
+          <tr>
+            <td>FE-036</td>
+            <td>Navbar.test.jsx</td>
+            <td>shows Login link when user is not logged in</td>
+            <td><span class="type-badge">Component</span></td>
+            <td>Navbar</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>3ms</td>
+          </tr>
+          <tr>
+            <td>FE-037</td>
+            <td>Navbar.test.jsx</td>
+            <td>does NOT show Logout button when not logged in</td>
+            <td><span class="type-badge">Component</span></td>
+            <td>Navbar</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>3ms</td>
+          </tr>
+          <tr>
+            <td>FE-038</td>
+            <td>Navbar.test.jsx</td>
+            <td>does NOT show Profile link when not logged in</td>
+            <td><span class="type-badge">Component</span></td>
+            <td>Navbar</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>3ms</td>
+          </tr>
+          <tr>
+            <td>FE-039</td>
+            <td>RequireAuth.test.jsx</td>
+            <td>renders children when user is logged in</td>
+            <td><span class="type-badge">Component</span></td>
+            <td>RequireAuth Guard</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>23ms</td>
+          </tr>
+          <tr>
+            <td>FE-040</td>
+            <td>RequireAuth.test.jsx</td>
+            <td>redirects to /login when user is NOT logged in</td>
+            <td><span class="type-badge">Component</span></td>
+            <td>RequireAuth Guard</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>3ms</td>
+          </tr>
+          <tr>
+            <td>FE-041</td>
+            <td>PaymentSuccess.test.jsx</td>
+            <td>renders "Payment Successful!" heading</td>
+            <td><span class="type-badge">Component</span></td>
+            <td>PaymentSuccess</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>15ms</td>
+          </tr>
+          <tr>
+            <td>FE-042</td>
+            <td>PaymentSuccess.test.jsx</td>
+            <td>renders success message body text</td>
+            <td><span class="type-badge">Component</span></td>
+            <td>PaymentSuccess</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>5ms</td>
+          </tr>
+          <tr>
+            <td>FE-043</td>
+            <td>PaymentSuccess.test.jsx</td>
+            <td>shows "View My Orders" button</td>
+            <td><span class="type-badge">Component</span></td>
+            <td>PaymentSuccess</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>4ms</td>
+          </tr>
+          <tr>
+            <td>FE-044</td>
+            <td>PaymentSuccess.test.jsx</td>
+            <td>shows "Continue Shopping" button</td>
+            <td><span class="type-badge">Component</span></td>
+            <td>PaymentSuccess</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>4ms</td>
+          </tr>
+          <tr>
+            <td>FE-045</td>
+            <td>PaymentSuccess.test.jsx</td>
+            <td>displays transaction ID when txn param is provided</td>
+            <td><span class="type-badge">Component</span></td>
+            <td>PaymentSuccess</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>5ms</td>
+          </tr>
+          <tr>
+            <td>FE-046</td>
+            <td>PaymentSuccess.test.jsx</td>
+            <td>does NOT show transaction reference when absent</td>
+            <td><span class="type-badge">Component</span></td>
+            <td>PaymentSuccess</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>3ms</td>
+          </tr>
+          <tr>
+            <td>FE-047</td>
+            <td>PaymentSuccess.test.jsx</td>
+            <td>navigates to Track page when "View My Orders" clicked</td>
+            <td><span class="type-badge">Component</span></td>
+            <td>PaymentSuccess</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>20ms</td>
+          </tr>
+          <tr>
+            <td>FE-048</td>
+            <td>PaymentSuccess.test.jsx</td>
+            <td>navigates to Catalog page when "Continue Shopping" clicked</td>
+            <td><span class="type-badge">Component</span></td>
+            <td>PaymentSuccess</td>
+            <td><span class="status-badge status-pass">✅ PASS</span></td>
+            <td>10ms</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <p>Packora Test Report — Generated automatically | Backend: JUnit 5 + Mockito + JaCoCo | Frontend: Jest + React Testing Library</p>
+      <p>To regenerate: <code>node generate-test-report.js</code> (Excel) or run <code>CI=true npm test</code> (Frontend) + <code>cd backend && ./mvnw test</code> (Backend)</p>
+    </div>
+  </div>
+</body>
+</html>

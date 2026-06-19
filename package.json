@@ -34,7 +34,28 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
+    "test:report": "CI=true react-scripts test --reporters=default --reporters=jest-html-reporter",
+    "test:coverage": "CI=true react-scripts test --coverage --coverageReporters=text --coverageReporters=html --coverageReporters=lcov",
     "eject": "react-scripts eject"
+  },
+  "jest": {
+    "collectCoverageFrom": [
+      "src/**/*.{js,jsx}",
+      "!src/index.js",
+      "!src/**/*.test.{js,jsx}"
+    ],
+    "moduleNameMapper": {
+      "^react-router-dom$": "<rootDir>/node_modules/react-router-dom/dist/index.js",
+      "^react-router$": "<rootDir>/node_modules/react-router/dist/development/index.js",
+      "^react-router/dom$": "<rootDir>/node_modules/react-router/dist/development/dom-export.js",
+      "^react-router/internal$": "<rootDir>/node_modules/react-router/dist/development/index.js"
+    }
+  },
+  "jest-html-reporter": {
+    "pageTitle": "Packora Frontend Test Report",
+    "outputPath": "./test-reports/test-report.html",
+    "includeFailureMsg": true,
+    "includeConsoleLog": true
   },
   "eslintConfig": {
     "extends": [
@@ -56,6 +77,7 @@
   },
   "devDependencies": {
     "autoprefixer": "^10.5.0",
+    "jest-html-reporter": "^3.10.2",
     "postcss": "^8.5.10",
     "tailwindcss": "^4.2.2"
   }
